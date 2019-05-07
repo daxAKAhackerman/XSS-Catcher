@@ -3,7 +3,6 @@ from app import db
 from app.models import Client, XSS
 from app.api import bp
 from flask_login import login_required
-import html
 
 
 @bp.route('/xss/stored/<guid>', methods=['GET'])
@@ -94,7 +93,7 @@ def gen_xss(id):
         payload = """'>"><img src="{}api/xss/{}/{}" />""".format(
             url, xss_type, guid)
 
-    return html.escape(payload)
+    return (payload)
 
 
 @bp.route('/xss/<id>', methods=['DELETE'])
