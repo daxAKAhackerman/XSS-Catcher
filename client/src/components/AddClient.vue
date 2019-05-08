@@ -74,7 +74,9 @@ export default {
           this.resetNewClient()
         })
         .catch(error => {
-          console.error(error.response.data)
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
+            console.error(error.response.data)
+          }
         })
     },
     resetNewClient () {

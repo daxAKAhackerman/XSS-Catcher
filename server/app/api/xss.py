@@ -24,6 +24,15 @@ def catch_stored_xss(guid):
         if not (param == 'cookies' or param == 'local_storage' or param == 'session_storage'):
             other_data += '{}={};'.format(param, value)
 
+    if cookies == '':
+        cookies = None
+
+    if local_storage == '' or local_storage == '{}':
+        local_storage = None
+
+    if session_storage == '' or session_storage == '{}':
+        session_storage = None
+
     if other_data == '':
         other_data = None
 
@@ -48,6 +57,18 @@ def catch_reflected_xss(guid):
     session_storage = request.args.get('session_storage')
     xss_type = 'reflected'
     other_data = ''
+
+    if cookies == '':
+        cookies = None
+
+    if local_storage == '' or local_storage == '{}':
+        local_storage = None
+
+    if session_storage == '' or session_storage == '{}':
+        session_storage = None
+
+    if other_data == '':
+        other_data = None
 
     xss = XSS(referer=referer, user_agent=str(user_agent), ip_addr=ip_addr,
               cookies=cookies, client_id=client.id, xss_type=xss_type, local_storage=local_storage, session_storage=session_storage, other_data=other_data)
