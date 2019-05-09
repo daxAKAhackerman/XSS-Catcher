@@ -56,7 +56,12 @@ def catch_reflected_xss(guid):
     local_storage = request.args.get('local_storage')
     session_storage = request.args.get('session_storage')
     xss_type = 'reflected'
+    other_data_dict = request.args.to_dict()
     other_data = ''
+
+    for param, value in other_data_dict.items():
+        if not (param == 'cookies' or param == 'local_storage' or param == 'session_storage'):
+            other_data += '{}={};'.format(param, value)
 
     if cookies == '':
         cookies = None

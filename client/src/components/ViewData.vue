@@ -7,6 +7,7 @@
     hide-footer
     size="xl"
     @show="getData"
+    @hide="$parent.getClients"
   >
 
     <h1 class="text-left">Cookies</h1>
@@ -16,10 +17,18 @@
         <tr
           v-for="(cookie_value,cookie_id) in data.cookies"
           v-bind:key="cookie_id"
-          class="text-left"
         >
-          <td>{{ cookie_value }}</td>
+          <td class="text-left">{{ cookie_value }}</td>
+          <td class="text-right">
+            <b-button
+              @click="deleteData('cookies', cookie_id)"
+              type="button"
+              variant="danger"
+            >Delete
+            </b-button>
+          </td>
         </tr>
+
       </tbody>
     </table>
 
@@ -30,9 +39,16 @@
         <tr
           v-for="(local_storage_value,local_storage_id) in data.local_storage"
           v-bind:key="local_storage_id"
-          class="text-left"
         >
-          <td>{{ local_storage_value }}</td>
+          <td class="text-left">{{ local_storage_value }}</td>
+          <td class="text-right">
+            <b-button
+              @click="deleteData('local_storage', local_storage_id)"
+              type="button"
+              variant="danger"
+            >Delete
+            </b-button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -44,9 +60,16 @@
         <tr
           v-for="(session_storage_value,session_storage_id) in data.session_storage"
           v-bind:key="session_storage_id"
-          class="text-left"
         >
-          <td>{{ session_storage_value }}</td>
+          <td class="text-left">{{ session_storage_value }}</td>
+          <td class="text-right">
+            <b-button
+              @click="deleteData('session_storage', session_storage_id)"
+              type="button"
+              variant="danger"
+            >Delete
+            </b-button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -58,9 +81,16 @@
         <tr
           v-for="(other_value,other_id) in data.other_data"
           v-bind:key="other_id"
-          class="text-left"
         >
-          <td>{{ other_value }}</td>
+          <td class="text-left">{{ other_value }}</td>
+          <td class="text-right">
+            <b-button
+              @click="deleteData('other_data', other_id)"
+              type="button"
+              variant="danger"
+            >Delete
+            </b-button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -92,6 +122,19 @@ export default {
       axios.get(path)
         .then(response => {
           this.data = response.data
+        })
+        .catch(error => {
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
+            console.error(error.response.data)
+          }
+        })
+    },
+    deleteData (dataType, xssID) {
+      const path = basePath + '/xss/' + xssID + '/' + dataType
+
+      axios.delete(path)
+        .then(response => {
+          this.getData()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {

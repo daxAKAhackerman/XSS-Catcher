@@ -46,10 +46,15 @@
                   {{ client.name }}
 
                 </td>
-                <td>{{ client.stored }}</td>
                 <td>
                   <b-link
-                    @click="xss_type='reflected'"
+                    @click="xss_type='stored'; viewed_client=client.id"
+                    v-b-modal.view-XSS-modal
+                  >{{ client.stored }}</b-link>
+                </td>
+                <td>
+                  <b-link
+                    @click="xss_type='reflected'; viewed_client=client.id"
                     v-b-modal.view-XSS-modal
                   >{{ client.reflected }}
                   </b-link>
@@ -86,7 +91,10 @@
     <AddClient />
     <GetPayload :client_id=viewed_client />
     <ViewData :client_id=viewed_client />
-    <ViewXSS :xss_type=xss_type />
+    <ViewXSS
+      :xss_type=xss_type
+      :client_id=viewed_client
+    />
 
   </b-container>
 </template>

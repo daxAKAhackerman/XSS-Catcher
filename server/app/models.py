@@ -22,7 +22,10 @@ class Client(db.Model):
                 xss_type='reflected').count(),
             'stored': XSS.query.filter_by(client_id=self.id).filter_by(
                 xss_type='stored').count(),
-            'cookies': XSS.query.filter_by(client_id=self.id).filter(XSS.cookies != None).count()
+            'cookies': (XSS.query.filter_by(client_id=self.id).filter(XSS.cookies != None).count() + \
+                        XSS.query.filter_by(client_id=self.id).filter(XSS.local_storage != None).count() + \
+                        XSS.query.filter_by(client_id=self.id).filter(XSS.session_storage != None).count() + \
+                        XSS.query.filter_by(client_id=self.id).filter(XSS.other_data != None).count())
         }
         return data
 

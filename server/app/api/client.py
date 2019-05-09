@@ -70,6 +70,7 @@ def get_client(id):
     elif request.method == 'DELETE':
 
         client = Client.query.filter_by(id=id).first_or_404()
+        XSS.query.filter_by(client_id=id).delete()
 
         db.session.delete(client)
         db.session.commit()
@@ -112,25 +113,25 @@ def get_client_reflected(id):
 def get_client_loot(id):
 
     loot = {
-        'cookies': [],
-        'local_storage': [],
-        'session_storage': [],
-        'other_data': []
+        'cookies': {},
+        'local_storage': {},
+        'session_storage': {},
+        'other_data': {}
     }
 
     xss = XSS.query.filter_by(client_id=id).all()
 
     for hit in xss:
         if hit.cookies != None:
-            loot['cookies'].append(hit.cookies)
+            loot['cookies'][hit.id] = hit.cookies
 
         if hit.local_storage != None:
-            loot['local_storage'].append(hit.local_storage)
+            loot['local_storage'][hit.id] = hit.local_storage
 
         if hit.session_storage != None:
-            loot['session_storage'].append(hit.session_storage)
+            loot['session_storage'][hit.id] = hit.session_storage
 
         if hit.other_data != None: 
-            loot['other_data'].append(hit.other_data)
+            loot['other_data'][hit.id] = hit.other_data
 
     return jsonify(loot)
