@@ -24,7 +24,7 @@
           v-for="hit in orderBy(dataXSS, 'timestamp')"
           v-bind:key="hit.id"
         >
-          <td>{{ hit.timestamp | moment('timezone', 'America/Anchorage', 'MMMM Do YYYY, HH:mm:ss') }} </td>
+          <td>{{ convertTimestamp(hit.timestamp) }} </td>
           <td>{{ hit.referer }}</td>
           <td>{{ hit.ip_addr}}</td>
           <td>
@@ -58,6 +58,7 @@ import axios from 'axios'
 import Vue2Filters from 'vue2-filters'
 
 import ViewDetails from './ViewDetails'
+import moment from 'moment'
 
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -102,6 +103,10 @@ export default {
             console.error(error.response.data)
           }
         })
+    },
+    convertTimestamp (timestamp) {
+      let timestampLocal = moment(timestamp).format('MM-DD-YYYY HH:mm:ss')
+      return timestampLocal
     }
   }
 

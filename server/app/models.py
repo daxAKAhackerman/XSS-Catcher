@@ -1,7 +1,8 @@
 from app import db, login
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from sqlalchemy import DateTime
+from sqlalchemy.sql.expression import func
 import uuid
 import random
 import string
@@ -57,7 +58,7 @@ class XSS(db.Model):
     local_storage = db.Column(db.TEXT)
     session_storage = db.Column(db.TEXT)
     other_data = db.Column(db.TEXT)
-    timestamp = db.Column(db.TEXT, default=datetime.utcnow)
+    timestamp = db.Column(DateTime, default=func.now(), onupdate=func.now())
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
     xss_type = db.Column(db.String(9))
 
