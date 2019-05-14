@@ -19,9 +19,18 @@
               new client</b-button>
           </b-col>
           <b-col
-            offset-sm="3"
-            sm="6"
+            offset-sm="6"
+            sm="3"
+            class="text-right"
           >
+            <b-button variant="success">
+              Create user
+            </b-button>
+            <b-button
+              type="button"
+              variant="warning"
+              @click="getLogout"
+            >Log out</b-button>
           </b-col>
         </b-row>
         <br />
@@ -43,8 +52,12 @@
                 v-bind:key="client.id"
               >
                 <td>
-                  {{ client.name }}
-
+                  <b-link
+                    @click="viewed_client=client.id"
+                    v-b-modal.view-client-modal
+                  >
+                    {{ client.name }}
+                  </b-link>
                 </td>
                 <td>
                   <b-link
@@ -95,6 +108,7 @@
       :xss_type=xss_type
       :client_id=viewed_client
     />
+    <ViewClient :client_id=viewed_client />
 
   </b-container>
 </template>
@@ -107,6 +121,7 @@ import AddClient from './AddClient'
 import GetPayload from './GetPayload'
 import ViewData from './ViewData'
 import ViewXSS from './ViewXSS'
+import ViewClient from './ViewClient'
 
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -118,7 +133,8 @@ export default {
     AddClient,
     GetPayload,
     ViewData,
-    ViewXSS
+    ViewXSS,
+    ViewClient
   },
   mixins: [Vue2Filters.mixin],
   data () {
@@ -151,6 +167,16 @@ export default {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
             console.error(error.response.data)
           }
+        })
+    },
+    getLogout () {
+      const path = basePath + '/auth/logout'
+      axios.get(path)
+        .then(response => {
+          this.$router.push({ name: 'Login' })
+        })
+        .catch(error => {
+          console.error(error.response.data)
         })
     }
   },

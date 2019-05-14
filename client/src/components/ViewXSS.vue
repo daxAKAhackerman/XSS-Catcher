@@ -30,7 +30,7 @@
           <td>
             <b-button
               type="button"
-              variant="primary"
+              variant="info"
               v-b-modal.view-details-modal
               @click="viewedXSS=hit"
             >View details
