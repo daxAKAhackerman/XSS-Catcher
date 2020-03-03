@@ -19,12 +19,15 @@
               new client</b-button>
           </b-col>
           <b-col
-            offset-sm="6"
-            sm="3"
+            offset-sm="4"
+            sm="5"
             class="text-right"
           >
-            <b-button variant="success">
+            <b-button variant="success" v-b-modal.create-user-modal>
               Create user
+            </b-button>
+            <b-button variant="warning" v-b-modal.change-password-modal>
+              Change password
             </b-button>
             <b-button
               type="button"
@@ -88,7 +91,8 @@
                   >Generate payload
                   </b-button>
                   <b-button
-                    @click="deleteClient(client.id)"
+                    @click="firstDelete(client.id)"
+                    v-b-modal.delete-client-modal
                     type="button"
                     variant="danger"
                   >Delete
@@ -101,6 +105,26 @@
       </b-col>
     </b-row>
 
+    <b-modal
+    ref="deleteClientModal"
+    id="delete-client-modal"
+    title="Are you sure?"
+    hide-footer
+    >
+      <b-form
+        @submit="deleteClient"
+        @reset="$refs.deleteClientModal.hide()"
+      >
+
+        <b-button
+          type="submit"
+          variant="danger"
+        >Yes, delete this entry</b-button>
+        <b-button type="reset">Cancel</b-button>
+
+      </b-form>
+    </b-modal>
+
     <AddClient />
     <GetPayload :client_id=viewed_client />
     <ViewData :client_id=viewed_client />
@@ -109,6 +133,8 @@
       :client_id=viewed_client
     />
     <ViewClient :client_id=viewed_client />
+    <CreateUser />
+    <ChangePassword />
 
   </b-container>
 </template>
@@ -122,6 +148,8 @@ import GetPayload from './GetPayload'
 import ViewData from './ViewData'
 import ViewXSS from './ViewXSS'
 import ViewClient from './ViewClient'
+import CreateUser from './CreateUser'
+import ChangePassword from './ChangePassword'
 
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -134,14 +162,17 @@ export default {
     GetPayload,
     ViewData,
     ViewXSS,
-    ViewClient
+    ViewClient,
+    CreateUser,
+    ChangePassword
   },
   mixins: [Vue2Filters.mixin],
   data () {
     return {
       clients: {},
       viewed_client: '',
-      xss_type: ''
+      xss_type: '',
+      to_delete: 0
     }
   },
   methods: {
@@ -157,11 +188,12 @@ export default {
           }
         })
     },
-    deleteClient (clientId) {
-      const path = basePath + '/client/' + clientId
+    deleteClient () {
+      const path = basePath + '/client/' + this.to_delete
       axios.delete(path)
         .then(response => {
           this.getClients()
+          this.$refs.deleteClientModal.hide()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
@@ -178,6 +210,9 @@ export default {
         .catch(error => {
           console.error(error.response.data)
         })
+    },
+    firstDelete (id) {
+      this.to_delete = id
     }
   },
   created () {

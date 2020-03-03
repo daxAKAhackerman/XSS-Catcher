@@ -36,7 +36,8 @@
             >View details
             </b-button>
             <b-button
-              @click="deleteXSS(hit.id)"
+              @click="firstDelete(hit.id)"
+              v-b-modal.delete-xss-modal
               type="button"
               variant="danger"
             >Delete
@@ -45,6 +46,26 @@
         </tr>
       </tbody>
     </table>
+
+    <b-modal
+    ref="deleteXSSModal"
+    id="delete-xss-modal"
+    title="Are you sure?"
+    hide-footer
+    >
+      <b-form
+        @submit="deleteXSS"
+        @reset="$refs.deleteXSSModal.hide()"
+      >
+
+        <b-button
+          type="submit"
+          variant="danger"
+        >Yes, delete this entry</b-button>
+        <b-button type="reset">Cancel</b-button>
+
+      </b-form>
+    </b-modal>
 
     <ViewDetails :data=viewedXSS />
 
@@ -74,7 +95,8 @@ export default {
   data () {
     return {
       dataXSS: {},
-      viewedXSS: {}
+      viewedXSS: {},
+      to_delete: 0
     }
   },
   methods: {
@@ -91,12 +113,13 @@ export default {
           }
         })
     },
-    deleteXSS (xssID) {
-      const path = basePath + '/xss/' + xssID
+    deleteXSS () {
+      const path = basePath + '/xss/' + this.to_delete
 
       axios.delete(path)
         .then(response => {
           this.getXSS()
+          this.$refs.deleteXSSModal.hide()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
@@ -107,6 +130,9 @@ export default {
     convertTimestamp (timestamp) {
       let timestampLocal = moment(timestamp).format('MM-DD-YYYY HH:mm:ss')
       return timestampLocal
+    },
+    firstDelete (id) {
+      this.to_delete = id
     }
   }
 

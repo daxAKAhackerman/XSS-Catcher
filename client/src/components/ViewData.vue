@@ -21,7 +21,8 @@
           <td class="text-left">{{ cookie_value }}</td>
           <td class="text-right">
             <b-button
-              @click="deleteData('cookies', cookie_id)"
+              @click="firstDelete('cookies', cookie_id)"
+              v-b-modal.delete-data-modal
               type="button"
               variant="danger"
             >Delete
@@ -43,7 +44,8 @@
           <td class="text-left">{{ local_storage_value }}</td>
           <td class="text-right">
             <b-button
-              @click="deleteData('local_storage', local_storage_id)"
+              @click="firstDelete('local_storage', local_storage_id)"
+              v-b-modal.delete-data-modal
               type="button"
               variant="danger"
             >Delete
@@ -64,7 +66,8 @@
           <td class="text-left">{{ session_storage_value }}</td>
           <td class="text-right">
             <b-button
-              @click="deleteData('session_storage', session_storage_id)"
+              @click="firstDelete('session_storage', session_storage_id)"
+              v-b-modal.delete-data-modal
               type="button"
               variant="danger"
             >Delete
@@ -85,7 +88,8 @@
           <td class="text-left">{{ other_value }}</td>
           <td class="text-right">
             <b-button
-              @click="deleteData('other_data', other_id)"
+              @click="firstDelete('other_data', other_id)"
+              v-b-modal.delete-data-modal
               type="button"
               variant="danger"
             >Delete
@@ -94,6 +98,26 @@
         </tr>
       </tbody>
     </table>
+
+    <b-modal
+    ref="deleteDataModal"
+    id="delete-data-modal"
+    title="Are you sure?"
+    hide-footer
+    >
+      <b-form
+        @submit="deleteData"
+        @reset="$refs.deleteDataModal.hide()"
+      >
+
+        <b-button
+          type="submit"
+          variant="danger"
+        >Yes, delete this entry</b-button>
+        <b-button type="reset">Cancel</b-button>
+
+      </b-form>
+    </b-modal>
 
   </b-modal>
 
@@ -112,7 +136,9 @@ export default {
   props: ['client_id'],
   data () {
     return {
-      data: {}
+      data: {},
+      to_delete: 0,
+      to_delete_type: ''
     }
   },
   methods: {
@@ -129,18 +155,23 @@ export default {
           }
         })
     },
-    deleteData (dataType, xssID) {
-      const path = basePath + '/xss/' + xssID + '/' + dataType
+    deleteData () {
+      const path = basePath + '/xss/' + this.to_delete + '/' + this.to_delete_type
 
       axios.delete(path)
         .then(response => {
           this.getData()
+          this.$refs.deleteDataModal.hide()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
             console.error(error.response.data)
           }
         })
+    },
+    firstDelete (dataType, xssID) {
+      this.to_delete = xssID
+      this.to_delete_type = dataType
     }
   }
 

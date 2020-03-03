@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    size="lg"
     ref="getPayloadModal"
     id="get-payload-modal"
     title="Payload"
@@ -37,6 +38,18 @@
         >
           Steal session storage
         </b-form-checkbox>
+
+        <b-form-radio v-model="options.code_type" name="radio-button" value="js">JavaScript</b-form-radio>
+        <b-form-radio v-model="options.code_type" name="radio-button" value="html">HTML</b-form-radio>
+      </b-form-group>
+      <b-form-group
+      label="Other data: ">
+        <b-form-input
+          v-model="options.other"
+          name="input"
+          label="Other data: "
+          placeholder="param1=value1&param2=value2"
+        ></b-form-input>
       </b-form-group>
 
       <b-button
@@ -64,7 +77,9 @@ export default {
         cookies: false,
         local_storage: false,
         session_storage: false,
-        stored: false
+        stored: false,
+        code_type: 'html',
+        other: ''
       },
       xss_payload: ''
     }
@@ -73,11 +88,7 @@ export default {
     getPayload (evt) {
       evt.preventDefault()
 
-      let path = basePath + '/xss/generate/' + this.client_id
-
-      if (this.options.stored || this.options.cookies || this.options.local_storage || this.options.session_storage) {
-        path += '?'
-      }
+      let path = basePath + '/xss/generate/' + this.client_id + '?url=' + encodeURIComponent(location.origin) + '&'
 
       if (this.options.cookies) {
         path += 'cookie=1&'
@@ -92,8 +103,14 @@ export default {
       }
 
       if (this.options.stored) {
-        path += 'stored=1'
+        path += 'stored=1&'
       }
+
+      if (this.options.other) {
+        path += this.options.other + '&'
+      }
+
+      path += 'code=' + this.options.code_type
 
       if (path.substr(-1) === '&') {
         path = path.substr(0, path.length - 1)

