@@ -3,7 +3,11 @@ FROM alpine:latest
 RUN apk add --update npm apache2 libapache2-mod-wsgi-py3 python3 python3-mysqldb python3-pip
 
 COPY ./server /var/www/html/server
+WORKDIR /var/www/html/server
 RUN python3 -m pip install -r /var/www/html/server/requirements.txt
+RUN python3 -m flask db init
+RUN python3 -m flask db migrate -m "Initial migration."
+RUN python3 -m flask db upgrade
 
 COPY ./client /var/www/html/client
 WORKDIR /var/www/html/client
