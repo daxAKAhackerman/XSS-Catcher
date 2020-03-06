@@ -1,0 +1,19 @@
+version: '3.3'
+services:
+  web:
+    build: .
+    ports:
+     - "8888:80"
+    restart: always
+    environment: 
+      DATABASE_URL: 'mysql://user:FvzZ0a1mxfWWRp9gAeml@db/oaa'
+  db:
+    image: 'mariadb:latest'
+    restart: always
+    environment: 
+      MYSQL_DATABASE: 'oaa'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
+      MYSQL_ROOT_PASSWORD: 'CAcZeESTUDeK4JSBrxlq'
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
