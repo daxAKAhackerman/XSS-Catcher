@@ -154,7 +154,7 @@ import ChangePassword from './ChangePassword'
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
 
-const basePath = 'http://127.0.0.1/api'
+const basePath = '/api'
 
 export default {
   components: {
