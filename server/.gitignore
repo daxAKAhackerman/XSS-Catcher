@@ -114,3 +114,4 @@ dmypy.json
 
 # Custom ignores
 *.db
+migrations/
