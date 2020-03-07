@@ -15,9 +15,18 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
 
+
+
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
 
     return app
 
 from app import models
+
+if models.User.query.filter_by(username='admin').first() == None:
+    
+    user = models.User('admin')
+    user.set_password('admin')
+    db.session.add(user)
+    db.session.commit()
