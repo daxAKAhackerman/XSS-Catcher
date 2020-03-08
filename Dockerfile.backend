@@ -1,0 +1,10 @@
+FROM python:latest
+
+COPY ./server /var/www/html/server
+WORKDIR /var/www/html/server
+RUN python3 -m pip install waitress mysqlclient
+RUN python3 -m pip install -r /var/www/html/server/requirements.txt
+
+EXPOSE 8080
+
+CMD waitress-serve --call 'xss:create_app'

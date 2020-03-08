@@ -2,18 +2,34 @@ version: '3.3'
 services:
   db:
     image: 'mariadb:latest'
-    restart: always
+    restart: 'always'
     environment:
       MYSQL_DATABASE: 'xss'
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
       MYSQL_ROOT_PASSWORD: 'CAcZeESTUDeK4JSBrxlq'
-  web:
-    build: .
+    volumes:
+      - './database:/docker-entrypoint-initdb.d'
+      - 'xss-db:/var/lib/mysql'
+
+  backend: 
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile.backend'
     depends_on: 
       - 'db'
-    ports:
-     - "8888:80"
-    restart: always
-    environment: 
+    restart: 'always'
+    environment:
       DATABASE_URL: 'mysql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
+  frontend:
+    build:
+      context: '.'
+      dockerfile: 'Dockerfile.frontend'
+    depends_on: 
+      - 'backend'
+    ports:
+     - '8888:80'
+    restart: 'always'
+volumes: 
+  xss-db:
+

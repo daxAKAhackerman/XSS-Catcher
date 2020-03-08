@@ -23,10 +23,3 @@ def create_app(config_class=Config):
     return app
 
 from app import models
-
-if models.User.query.filter_by(username='admin').first() == None:
-    
-    user = models.User('admin')
-    user.set_password('admin')
-    db.session.add(user)
-    db.session.commit()
