@@ -18,8 +18,8 @@ docker-compose up -d
 * Default credentials to connect to the Web interface are **admin:xss**
 * Default Web port is **8888**
 ## To Do
-* [x] Create a README.md file
-* [ ] Allow management of users
+* [X] Create a README.md file
+* [X] Allow management of users
 * [X] Add some CSS
 * [ ] Add concept of admin users and client permission management
 ## Pictures
