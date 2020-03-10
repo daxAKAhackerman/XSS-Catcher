@@ -51,7 +51,12 @@ def catch_reflected_xss(guid):
 
     referer = request.referrer
     user_agent = request.user_agent
-    ip_addr = request.remote_addr
+
+    if request.headers.getlist("X-Forwarded-For"):
+        ip_addr = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip_addr = request.remote_addr
+
     cookies = request.args.get('cookies')
     local_storage = request.args.get('local_storage')
     session_storage = request.args.get('session_storage')
