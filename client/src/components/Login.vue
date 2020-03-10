@@ -76,7 +76,7 @@ export default {
       form: {
         username: '',
         password: '',
-        remember: false
+        remember: []
       },
       show_alert: false,
       user: {},
