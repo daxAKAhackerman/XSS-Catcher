@@ -28,3 +28,5 @@ docker-compose up -d
 ![Alt text](/pictures/xss.png?raw=true "Captured XSS")
 ![Alt text](/pictures/details.png?raw=true "XSS details")
 ![Alt text](/pictures/data.png?raw=true "Captured data")
+
+> The bootstrap theme used can be found [here](https://bootswatch.com/slate/)
