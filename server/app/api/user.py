@@ -71,6 +71,7 @@ def change_password():
 def get_user():
     return jsonify(current_user.to_dict()), 200
 
+
 @bp.route('/user/first_login', methods=['GET'])
 @login_required
 def user_first_login():
@@ -80,9 +81,33 @@ def user_first_login():
 
     return jsonify({'status': 'OK'}), 200
 
+
 @bp.route('/user/is_auth', methods=['GET'])
 @login_required
 def is_auth():
 
     return jsonify({'status': 'OK'}), 200
 
+
+@bp.route('/user/<id>', methods=['DELETE'])
+@login_required
+def delete_user(id):
+
+    user = User.query.filter_by(id=id).first_or_404()
+
+    db.session.delete(user)
+    db.session.commit()
+
+    return jsonify({'status': 'OK'})
+
+
+@bp.route('/user/all', methods=['GET'])
+@login_required
+def get_users():
+    users = []
+    data = User.query.all()
+
+    for user in data: 
+        users.append(user.to_dict())
+
+    return jsonify(users), 200

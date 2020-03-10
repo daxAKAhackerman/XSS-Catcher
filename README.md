@@ -20,7 +20,7 @@ docker-compose up -d
 ## To Do
 * [x] Create a README.md file
 * [ ] Allow management of users
-* [ ] Add some CSS
+* [X] Add some CSS
 * [ ] Add concept of admin users and client permission management
 ## Pictures
 ![Alt text](/pictures/dashboard.png?raw=true "Dashboard")

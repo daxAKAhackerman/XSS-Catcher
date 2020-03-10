@@ -19,12 +19,15 @@
               new client</b-button>
           </b-col>
           <b-col
-            offset-sm="4"
-            sm="5"
+            offset-sm="2"
+            sm="7"
             class="text-right"
           >
             <b-button variant="success" v-b-modal.create-user-modal>
               Create user
+            </b-button>
+            <b-button variant="danger" v-b-modal.manage-users-modal>
+              Delete user
             </b-button>
             <b-button variant="warning" v-b-modal.change-password-modal>
               Change password
@@ -135,6 +138,7 @@
     <ViewClient :client_id=viewed_client />
     <CreateUser />
     <ChangePassword />
+    <ManageUsers />
 
   </b-container>
 </template>
@@ -150,6 +154,7 @@ import ViewXSS from './ViewXSS'
 import ViewClient from './ViewClient'
 import CreateUser from './CreateUser'
 import ChangePassword from './ChangePassword'
+import ManageUsers from './ManageUsers'
 
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -164,7 +169,8 @@ export default {
     ViewXSS,
     ViewClient,
     CreateUser,
-    ChangePassword
+    ChangePassword,
+    ManageUsers
   },
   mixins: [Vue2Filters.mixin],
   data () {
