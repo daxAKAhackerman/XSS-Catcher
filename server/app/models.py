@@ -81,7 +81,8 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
-    first_login =db.Column(db.Boolean, nullable=False, default=1)
+    first_login = db.Column(db.Boolean, nullable=False, default=1)
+    is_admin = db.Column(db.Boolean, nullable=False, default=0)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -92,6 +93,15 @@ class User(UserMixin, db.Model):
     def generate_password(self):
         characters = string.ascii_letters + string.digits
         return ''.join(random.choice(characters) for i in range(12))
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'username': self.username, 
+            'first_login': self.first_login,
+            'is_admin': self.is_admin
+        }
+        return data
 
 
 @login.user_loader

@@ -36,7 +36,7 @@
             >View details
             </b-button>
             <b-button
-              @click="firstDelete(hit.id)"
+              @click="to_delete = hit.id"
               v-b-modal.delete-xss-modal
               type="button"
               variant="danger"
@@ -130,9 +130,6 @@ export default {
     convertTimestamp (timestamp) {
       let timestampLocal = moment(timestamp).format('MM-DD-YYYY HH:mm:ss')
       return timestampLocal
-    },
-    firstDelete (id) {
-      this.to_delete = id
     }
   }
 

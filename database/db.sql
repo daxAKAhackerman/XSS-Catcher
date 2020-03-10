@@ -69,6 +69,7 @@ CREATE TABLE `user` (
   `username` varchar(128) NOT NULL,
   `password_hash` varchar(128) NOT NULL,
   `first_login` tinyint(1) NOT NULL,
+  `is_admin` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   CONSTRAINT `CONSTRAINT_1` CHECK (`first_login` in (0,1))

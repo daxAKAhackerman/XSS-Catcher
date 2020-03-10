@@ -53,17 +53,24 @@
         </b-card>
       </b-col>
     </b-row>
+    <ChangePasswordLogin />
   </b-container>
 </template>
 
 <script>
 import axios from 'axios'
+
+import ChangePasswordLogin from './ChangePasswordLogin'
+
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
 
 const basePath = '/api'
 
 export default {
+  components: {
+    ChangePasswordLogin
+  },
   data () {
     return {
       form: {
@@ -71,10 +78,44 @@ export default {
         password: '',
         remember: false
       },
-      show_alert: false
+      show_alert: false,
+      user: {},
+      show_password_modal: false
     }
   },
   methods: {
+    setFirstLogin () {
+      const path = basePath + '/user/first_login'
+      axios.get(path)
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
+            console.error(error.response.data)
+          }
+        })
+    },
+    getUser () {
+      const path = basePath + '/user'
+      axios.get(path)
+        .then(response => {
+          this.user = response.data
+          if (this.user.first_login) {
+            this.show_password_modal = true
+            this.setFirstLogin()
+          } else {
+            this.$router.push({
+              name: 'Index'
+            })
+          }
+        })
+        .catch(error => {
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
+            console.error(error.response.data)
+          }
+        })
+    },
     postLogin (evt) {
       evt.preventDefault()
       const path = basePath + '/auth/login'
@@ -84,17 +125,23 @@ export default {
       payload.append('password', this.form.password)
       payload.append('remember', this.form.remember)
 
-      axios
-        .post(path, payload)
+      axios.post(path, payload)
         .then(response => {
-          this.$router.push({
-            name: 'Index'
-          })
+          this.getUser()
         })
         .catch(error => {
           this.form.password = ''
           this.show_alert = true
           console.error(error.response.data)
+        })
+    },
+    isAuth () {
+      const path = basePath + '/user/is_auth'
+      axios.get(path)
+        .then(response => {
+          this.$router.push({
+            name: 'Index'
+          })
         })
     }
   }

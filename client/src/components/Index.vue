@@ -91,7 +91,7 @@
                   >Generate payload
                   </b-button>
                   <b-button
-                    @click="firstDelete(client.id)"
+                    @click="to_delete = client.id"
                     v-b-modal.delete-client-modal
                     type="button"
                     variant="danger"
@@ -210,9 +210,6 @@ export default {
         .catch(error => {
           console.error(error.response.data)
         })
-    },
-    firstDelete (id) {
-      this.to_delete = id
     }
   },
   created () {

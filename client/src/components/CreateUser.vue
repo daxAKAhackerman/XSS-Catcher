@@ -26,6 +26,7 @@
       id="view-password-modal"
       title="User created"
       hide-footer
+      @hide="$refs.createUserModal.hide()"
     >
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
@@ -51,7 +52,7 @@ export default {
   },
   methods: {
     createUser () {
-      const path = basePath + '/register'
+      const path = basePath + '/user/new'
 
       var payload = new URLSearchParams()
 

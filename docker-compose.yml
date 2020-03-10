@@ -2,7 +2,7 @@ version: '3.3'
 services:
   db:
     image: 'mariadb:latest'
-    restart: 'always'
+    restart: 'unless-stopped'
     environment:
       MYSQL_DATABASE: 'xss'
       MYSQL_USER: 'user'
@@ -18,9 +18,10 @@ services:
       dockerfile: 'Dockerfile.backend'
     depends_on: 
       - 'db'
-    restart: 'always'
+    restart: 'unless-stopped'
     environment:
       DATABASE_URL: 'mysql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
+
   frontend:
     build:
       context: '.'
@@ -29,7 +30,8 @@ services:
       - 'backend'
     ports:
      - '8888:80'
-    restart: 'always'
+    restart: 'unless-stopped'
+
 volumes: 
   xss-db:
 

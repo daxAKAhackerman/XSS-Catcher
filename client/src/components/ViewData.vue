@@ -21,7 +21,7 @@
           <td class="text-left">{{ cookie_value }}</td>
           <td class="text-right">
             <b-button
-              @click="firstDelete('cookies', cookie_id)"
+              @click="to_delete_type = 'cookies'; to_delete = cookie_id"
               v-b-modal.delete-data-modal
               type="button"
               variant="danger"
@@ -44,7 +44,7 @@
           <td class="text-left">{{ local_storage_value }}</td>
           <td class="text-right">
             <b-button
-              @click="firstDelete('local_storage', local_storage_id)"
+              @click="to_delete_type = 'local_storage'; to_delete = local_storage_id"
               v-b-modal.delete-data-modal
               type="button"
               variant="danger"
@@ -66,7 +66,7 @@
           <td class="text-left">{{ session_storage_value }}</td>
           <td class="text-right">
             <b-button
-              @click="firstDelete('session_storage', session_storage_id)"
+              @click="to_delete_type = 'session_storage'; to_delete = session_storage_id"
               v-b-modal.delete-data-modal
               type="button"
               variant="danger"
@@ -88,7 +88,7 @@
           <td class="text-left">{{ other_value }}</td>
           <td class="text-right">
             <b-button
-              @click="firstDelete('other_data', other_id)"
+              @click="to_delete_type = 'other_data'; to_delete = other_id"
               v-b-modal.delete-data-modal
               type="button"
               variant="danger"
@@ -168,10 +168,6 @@ export default {
             console.error(error.response.data)
           }
         })
-    },
-    firstDelete (dataType, xssID) {
-      this.to_delete = xssID
-      this.to_delete_type = dataType
     }
   }
 
