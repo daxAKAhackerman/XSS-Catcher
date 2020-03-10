@@ -15,8 +15,8 @@ docker-compose up -d
 # Even if the containers are up, allow for a little bit of time before the first login. The MySQL container takes like 1 minute to be ready
 ```
 ## First login
-Default credentials to connect to the Web interface are **admin:xss**
-Default Web port is **8888**
+* Default credentials to connect to the Web interface are **admin:xss**
+* Default Web port is **8888**
 ## To Do
 * [x] Create a README.md file
 * [ ] Allow management of users
