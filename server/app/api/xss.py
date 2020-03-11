@@ -52,8 +52,8 @@ def catch_reflected_xss(guid):
     referer = request.referrer
     user_agent = request.user_agent
 
-    if request.headers.getlist("X-Forwarded-For"):
-        ip_addr = request.headers.getlist("X-Forwarded-For")[0]
+    if 'X-Forwarded-For' in request.headers:
+        ip_addr = request.headers['X-Forwarded-For'].split(', ')[0]
     else:
         ip_addr = request.remote_addr
 
