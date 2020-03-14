@@ -2,7 +2,7 @@ from flask import jsonify, request
 from app import db
 from app.models import Client, XSS
 from app.api import bp
-from flask_login import login_required
+from flask_login import login_required, current_user
 from app.validators import not_empty, check_length
 
 
@@ -20,7 +20,7 @@ def create_client():
 
     if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['full_name'], 32):
 
-        new_client = Client(name=data['name'], full_name=data['full_name'])
+        new_client = Client(name=data['name'], full_name=data['full_name'], owner_id=current_user.id)
 
         new_client.gen_guid()
 

@@ -12,8 +12,9 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     guid = db.Column(db.CHAR(36), nullable=False)
     name = db.Column(db.String(32), unique=True, nullable=False)
-    full_name = db.Column(db.String(128), unique=True)
+    full_name = db.Column(db.String(128))
     xss = db.relationship('XSS', backref='client', lazy='dynamic')
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def to_dict_clients(self):
         data = {
@@ -31,7 +32,12 @@ class Client(db.Model):
         return data
 
     def to_dict_client(self):
+        owner = User.query.filter_by(id=self.owner_id).first().username
+        if owner == None:
+            owner = 'Nobody'
+
         data = {
+            'owner': owner,
             'id': self.id,
             'name': self.name,
             'guid': self.guid,
@@ -83,6 +89,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     first_login = db.Column(db.Boolean, nullable=False, default=1)
     is_admin = db.Column(db.Boolean, nullable=False, default=0)
+    client = db.relationship('Client', backref='owner', lazy='dynamic')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
