@@ -15,12 +15,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-USE xss;
-
 --
 -- Table structure for table `XSS`
 --
 
+DROP TABLE IF EXISTS `XSS`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `XSS` (
@@ -42,9 +41,42 @@ CREATE TABLE `XSS` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Dumping data for table `XSS`
+--
+
+LOCK TABLES `XSS` WRITE;
+/*!40000 ALTER TABLE `XSS` DISABLE KEYS */;
+/*!40000 ALTER TABLE `XSS` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `alembic_version`
+--
+
+DROP TABLE IF EXISTS `alembic_version`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `alembic_version` (
+  `version_num` varchar(32) NOT NULL,
+  PRIMARY KEY (`version_num`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `alembic_version`
+--
+
+LOCK TABLES `alembic_version` WRITE;
+/*!40000 ALTER TABLE `alembic_version` DISABLE KEYS */;
+INSERT INTO `alembic_version` VALUES ('0a533193996b');
+/*!40000 ALTER TABLE `alembic_version` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `client`
 --
 
+DROP TABLE IF EXISTS `client`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `client` (
@@ -52,16 +84,28 @@ CREATE TABLE `client` (
   `guid` char(36) NOT NULL,
   `name` varchar(32) NOT NULL,
   `full_name` varchar(128) DEFAULT NULL,
+  `owner_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
-  UNIQUE KEY `full_name` (`full_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+  KEY `owner_id` (`owner_id`),
+  CONSTRAINT `client_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `client`
+--
+
+LOCK TABLES `client` WRITE;
+/*!40000 ALTER TABLE `client` DISABLE KEYS */;
+/*!40000 ALTER TABLE `client` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
@@ -72,7 +116,8 @@ CREATE TABLE `user` (
   `is_admin` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
-  CONSTRAINT `CONSTRAINT_1` CHECK (`first_login` in (0,1))
+  CONSTRAINT `CONSTRAINT_1` CHECK (`first_login` in (0,1)),
+  CONSTRAINT `CONSTRAINT_2` CHECK (`is_admin` in (0,1))
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -95,5 +140,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-08  1:32:07
-
+-- Dump completed on 2020-03-14  0:56:31
