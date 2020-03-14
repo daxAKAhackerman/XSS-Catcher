@@ -178,7 +178,8 @@ export default {
       clients: {},
       viewed_client: '',
       xss_type: '',
-      to_delete: 0
+      to_delete: 0,
+      show_password_modal: false
     }
   },
   methods: {

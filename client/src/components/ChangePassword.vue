@@ -5,6 +5,7 @@
     title="Change password"
     hide-footer
     @hidden="resetCP"
+    :visible="$parent.show_password_modal"
   >
     <b-form
       @submit="changePassword"
@@ -89,7 +90,6 @@ export default {
 
       axios.post(path, payload)
         .then(response => {
-          console.log(response.data)
           this.resetCP()
         })
         .catch(error => {
@@ -103,6 +103,11 @@ export default {
       this.new_password1 = ''
       this.new_password2 = ''
       this.$refs.changePasswordModal.hide()
+      if (this.$route.name !== 'Index') {
+        this.$router.push({
+          name: 'Index'
+        })
+      }
     }
   }
 }

@@ -62,6 +62,8 @@ def change_password():
         return jsonify({'status': 'error', 'detail': 'old password is incorrect'}), 403
 
     current_user.set_password(data['password1'])
+    current_user.first_login = False
+
     db.session.commit()
     return jsonify({'status': 'OK'})
 
@@ -70,16 +72,6 @@ def change_password():
 @login_required
 def get_user():
     return jsonify(current_user.to_dict()), 200
-
-
-@bp.route('/user/first_login', methods=['GET'])
-@login_required
-def user_first_login():
-
-    current_user.first_login = False
-    db.session.commit()
-
-    return jsonify({'status': 'OK'}), 200
 
 
 @bp.route('/user/is_auth', methods=['GET'])

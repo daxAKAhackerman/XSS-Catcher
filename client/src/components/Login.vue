@@ -53,14 +53,14 @@
         </b-card>
       </b-col>
     </b-row>
-    <ChangePasswordLogin />
+    <ChangePassword />
   </b-container>
 </template>
 
 <script>
 import axios from 'axios'
 
-import ChangePasswordLogin from './ChangePasswordLogin'
+import ChangePassword from './ChangePassword'
 
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
@@ -69,7 +69,7 @@ const basePath = '/api'
 
 export default {
   components: {
-    ChangePasswordLogin
+    ChangePassword
   },
   data () {
     return {
@@ -84,18 +84,6 @@ export default {
     }
   },
   methods: {
-    setFirstLogin () {
-      const path = basePath + '/user/first_login'
-      axios.get(path)
-        .then(response => {
-          console.log(response.data)
-        })
-        .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
-        })
-    },
     getUser () {
       const path = basePath + '/user'
       axios.get(path)
@@ -103,7 +91,6 @@ export default {
           this.user = response.data
           if (this.user.first_login) {
             this.show_password_modal = true
-            this.setFirstLogin()
           } else {
             this.$router.push({
               name: 'Index'
