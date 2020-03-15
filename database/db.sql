@@ -83,7 +83,7 @@ CREATE TABLE `client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `guid` char(36) NOT NULL,
   `name` varchar(32) NOT NULL,
-  `full_name` varchar(128) DEFAULT NULL,
+  `description` varchar(128) DEFAULT NULL,
   `owner_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),

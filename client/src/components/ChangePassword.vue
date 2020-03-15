@@ -59,6 +59,12 @@
       </b-button>
       <b-button type="reset">Cancel</b-button>
     </b-form>
+    <br />
+    <b-alert
+      show
+      variant="danger"
+      v-if="show_alert"
+    >{{ alert_msg }}</b-alert>
   </b-modal>
 </template>
 
@@ -75,7 +81,9 @@ export default {
     return {
       old_password: '',
       new_password1: '',
-      new_password2: ''
+      new_password2: '',
+      show_alert: false,
+      alert_msg: ''
     }
   },
   methods: {
@@ -94,7 +102,8 @@ export default {
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
+            this.show_alert = true
+            this.alert_msg = error.response.data.detail
           }
         })
     },
@@ -102,6 +111,8 @@ export default {
       this.old_password = ''
       this.new_password1 = ''
       this.new_password2 = ''
+      this.show_alert = false
+      this.alert_msg = ''
       this.$refs.changePasswordModal.hide()
       if (this.$route.name !== 'Index') {
         this.$router.push({

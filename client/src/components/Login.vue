@@ -45,11 +45,12 @@
               variant="info"
             >Login</b-button>
           </b-form>
+          <br />
           <b-alert
             show
             variant="danger"
             v-if="show_alert"
-          >Bad login</b-alert>
+          >{{ alert_msg }}</b-alert>
         </b-card>
       </b-col>
     </b-row>
@@ -79,6 +80,7 @@ export default {
         remember: []
       },
       show_alert: false,
+      alert_msg: '',
       user: {},
       show_password_modal: false
     }
@@ -98,9 +100,7 @@ export default {
           }
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) }
         })
     },
     postLogin (evt) {
@@ -119,7 +119,7 @@ export default {
         .catch(error => {
           this.form.password = ''
           this.show_alert = true
-          console.error(error.response.data)
+          this.alert_msg = error.response.data.detail
         })
     },
     isAuth () {

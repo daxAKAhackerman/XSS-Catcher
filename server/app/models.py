@@ -12,7 +12,7 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     guid = db.Column(db.CHAR(36), nullable=False)
     name = db.Column(db.String(32), unique=True, nullable=False)
-    full_name = db.Column(db.String(128))
+    description = db.Column(db.String(128))
     xss = db.relationship('XSS', backref='client', lazy='dynamic')
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -41,7 +41,7 @@ class Client(db.Model):
             'id': self.id,
             'name': self.name,
             'guid': self.guid,
-            'full_name': self.full_name
+            'description': self.description
         }
         return data
 

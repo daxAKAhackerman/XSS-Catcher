@@ -7,6 +7,7 @@
     hide-footer
     size="md"
     @show="getUsers"
+    @hide="cleanup"
   >
 
     <table class="table table-hover">
@@ -34,7 +35,12 @@
         </tr>
       </tbody>
     </table>
-
+    <br />
+    <b-alert
+      show
+      variant="danger"
+      v-if="show_alert"
+    >{{ alert_msg }}</b-alert>
     <b-modal
     ref="deleteUserModal"
     id="delete-user-modal"
@@ -74,7 +80,9 @@ export default {
   data () {
     return {
       users: [],
-      to_delete: 0
+      to_delete: 0,
+      show_alert: false,
+      alert_msg: ''
     }
   },
   methods: {
@@ -101,9 +109,17 @@ export default {
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
+            this.$refs.deleteUserModal.hide()
+            this.alert_msg = error.response.data.detail
+            this.show_alert = true
           }
         })
+    },
+    cleanup () {
+      this.users = []
+      this.to_delete = 0
+      this.show_alert = false
+      this.alert_msg = ''
     }
   }
 

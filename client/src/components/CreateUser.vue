@@ -5,6 +5,7 @@
     id="create-user-modal"
     title="Create user"
     hide-footer
+    @hide="cleanup"
   >
     <b-form @submit="createUser">
 
@@ -21,6 +22,12 @@
       </b-form-group>
       <b-button type="submit" variant="info">Create user</b-button>
     </b-form>
+    <br />
+    <b-alert
+      show
+      variant="danger"
+      v-if="show_alert"
+    >{{ alert_msg }}</b-alert>
     <b-modal
       ref="viewPasswordModal"
       id="view-password-modal"
@@ -47,7 +54,9 @@ export default {
   data () {
     return {
       data: {},
-      username: ''
+      username: '',
+      show_alert: false,
+      alert_msg: ''
     }
   },
   methods: {
@@ -65,11 +74,17 @@ export default {
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
+            this.show_alert = true
+            this.alert_msg = error.response.data.detail
           }
         })
+    },
+    cleanup () {
+      this.data = {}
+      this.username = ''
+      this.show_alert = false
+      this.alert_msg = ''
     }
-
   }
 }
 

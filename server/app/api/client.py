@@ -12,15 +12,15 @@ def create_client():
     data = request.form
 
     if 'name' not in data.keys() or\
-       'full_name' not in data.keys():
+       'description' not in data.keys():
         return jsonify({'status': 'error', 'detail': 'missing data'}), 400
 
     if Client.query.filter_by(name=data['name']).first() != None:
-        return jsonify({'status': 'error', 'detai': 'client already exists'}), 400
+        return jsonify({'status': 'error', 'detail': 'client already exists'}), 400
 
-    if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['full_name'], 32):
+    if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['description'], 32):
 
-        new_client = Client(name=data['name'], full_name=data['full_name'], owner_id=current_user.id)
+        new_client = Client(name=data['name'], description=data['description'], owner_id=current_user.id)
 
         new_client.gen_guid()
 
@@ -50,18 +50,22 @@ def get_client(id):
 
         if 'name' in data.keys():
 
+            if client.name != data['name']: 
+                if Client.query.filter_by(name=data['name']).first() != None:
+                    return jsonify({'status': 'error', 'detail': 'another client already uses this name'}), 400
+
             if not_empty(data['name']) and check_length(data['name'], 32):
                 client.name = data['name']
             else:
                 return jsonify({'status': 'error', 'detail': 'invalid name'}), 400
 
 
-        if 'full_name' in data.keys():
+        if 'description' in data.keys():
 
-            if check_length(data['full_name'], 128):
-                client.full_name = data['full_name']
+            if check_length(data['description'], 128):
+                client.description = data['description']
             else:
-                return jsonify({'status': 'error', 'detail': 'invalid full name'}), 400
+                return jsonify({'status': 'error', 'detail': 'invalid description'}), 400
 
         db.session.commit()
 

@@ -85,6 +85,9 @@ def is_auth():
 @login_required
 def delete_user(id):
 
+    if len(User.query.all()) <= 1:
+        return jsonify({'status': 'error', 'detail': 'can\'t delete the only user'}), 400
+
     user = User.query.filter_by(id=id).first_or_404()
 
     db.session.delete(user)
