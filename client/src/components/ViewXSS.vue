@@ -24,7 +24,7 @@
           v-for="hit in orderBy(dataXSS, 'timestamp')"
           v-bind:key="hit.id"
         >
-          <td>{{ convertTimestamp(hit.timestamp) }} </td>
+          <td>{{ convertTimestamp(hit.timestamp) }}</td>
           <td>{{ hit.referer }}</td>
           <td>{{ hit.ip_addr}}</td>
           <td>
@@ -128,7 +128,7 @@ export default {
         })
     },
     convertTimestamp (timestamp) {
-      let timestampLocal = moment(timestamp).format('MM-DD-YYYY HH:mm:ss')
+      let timestampLocal = moment(timestamp).format('YYYY-MM-DD @ HH:mm:ss')
       return timestampLocal
     }
   }

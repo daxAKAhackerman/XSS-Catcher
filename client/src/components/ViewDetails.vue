@@ -17,8 +17,8 @@
       >
         <b-form-input
           id="input-field-timestamp"
-          v-model="data.timestamp"
           disabled
+          v-model="converted_timestamp"
         ></b-form-input>
       </b-form-group>
 
@@ -120,9 +120,23 @@
 </template>
 
 <script>
+import moment from 'moment'
 
 export default {
-  props: ['data']
+  props: ['data'],
+  computed: {
+    converted_timestamp: {
+      get () {
+        return this.convertTimestamp(this.data.timestamp)
+      }
+    }
+  },
+  methods: {
+    convertTimestamp (timestamp) {
+      let timestampLocal = moment(timestamp).format('dddd MMMM Do YYYY, h:mm:ss a')
+      return timestampLocal
+    }
+  }
 }
 
 </script>

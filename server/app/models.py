@@ -20,13 +20,11 @@ class Client(db.Model):
         data = {
             'id': self.id,
             'name': self.name,
-            'reflected': XSS.query.filter_by(client_id=self.id).filter_by(
-                xss_type='reflected').count(),
-            'stored': XSS.query.filter_by(client_id=self.id).filter_by(
-                xss_type='stored').count(),
-            'cookies': (XSS.query.filter_by(client_id=self.id).filter(XSS.cookies != None).count() + \
-                        XSS.query.filter_by(client_id=self.id).filter(XSS.local_storage != None).count() + \
-                        XSS.query.filter_by(client_id=self.id).filter(XSS.session_storage != None).count() + \
+            'reflected': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='reflected').count(),
+            'stored': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='stored').count(),
+            'cookies': (XSS.query.filter_by(client_id=self.id).filter(XSS.cookies != None).count() +
+                        XSS.query.filter_by(client_id=self.id).filter(XSS.local_storage != None).count() +
+                        XSS.query.filter_by(client_id=self.id).filter(XSS.session_storage != None).count() +
                         XSS.query.filter_by(client_id=self.id).filter(XSS.other_data != None).count())
         }
         return data
@@ -35,7 +33,6 @@ class Client(db.Model):
         owner = User.query.filter_by(id=self.owner_id).first().username
         if owner == None:
             owner = 'Nobody'
-
         data = {
             'owner': owner,
             'id': self.id,
@@ -48,10 +45,8 @@ class Client(db.Model):
     def gen_guid(self):
 
         new_guid = str(uuid.uuid4())
-
         while(Client.query.filter_by(guid=new_guid).first() != None):
             new_guid = str(uuid.uuid4())
-
         self.guid = new_guid
 
 
@@ -104,7 +99,7 @@ class User(UserMixin, db.Model):
     def to_dict(self):
         data = {
             'id': self.id,
-            'username': self.username, 
+            'username': self.username,
             'first_login': self.first_login,
             'is_admin': self.is_admin
         }
@@ -114,4 +109,3 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(id)
-
