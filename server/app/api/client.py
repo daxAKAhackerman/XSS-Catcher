@@ -87,7 +87,7 @@ def get_client(id):
 @login_required
 def get_client_xss(id, flavor):
 
-    if flavor != 'reflected' or flavor != 'stored':
+    if flavor != 'reflected' and flavor != 'stored':
         return jsonify({'status': 'error', 'detail': 'Unknown XSS type'}), 400
 
     xss_list = []

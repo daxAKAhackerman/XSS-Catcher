@@ -25,10 +25,10 @@ def catch_xss(flavor, uid):
         ip_addr = request.remote_addr
     parameters = request.args.to_dict()
 
-    other_data = ''
-    cookies = ''
-    local_storage = ''
-    session_storage = ''
+    other_data = None
+    cookies = None
+    local_storage = None
+    session_storage = None
 
     for param, value in parameters.items():
 
