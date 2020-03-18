@@ -58,7 +58,7 @@ DROP TABLE IF EXISTS `client`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `guid` char(36) NOT NULL,
+  `uid` char(6) NOT NULL,
   `name` varchar(32) NOT NULL,
   `description` varchar(128) DEFAULT NULL,
   `owner_id` int(11) DEFAULT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `username` (`username`),
   CONSTRAINT `CONSTRAINT_1` CHECK (`first_login` in (0,1)),
   CONSTRAINT `CONSTRAINT_2` CHECK (`is_admin` in (0,1))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -117,4 +117,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-14  0:56:31
+-- Dump completed on 2020-03-18 12:23:02
