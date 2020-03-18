@@ -88,7 +88,7 @@ export default {
     getPayload (evt) {
       evt.preventDefault()
 
-      let path = basePath + '/xss/generate/' + this.client_id + '?'
+      let path = basePath + '/xss/generate/' + this.client_id + '?url=' + encodeURIComponent(location.origin) + '&'
 
       if (this.options.cookies) {
         path += 'cookies=1&'
