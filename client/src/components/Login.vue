@@ -123,7 +123,7 @@ export default {
         })
     },
     isAuth () {
-      const path = basePath + '/user/is_auth'
+      const path = basePath + '/user'
       axios.get(path)
         .then(response => {
           this.$router.push({

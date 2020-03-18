@@ -3,14 +3,13 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import DateTime
 from sqlalchemy.sql.expression import func
-import uuid
 import random
 import string
 
 
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    guid = db.Column(db.CHAR(36), nullable=False)
+    uid = db.Column(db.CHAR(6), nullable=False)
     name = db.Column(db.String(32), unique=True, nullable=False)
     description = db.Column(db.String(128))
     xss = db.relationship('XSS', backref='client', lazy='dynamic')
@@ -37,17 +36,18 @@ class Client(db.Model):
             'owner': owner,
             'id': self.id,
             'name': self.name,
-            'guid': self.guid,
+            'uid': self.uid,
             'description': self.description
         }
         return data
 
-    def gen_guid(self):
+    def gen_uid(self):
+        characters = string.ascii_letters + string.digits
+        new_uid = ''.join(random.choice(characters) for i in range(6))
 
-        new_guid = str(uuid.uuid4())
-        while(Client.query.filter_by(guid=new_guid).first() != None):
-            new_guid = str(uuid.uuid4())
-        self.guid = new_guid
+        while(Client.query.filter_by(uid=new_uid).first() != None):
+            new_uid = ''.join(random.choice(characters) for i in range(6))
+        self.uid = new_uid
 
 
 class XSS(db.Model):

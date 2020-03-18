@@ -16,4 +16,4 @@ def get_clients():
     for client in clients:
         client_list.append(client.to_dict_clients())
 
-    return jsonify(client_list)
+    return jsonify(client_list), 200

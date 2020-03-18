@@ -13,23 +13,23 @@ def create_client():
 
     if 'name' not in data.keys() or\
        'description' not in data.keys():
-        return jsonify({'status': 'error', 'detail': 'missing data'}), 400
+        return jsonify({'status': 'error', 'detail': 'Missing name or description'}), 400
 
     if Client.query.filter_by(name=data['name']).first() != None:
-        return jsonify({'status': 'error', 'detail': 'client already exists'}), 400
+        return jsonify({'status': 'error', 'detail': 'Client already exists'}), 400
 
-    if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['description'], 32):
+    if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['description'], 128):
 
         new_client = Client(name=data['name'], description=data['description'], owner_id=current_user.id)
 
-        new_client.gen_guid()
+        new_client.gen_uid()
 
         db.session.add(new_client)
 
         db.session.commit()
         return jsonify({'status': 'OK'}), 201
     else:
-        return jsonify({'status': 'error', 'detail': 'invalid data'}), 400
+        return jsonify({'status': 'error', 'detail': 'Invalid data (name empty or too long or description too long)'}), 400
 
 
 @bp.route('/client/<id>', methods=['GET', 'POST', 'DELETE'])
@@ -40,24 +40,24 @@ def get_client(id):
 
         client = Client.query.filter_by(id=id).first_or_404()
 
-        return jsonify(client.to_dict_client())
+        return jsonify(client.to_dict_client()), 200
 
     elif request.method == 'POST':
 
         data = request.form
 
-        client = Client.query.filter_by(id=id).first()
+        client = Client.query.filter_by(id=id).first_or_404()
 
         if 'name' in data.keys():
 
             if client.name != data['name']: 
                 if Client.query.filter_by(name=data['name']).first() != None:
-                    return jsonify({'status': 'error', 'detail': 'another client already uses this name'}), 400
+                    return jsonify({'status': 'error', 'detail': 'Another client already uses this name'}), 400
 
             if not_empty(data['name']) and check_length(data['name'], 32):
                 client.name = data['name']
             else:
-                return jsonify({'status': 'error', 'detail': 'invalid name'}), 400
+                return jsonify({'status': 'error', 'detail': 'Invalid name (too long or empty)'}), 400
 
 
         if 'description' in data.keys():
@@ -65,11 +65,11 @@ def get_client(id):
             if check_length(data['description'], 128):
                 client.description = data['description']
             else:
-                return jsonify({'status': 'error', 'detail': 'invalid description'}), 400
+                return jsonify({'status': 'error', 'detail': 'Invalid description (too long)'}), 400
 
         db.session.commit()
 
-        return jsonify({'status': 'OK'})
+        return jsonify({'status': 'OK'}), 200
 
     elif request.method == 'DELETE':
 
@@ -79,37 +79,24 @@ def get_client(id):
         db.session.delete(client)
         db.session.commit()
 
-        return jsonify({'status': 'OK'})
+        return jsonify({'status': 'OK'}), 200
 
 
 
-@bp.route('/client/<id>/stored', methods=['GET'])
+@bp.route('/client/<id>/<flavor>', methods=['GET'])
 @login_required
-def get_client_stored(id):
+def get_client_xss(id, flavor):
 
-    if request.method == 'GET':
-
-        xss_list = []
-        xss = XSS.query.filter_by(client_id=id).filter_by(xss_type='stored').all()
-
-        for hit in xss:
-            xss_list.append(hit.to_dict())
-
-        return jsonify(xss_list)
-
-
-@bp.route('/client/<id>/reflected', methods=['GET'])
-@login_required
-def get_client_reflected(id):
+    if flavor != 'reflected' or flavor != 'stored':
+        return jsonify({'status': 'error', 'detail': 'Unknown XSS type'}), 400
 
     xss_list = []
-    xss = XSS.query.filter_by(client_id=id).filter_by(
-        xss_type='reflected').all()
+    xss = XSS.query.filter_by(client_id=id).filter_by(xss_type=flavor).all()
 
     for hit in xss:
         xss_list.append(hit.to_dict())
 
-    return jsonify(xss_list)
+    return jsonify(xss_list), 200
 
 
 @bp.route('/client/<id>/loot', methods=['GET'])
@@ -138,4 +125,4 @@ def get_client_loot(id):
         if hit.other_data != None: 
             loot['other_data'][hit.id] = hit.other_data
 
-    return jsonify(loot)
+    return jsonify(loot), 200

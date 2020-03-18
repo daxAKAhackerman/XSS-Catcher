@@ -9,7 +9,7 @@
   >
     <b-form @submit="getPayload">
       <b-form-group class="text-left">
-        <p>{{ xss_payload }}</p>
+        <p v-if="xss_payload !== ''"><kbd>{{ xss_payload }}</kbd></p>
         <b-form-checkbox
           v-model="options.stored"
           name="check-button"
@@ -88,18 +88,18 @@ export default {
     getPayload (evt) {
       evt.preventDefault()
 
-      let path = basePath + '/xss/generate/' + this.client_id + '?url=' + encodeURIComponent(location.origin) + '&'
+      let path = basePath + '/xss/generate/' + this.client_id + '?'
 
       if (this.options.cookies) {
-        path += 'cookie=1&'
+        path += 'cookies=1&'
       }
 
       if (this.options.local_storage) {
-        path += 'local=1&'
+        path += 'local_storage=1&'
       }
 
       if (this.options.session_storage) {
-        path += 'session=1&'
+        path += 'session_storage=1&'
       }
 
       if (this.options.stored) {
@@ -129,7 +129,14 @@ export default {
     },
     resetGetPayload () {
       this.xss_payload = ''
-      this.options = {}
+      this.options = {
+        cookies: false,
+        local_storage: false,
+        session_storage: false,
+        stored: false,
+        code_type: 'html',
+        other: ''
+      }
       this.$refs.getPayloadModal.hide()
       this.$parent.getClients()
     }
