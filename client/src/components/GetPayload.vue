@@ -9,7 +9,7 @@
   >
     <b-form @submit="getPayload">
       <b-form-group class="text-left">
-        <p v-if="xss_payload !== ''"><kbd>{{ xss_payload }}</kbd></p>
+        <p style="overflow-wrap:break-word" v-if="xss_payload !== ''"><kbd>{{ xss_payload }}</kbd></p>
         <b-form-checkbox
           v-model="options.stored"
           name="check-button"

@@ -1,6 +1,19 @@
 <template>
   <b-container>
-
+    <b-row>
+      <b-col
+        sm="9"
+        class="text-left">
+        <h1>XSS-Catcher</h1>
+      </b-col>
+      <b-col
+        sm="2"
+        class="text-right"
+        >
+        <p style="margin-bottom:0;margin-top:revert">Current user: <b>{{ user.username }}</b></p>
+      </b-col>
+    </b-row>
+    <br />
     <b-row>
       <b-col
         offset-sm="1"
@@ -19,10 +32,13 @@
               new client</b-button>
           </b-col>
           <b-col
-            offset-sm="2"
-            sm="7"
+            offset-sm="1"
+            sm="8"
             class="text-right"
           >
+            <b-button>
+              <b-icon-arrow-repeat @click="getClients" style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
+            </b-button>
             <b-button variant="success" v-b-modal.create-user-modal>
               Create user
             </b-button>
@@ -179,7 +195,8 @@ export default {
       viewed_client: '',
       xss_type: '',
       to_delete: 0,
-      show_password_modal: false
+      show_password_modal: false,
+      user: {}
     }
   },
   methods: {
@@ -217,10 +234,23 @@ export default {
         .catch(error => {
           console.error(error.response.data)
         })
+    },
+    getUser () {
+      const path = basePath + '/user'
+      axios.get(path)
+        .then(response => {
+          this.user = response.data
+        })
+        .catch(error => {
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
+            console.error(error.response.data)
+          }
+        })
     }
   },
   created () {
     this.getClients()
+    this.getUser()
   }
 }
 </script>
