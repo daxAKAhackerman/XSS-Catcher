@@ -48,9 +48,9 @@ def catch_xss(flavor, uid):
                 session_storage = None
 
         else:
+            if other_data == None:
+                other_data = ''
             other_data += '{}={};'.format(param, value)
-            if other_data == '':
-                other_data = None
 
     xss = XSS(referer=referer, user_agent=str(user_agent), ip_addr=ip_addr,
               cookies=cookies, client_id=client.id, xss_type=xss_type, local_storage=local_storage, session_storage=session_storage, other_data=other_data)
