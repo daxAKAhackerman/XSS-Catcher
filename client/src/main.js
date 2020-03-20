@@ -9,9 +9,7 @@ import Vue2Filters from 'vue2-filters'
 import VueMoment from 'vue-moment'
 import moment from 'moment-timezone'
 
-Vue.use(VueMoment, {
-  moment
-})
+Vue.use(VueMoment, { moment })
 Vue.use(Vue2Filters)
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false

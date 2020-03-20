@@ -86,7 +86,7 @@ export default {
     }
   },
   methods: {
-    getUser () {
+    loginProcess () {
       const path = basePath + '/user'
       axios.get(path)
         .then(response => {
@@ -114,7 +114,7 @@ export default {
 
       axios.post(path, payload)
         .then(response => {
-          this.getUser()
+          this.loginProcess()
         })
         .catch(error => {
           this.form.password = ''

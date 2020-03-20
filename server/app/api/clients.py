@@ -4,10 +4,13 @@ from app.models import Client
 from app.api import bp
 from flask_login import login_required
 
+from config import Config
 
 @bp.route('/clients', methods=['GET'])
 @login_required
 def get_clients():
+
+    print(Config.SECRET_KEY)
 
     client_list = []
 
