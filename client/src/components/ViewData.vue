@@ -169,7 +169,7 @@ export default {
       this.data = {}
       this.to_delete = 0
       this.to_delete_type = ''
-      this.$parent.getClients
+      this.$parent.getClients()
     }
   }
 

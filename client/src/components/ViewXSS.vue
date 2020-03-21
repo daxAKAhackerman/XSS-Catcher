@@ -126,12 +126,12 @@ export default {
     convertTimestamp (timestamp) {
       let timestampLocal = moment(timestamp).format('YYYY-MM-DD @ HH:mm:ss')
       return timestampLocal
-    }, 
+    },
     cleanup () {
       this.dataXSS = {}
       this.viewedXSS = {}
       this.to_delete = 0
-      this.$parent.getClients
+      this.$parent.getClients()
     }
   }
 
