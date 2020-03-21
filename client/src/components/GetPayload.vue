@@ -1,13 +1,13 @@
 <template>
   <b-modal
-    size="lg"
+    size="md"
     ref="getPayloadModal"
     id="get-payload-modal"
     title="Payload"
     hide-footer
-    @hidden="resetGetPayload"
+    @hidden="cleanup"
   >
-    <b-form @submit="getPayload">
+    <b-form @submit="getPayload" @reset="cleanup">
       <b-form-group class="text-left">
         <p style="overflow-wrap:break-word" v-if="xss_payload !== ''"><kbd>{{ xss_payload }}</kbd></p>
         <b-form-checkbox
@@ -51,12 +51,13 @@
           placeholder="param1=value1&param2=value2"
         ></b-form-input>
       </b-form-group>
-
-      <b-button
-        type="submit"
-        variant="primary"
-      >Generate</b-button>
-
+      <div class="text-right">
+        <b-button
+          type="submit"
+          variant="info"
+        >Generate</b-button>
+        <b-button type="reset">Cancel</b-button>
+      </div>
     </b-form>
   </b-modal>
 </template>
@@ -122,12 +123,10 @@ export default {
           this.$forceUpdate()
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
-    resetGetPayload () {
+    cleanup () {
       this.xss_payload = ''
       this.options = {
         cookies: false,

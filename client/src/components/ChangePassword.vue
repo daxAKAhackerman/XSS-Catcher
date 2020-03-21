@@ -4,12 +4,12 @@
     id="change-password-modal"
     title="Change password"
     hide-footer
-    @hidden="resetCP"
+    @hidden="cleanup"
     :visible="$parent.show_password_modal"
   >
     <b-form
       @submit="changePassword"
-      @reset="resetCP"
+      @reset="cleanup"
     >
       <b-form-group
         id="input-group-op"
@@ -52,14 +52,16 @@
           required
         ></b-form-input>
       </b-form-group>
-      <b-button
-        type="submit"
-        variant="info"
-      >Save
-      </b-button>
-      <b-button type="reset">Cancel</b-button>
+      <div class="text-right">
+        <b-button
+          type="submit"
+          variant="info"
+        >Save
+        </b-button>
+        <b-button type="reset">Cancel</b-button>
+      </div>
     </b-form>
-    <br />
+    <br v-if="show_alert" />
     <b-alert
       show
       variant="danger"
@@ -98,7 +100,7 @@ export default {
 
       axios.post(path, payload)
         .then(response => {
-          this.resetCP()
+          this.cleanup()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
@@ -107,7 +109,7 @@ export default {
           }
         })
     },
-    resetCP () {
+    cleanup () {
       this.old_password = ''
       this.new_password1 = ''
       this.new_password2 = ''

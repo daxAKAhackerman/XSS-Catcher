@@ -134,13 +134,13 @@
         @submit="deleteClient"
         @reset="$refs.deleteClientModal.hide()"
       >
-
-        <b-button
-          type="submit"
-          variant="danger"
-        >Yes, delete this entry</b-button>
-        <b-button type="reset">Cancel</b-button>
-
+        <div class="text-right">
+          <b-button
+            type="submit"
+            variant="danger"
+          >Yes, delete this entry</b-button>
+          <b-button type="reset">Cancel</b-button>
+        </div>
       </b-form>
     </b-modal>
 
@@ -207,9 +207,7 @@ export default {
           this.clients = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     deleteClient () {
@@ -220,9 +218,7 @@ export default {
           this.$refs.deleteClientModal.hide()
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     getLogout () {
@@ -232,7 +228,7 @@ export default {
           this.$router.push({ name: 'Login' })
         })
         .catch(error => {
-          console.error(error.response.data)
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     getUser () {
@@ -242,9 +238,7 @@ export default {
           this.user = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     }
   },

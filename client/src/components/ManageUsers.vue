@@ -14,7 +14,7 @@
       <thead>
         <tr>
           <th scope="col">Username</th>
-          <th scope="col" class='text-center'>Action</th>
+          <th scope="col" class='text-right'>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -23,7 +23,7 @@
           v-bind:key="user.id"
         >
           <td>{{ user.username }}</td>
-          <td class='text-center'>
+          <td class='text-right'>
             <b-button
               @click="to_delete = user.id"
               v-b-modal.delete-user-modal
@@ -35,7 +35,7 @@
         </tr>
       </tbody>
     </table>
-    <br />
+    <br v-if="show_alert" />
     <b-alert
       show
       variant="danger"
@@ -51,13 +51,13 @@
         @submit="deleteUser"
         @reset="$refs.deleteUserModal.hide()"
       >
-
-        <b-button
-          type="submit"
-          variant="danger"
-        >Yes, delete this user</b-button>
-        <b-button type="reset">Cancel</b-button>
-
+        <div class="text-right">
+          <b-button
+            type="submit"
+            variant="danger"
+          >Yes, delete this user</b-button>
+          <b-button type="reset">Cancel</b-button>
+        </div>
       </b-form>
     </b-modal>
 
@@ -94,9 +94,7 @@ export default {
           this.users = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     deleteUser () {

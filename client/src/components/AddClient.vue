@@ -4,11 +4,11 @@
     id="add-client-modal"
     title="New client"
     hide-footer
-    @hidden="resetNewClient"
+    @hidden="cleanup"
   >
     <b-form
       @submit="putClient"
-      @reset="resetNewClient"
+      @reset="cleanup"
     >
       <b-form-group
         id="input-group-name"
@@ -35,14 +35,16 @@
           required
         ></b-form-input>
       </b-form-group>
-      <b-button
-        type="submit"
-        variant="info"
-      >Save
-      </b-button>
-      <b-button type="reset">Cancel</b-button>
+      <div class="text-right">
+        <b-button
+          type="submit"
+          variant="info"
+        >Save
+        </b-button>
+        <b-button type="reset">Cancel</b-button>
+      </div>
     </b-form>
-    <br />
+    <br v-if="show_alert" />
     <b-alert
       show
       variant="danger"
@@ -78,7 +80,7 @@ export default {
 
       axios.put(path, payload)
         .then(response => {
-          this.resetNewClient()
+          this.cleanup()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
@@ -87,7 +89,7 @@ export default {
           }
         })
     },
-    resetNewClient () {
+    cleanup () {
       this.client = {}
       this.show_alert = false
       this.alert_msg = ''

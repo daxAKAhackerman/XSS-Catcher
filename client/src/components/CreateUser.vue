@@ -7,7 +7,7 @@
     hide-footer
     @hide="cleanup"
   >
-    <b-form @submit="createUser">
+    <b-form @submit="createUser" @reset="cleanup">
 
       <b-form-group
         id="input-group-username"
@@ -20,9 +20,12 @@
           id="input-field-username"
         ></b-form-input>
       </b-form-group>
-      <b-button type="submit" variant="info">Create user</b-button>
+      <div class="text-right">
+        <b-button type="submit" variant="info">Create user</b-button>
+        <b-button type="reset">Cancel</b-button>
+      </div>
     </b-form>
-    <br />
+    <br v-if="show_alert" />
     <b-alert
       show
       variant="danger"
@@ -37,6 +40,9 @@
     >
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
+      <div class="text-right">
+        <b-button @click="$refs.createUserModal.hide()" type="reset">Close</b-button>
+      </div>
     </b-modal>
   </b-modal>
 
@@ -84,6 +90,7 @@ export default {
       this.username = ''
       this.show_alert = false
       this.alert_msg = ''
+      this.$refs.createUserModal.hide()
     }
   }
 }

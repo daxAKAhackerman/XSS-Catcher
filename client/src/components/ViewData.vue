@@ -7,7 +7,7 @@
     hide-footer
     size="xl"
     @show="getData"
-    @hide="$parent.getClients"
+    @hide="cleanup"
   >
 
     <h1 class="text-left">Cookies</h1>
@@ -150,9 +150,7 @@ export default {
           this.data = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     deleteData () {
@@ -164,10 +162,14 @@ export default {
           this.$refs.deleteDataModal.hide()
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
+    },
+    cleanup () {
+      this.data = {}
+      this.to_delete = 0
+      this.to_delete_type = ''
+      this.$parent.getClients
     }
   }
 

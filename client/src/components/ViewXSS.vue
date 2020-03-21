@@ -7,7 +7,7 @@
     hide-footer
     size="xl"
     @show="getXSS"
-    @hide="$parent.getClients"
+    @hide="cleanup"
   >
 
     <table class="table table-hover">
@@ -108,9 +108,7 @@ export default {
           this.dataXSS = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     deleteXSS () {
@@ -122,14 +120,18 @@ export default {
           this.$refs.deleteXSSModal.hide()
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     convertTimestamp (timestamp) {
       let timestampLocal = moment(timestamp).format('YYYY-MM-DD @ HH:mm:ss')
       return timestampLocal
+    }, 
+    cleanup () {
+      this.dataXSS = {}
+      this.viewedXSS = {}
+      this.to_delete = 0
+      this.$parent.getClients
     }
   }
 

@@ -6,11 +6,11 @@
     title="Client"
     hide-footer
     @show="getClient"
-    @hide="resetClient"
+    @hide="cleanup"
   >
     <b-form
       @submit="postClient"
-      @reset="resetClient"
+      @reset="cleanup"
     >
 
       <b-form-group
@@ -49,17 +49,18 @@
           disabled
         ></b-form-input>
       </b-form-group>
-
-      <b-button
-        type="submit"
-        variant="info"
-      >Save</b-button>
-      <b-button
-        type="reset"
-        variant="secondary"
-      >Cancel</b-button>
+      <div class="text-right">
+        <b-button
+          type="submit"
+          variant="info"
+        >Save</b-button>
+        <b-button
+          type="reset"
+          variant="secondary"
+        >Cancel</b-button>
+      </div>
     </b-form>
-    <br />
+    <br v-if="show_alert" />
     <b-alert
       show
       variant="danger"
@@ -96,9 +97,7 @@ export default {
           this.client = response.data
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            console.error(error.response.data)
-          }
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     postClient () {
@@ -111,7 +110,7 @@ export default {
 
       axios.post(path, payload)
         .then(response => {
-          this.resetClient()
+          this.cleanup()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
@@ -120,7 +119,7 @@ export default {
           }
         })
     },
-    resetClient () {
+    cleanup () {
       this.show_alert = false
       this.alert_msg = ''
       this.client = {}
