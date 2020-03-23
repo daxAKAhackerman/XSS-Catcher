@@ -40,11 +40,8 @@
             <b-button>
               <b-icon-arrow-repeat @click="getClients" style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
-            <b-button variant="success" v-b-modal.create-user-modal>
-              Create user
-            </b-button>
-            <b-button variant="danger" v-b-modal.manage-users-modal>
-              Delete user
+            <b-button v-if="user.is_admin" variant="info" v-b-modal.manage-users-modal>
+              Manage users
             </b-button>
             <b-button variant="warning" v-b-modal.change-password-modal>
               Change password
@@ -174,7 +171,6 @@
       :owner_id=viewed_client.owner_id
       :user_id=user.id
     />
-    <CreateUser />
     <ChangePassword />
     <ManageUsers />
 
@@ -190,7 +186,6 @@ import GetPayload from './GetPayload'
 import ViewData from './ViewData'
 import ViewXSS from './ViewXSS'
 import ViewClient from './ViewClient'
-import CreateUser from './CreateUser'
 import ChangePassword from './ChangePassword'
 import ManageUsers from './ManageUsers'
 
@@ -206,7 +201,6 @@ export default {
     ViewData,
     ViewXSS,
     ViewClient,
-    CreateUser,
     ChangePassword,
     ManageUsers
   },

@@ -36,7 +36,7 @@
       id="view-password-modal"
       title="User created"
       hide-footer
-      @hide="$refs.createUserModal.hide()"
+      @hide="cleanup"
     >
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
@@ -91,6 +91,7 @@ export default {
       this.show_alert = false
       this.alert_msg = ''
       this.$refs.createUserModal.hide()
+      this.$parent.$parent.$parent.getUsers()
     }
   }
 }

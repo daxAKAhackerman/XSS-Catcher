@@ -62,25 +62,72 @@ def change_password():
     return jsonify({'status': 'OK'}), 200
 
 
+@bp.route('/user/<id>/reset_password', methods=['POST'])
+@login_required
+def reset_password(id):
+
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'detail': 'Only an administrator can do that'}), 403
+
+    user = User.query.filter_by(id=id).first_or_404()
+
+    password = user.generate_password()
+
+    user.set_password(password)
+
+    user.first_login = True
+
+    db.session.commit()
+    return jsonify({'status': 'OK', 'detail': password}), 200
+
+
 @bp.route('/user', methods=['GET'])
 @login_required
 def get_user():
     return jsonify(current_user.to_dict()), 200
 
 
-@bp.route('/user/<id>', methods=['DELETE'])
+@bp.route('/user/<id>', methods=['DELETE', 'POST'])
 @login_required
-def delete_user(id):
+def edit_user(id):
 
-    if len(User.query.all()) <= 1:
-        return jsonify({'status': 'error', 'detail': 'Can\'t delete the only user'}), 400
+    if request.method == 'DELETE':
 
-    user = User.query.filter_by(id=id).first_or_404()
+        if len(User.query.all()) <= 1:
+            return jsonify({'status': 'error', 'detail': 'Can\'t delete the only user'}), 400
 
-    db.session.delete(user)
-    db.session.commit()
+        if current_user.id == int(id):
+            return jsonify({'status': 'error', 'detail': 'Can\'t delete yourself'}), 400
 
-    return jsonify({'status': 'OK'}), 200
+        user = User.query.filter_by(id=id).first_or_404()
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return jsonify({'status': 'OK'}), 200
+
+    elif request.method == 'POST':
+
+        if not current_user.is_admin:
+            return jsonify({'status': 'error', 'detail': 'Only an administrator can do that'}), 403
+
+        if current_user.id == int(id):
+            return jsonify({'status': 'error', 'detail': 'Can\'t demote yourself'}), 400
+
+        user = User.query.filter_by(id=id).first_or_404()
+
+        data = request.form
+
+        if ('is_admin' not in data.keys()):
+            return jsonify({'status': 'error', 'detail': 'Missing data'}), 400
+
+        if (int(data['is_admin']) != 1) and (int(data['is_admin']) != 0):
+            return jsonify({'status': 'error', 'detail': 'Invalid data'}), 400
+
+        user.is_admin = (int(data['is_admin']) == 1)
+
+        db.session.commit()
+        return jsonify({'status': 'OK'}), 200
 
 
 @bp.route('/user/all', methods=['GET'])
