@@ -27,30 +27,34 @@
           <td class='text-right'>
             <b-button
               v-if="user.is_admin"
+              v-b-tooltip.hover title="Demote user"
               @click="promoteUser(0, user.id)"
               type="button"
               variant="danger"
-            >Demote
+            ><b-icon-chevron-down style="width: 20px; height: 20px;"></b-icon-chevron-down>
             </b-button>
             <b-button
               v-else
+              v-b-tooltip.hover title="Promote user"
               @click="promoteUser(1, user.id)"
               type="button"
               variant="success"
-            >Promote
+            ><b-icon-chevron-up style="width: 20px; height: 20px;"></b-icon-chevron-up>
             </b-button>
             <b-button
+              v-b-tooltip.hover title="Reset password"
               @click="resetPassword(user.id, user.username)"
               type="button"
               variant="warning"
-            >Reset password
+            ><b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
             <b-button
+              v-b-tooltip.hover title="Delete user"
               @click="to_delete = user.id"
               v-b-modal.delete-user-modal
               type="button"
               variant="danger"
-            >Delete
+            ><b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
             </b-button>
           </td>
         </tr>
