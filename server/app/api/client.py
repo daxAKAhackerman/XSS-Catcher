@@ -48,6 +48,9 @@ def get_client(id):
 
         client = Client.query.filter_by(id=id).first_or_404()
 
+        if current_user.id != client.owner_id and not current_user.is_admin:
+            return jsonify({'status': 'error', 'detail': 'Can\'t modify someone else\'s client'}), 403
+
         if 'name' in data.keys():
 
             if client.name != data['name']: 
@@ -74,6 +77,10 @@ def get_client(id):
     elif request.method == 'DELETE':
 
         client = Client.query.filter_by(id=id).first_or_404()
+
+        if current_user.id != client.owner_id and not current_user.is_admin:
+            return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s client'}), 403
+
         XSS.query.filter_by(client_id=id).delete()
 
         db.session.delete(client)

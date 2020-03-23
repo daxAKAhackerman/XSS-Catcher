@@ -12,11 +12,11 @@ def login():
     if user is None or not user.check_password(data['password']):
         return jsonify({'status': 'error', 'detail': 'Bad username or password'}), 403
     login_user(user, remember=data['remember'])
-    return jsonify({'status': 'OK'})
+    return jsonify({'status': 'OK'}), 200
 
 
 @bp.route('/auth/logout')
 @login_required
 def logout():
     logout_user()
-    return  jsonify({'status': 'OK'})
+    return  jsonify({'status': 'OK'}), 200

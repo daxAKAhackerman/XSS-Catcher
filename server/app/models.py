@@ -17,6 +17,7 @@ class Client(db.Model):
 
     def to_dict_clients(self):
         data = {
+            'owner_id': self.owner_id,
             'id': self.id,
             'name': self.name,
             'reflected': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='reflected').count(),

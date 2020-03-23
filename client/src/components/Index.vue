@@ -7,10 +7,11 @@
         <h1>XSS-Catcher</h1>
       </b-col>
       <b-col
-        sm="2"
+        sm="3"
         class="text-right"
         >
-        <p style="margin-bottom:0;margin-top:revert">Current user: <b>{{ user.username }}</b></p>
+        <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">Current user: <b>{{ user.username }}</b> [admin]</p>
+        <p v-else style="margin-bottom:0;margin-top:revert">Current user: <b>{{ user.username }}</b></p>
       </b-col>
     </b-row>
     <br />
@@ -75,7 +76,7 @@
               >
                 <td>
                   <b-link
-                    @click="viewed_client=client.id"
+                    @click="viewed_client=client"
                     v-b-modal.view-client-modal
                   >
                     {{ client.name }}
@@ -83,35 +84,43 @@
                 </td>
                 <td>
                   <b-link
-                    @click="xss_type='stored'; viewed_client=client.id"
+                    @click="xss_type='stored'; viewed_client=client"
                     v-b-modal.view-XSS-modal
                   >{{ client.stored }}</b-link>
                 </td>
                 <td>
                   <b-link
-                    @click="xss_type='reflected'; viewed_client=client.id"
+                    @click="xss_type='reflected'; viewed_client=client"
                     v-b-modal.view-XSS-modal
                   >{{ client.reflected }}
                   </b-link>
                 </td>
                 <td>
                   <b-link
-                    @click="viewed_client=client.id"
+                    @click="viewed_client=client"
                     v-b-modal.view-data-modal
                   >{{ client.cookies }}
                   </b-link>
                 </td>
                 <td>
                   <b-button
-                    @click="viewed_client=client.id"
+                    @click="viewed_client=client"
                     v-b-modal.get-payload-modal
                     type="button"
                     variant="info"
                   >Generate payload
                   </b-button>
                   <b-button
+                    v-if="client.owner_id === user.id || user.is_admin"
                     @click="to_delete = client.id"
                     v-b-modal.delete-client-modal
+                    type="button"
+                    variant="danger"
+                  >Delete
+                  </b-button>
+                  <b-button
+                    v-else
+                    disabled
                     type="button"
                     variant="danger"
                   >Delete
@@ -145,13 +154,26 @@
     </b-modal>
 
     <AddClient />
-    <GetPayload :client_id=viewed_client />
-    <ViewData :client_id=viewed_client />
+    <GetPayload :client_id=viewed_client.id />
+    <ViewData 
+      :client_id=viewed_client.id
+      :is_admin=user.is_admin
+      :owner_id=viewed_client.owner_id
+      :user_id=user.id
+    />
     <ViewXSS
       :xss_type=xss_type
-      :client_id=viewed_client
+      :client_id=viewed_client.id
+      :is_admin=user.is_admin
+      :owner_id=viewed_client.owner_id
+      :user_id=user.id
     />
-    <ViewClient :client_id=viewed_client />
+    <ViewClient 
+      :client_id=viewed_client.id
+      :is_admin=user.is_admin
+      :owner_id=viewed_client.owner_id
+      :user_id=user.id
+    />
     <CreateUser />
     <ChangePassword />
     <ManageUsers />

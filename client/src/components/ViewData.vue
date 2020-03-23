@@ -21,6 +21,7 @@
           <td class="text-left">{{ cookie_value }}</td>
           <td class="text-right">
             <b-button
+              v-if="owner_id === user_id || is_admin"
               @click="to_delete_type = 'cookies'; to_delete = cookie_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -44,6 +45,7 @@
           <td class="text-left">{{ local_storage_value }}</td>
           <td class="text-right">
             <b-button
+              v-if="owner_id === user_id || is_admin"
               @click="to_delete_type = 'local_storage'; to_delete = local_storage_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -66,6 +68,7 @@
           <td class="text-left">{{ session_storage_value }}</td>
           <td class="text-right">
             <b-button
+              v-if="owner_id === user_id || is_admin"
               @click="to_delete_type = 'session_storage'; to_delete = session_storage_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -88,6 +91,7 @@
           <td class="text-left">{{ other_value }}</td>
           <td class="text-right">
             <b-button
+              v-if="owner_id === user_id || is_admin"
               @click="to_delete_type = 'other_data'; to_delete = other_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -133,7 +137,7 @@ axios.defaults.headers.post['Content-Type'] =
 const basePath = '/api'
 
 export default {
-  props: ['client_id'],
+  props: ['client_id', 'is_admin', 'owner_id', 'user_id'],
   data () {
     return {
       data: {},

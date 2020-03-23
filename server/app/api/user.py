@@ -53,7 +53,7 @@ def change_password():
         return jsonify({'status': 'error', 'detail': 'Passwords don\'t match'}), 400
 
     if not current_user.check_password(data['old_password']):
-        return jsonify({'status': 'error', 'detail': 'Old password is incorrect'}), 401
+        return jsonify({'status': 'error', 'detail': 'Old password is incorrect'}), 400
 
     current_user.set_password(data['password1'])
     current_user.first_login = False

@@ -2,7 +2,7 @@ from flask import jsonify, request
 from app import db
 from app.models import Client, XSS
 from app.api import bp
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 
 @bp.route('/xss/generate/<id>', methods=['GET'])
@@ -105,6 +105,9 @@ def delete_xss(id):
 
     xss = XSS.query.filter_by(id=id).first_or_404()
 
+    if current_user.id != xss.client.owner_id and not current_user.is_admin:
+        return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s XSS'}), 403
+
     db.session.delete(xss)
     db.session.commit()
 
@@ -116,6 +119,9 @@ def delete_xss(id):
 def delete_loot(id, loot_type):
 
     xss = XSS.query.filter_by(id=id).first_or_404()
+
+    if current_user.id != xss.client.owner_id and not current_user.is_admin:
+        return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s data'}), 403
 
     if loot_type == 'local_storage':
         xss.local_storage = None

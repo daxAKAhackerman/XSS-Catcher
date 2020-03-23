@@ -20,6 +20,13 @@
         label-for="input-field-name"
       >
         <b-form-input
+          v-if="owner_id === user_id || is_admin"
+          id="input-field-name"
+          v-model="client.name"
+        ></b-form-input>
+        <b-form-input
+          v-else
+          disabled
           id="input-field-name"
           v-model="client.name"
         ></b-form-input>
@@ -32,6 +39,13 @@
         label-for="input-field-description"
       >
         <b-form-input
+          v-if="owner_id === user_id || is_admin"
+          id="input-field-description"
+          v-model="client.description"
+        ></b-form-input>
+        <b-form-input
+          v-else
+          disabled
           id="input-field-description"
           v-model="client.description"
         ></b-form-input>
@@ -51,6 +65,7 @@
       </b-form-group>
       <div class="text-right">
         <b-button
+          v-if="owner_id === user_id || is_admin" 
           type="submit"
           variant="info"
         >Save</b-button>
@@ -80,7 +95,7 @@ axios.defaults.headers.post['Content-Type'] =
 const basePath = '/api'
 
 export default {
-  props: ['client_id'],
+  props: ['client_id', 'is_admin', 'owner_id', 'user_id'],
   data () {
     return {
       client: {},

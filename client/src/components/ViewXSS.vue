@@ -36,6 +36,7 @@
             >View details
             </b-button>
             <b-button
+              v-if="owner_id === user_id || is_admin"
               @click="to_delete = hit.id"
               v-b-modal.delete-xss-modal
               type="button"
@@ -90,7 +91,7 @@ export default {
   components: {
     ViewDetails
   },
-  props: ['xss_type', 'client_id'],
+  props: ['xss_type', 'client_id', 'is_admin', 'owner_id', 'user_id'],
   mixins: [Vue2Filters.mixin],
   data () {
     return {
