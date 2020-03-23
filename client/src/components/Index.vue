@@ -155,7 +155,7 @@
 
     <AddClient />
     <GetPayload :client_id=viewed_client.id />
-    <ViewData 
+    <ViewData
       :client_id=viewed_client.id
       :is_admin=user.is_admin
       :owner_id=viewed_client.owner_id
@@ -168,7 +168,7 @@
       :owner_id=viewed_client.owner_id
       :user_id=user.id
     />
-    <ViewClient 
+    <ViewClient
       :client_id=viewed_client.id
       :is_admin=user.is_admin
       :owner_id=viewed_client.owner_id

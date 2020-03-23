@@ -65,7 +65,7 @@
       </b-form-group>
       <div class="text-right">
         <b-button
-          v-if="owner_id === user_id || is_admin" 
+          v-if="owner_id === user_id || is_admin"
           type="submit"
           variant="info"
         >Save</b-button>
