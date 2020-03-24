@@ -38,6 +38,13 @@
         >
           Steal session storage
         </b-form-checkbox>
+        <b-form-checkbox
+          v-model="options.geturl"
+          name="check-button"
+          switch
+        >
+          Get origin URL
+        </b-form-checkbox>
 
         <b-form-radio v-model="options.code_type" name="radio-button" value="js">JavaScript</b-form-radio>
         <b-form-radio v-model="options.code_type" name="radio-button" value="html">HTML</b-form-radio>
@@ -79,6 +86,7 @@ export default {
         local_storage: false,
         session_storage: false,
         stored: false,
+        geturl: false,
         code_type: 'html',
         other: ''
       },
@@ -105,6 +113,10 @@ export default {
 
       if (this.options.stored) {
         path += 'stored=1&'
+      }
+
+      if (this.options.geturl) {
+        path += 'geturl=1&'
       }
 
       if (this.options.other) {

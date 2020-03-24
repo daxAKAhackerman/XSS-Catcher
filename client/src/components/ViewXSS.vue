@@ -37,6 +37,7 @@
             </b-button>
             <b-button
               v-if="owner_id === user_id || is_admin"
+              v-b-tooltip.hover title="Delete XSS"
               @click="to_delete = hit.id"
               v-b-modal.delete-xss-modal
               type="button"

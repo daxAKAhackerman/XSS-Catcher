@@ -22,6 +22,7 @@
           <td class="text-right">
             <b-button
               v-if="owner_id === user_id || is_admin"
+              v-b-tooltip.hover title="Delete data"
               @click="to_delete_type = 'cookies'; to_delete = cookie_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -46,6 +47,7 @@
           <td class="text-right">
             <b-button
               v-if="owner_id === user_id || is_admin"
+              v-b-tooltip.hover title="Delete data"
               @click="to_delete_type = 'local_storage'; to_delete = local_storage_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -69,6 +71,7 @@
           <td class="text-right">
             <b-button
               v-if="owner_id === user_id || is_admin"
+              v-b-tooltip.hover title="Delete data"
               @click="to_delete_type = 'session_storage'; to_delete = session_storage_id"
               v-b-modal.delete-data-modal
               type="button"
@@ -92,6 +95,7 @@
           <td class="text-right">
             <b-button
               v-if="owner_id === user_id || is_admin"
+              v-b-tooltip.hover title="Delete data"
               @click="to_delete_type = 'other_data'; to_delete = other_id"
               v-b-modal.delete-data-modal
               type="button"
