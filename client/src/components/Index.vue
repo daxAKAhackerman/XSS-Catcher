@@ -109,6 +109,7 @@
                   </b-button>
                   <b-button
                     v-if="client.owner_id === user.id || user.is_admin"
+                    v-b-tooltip.hover title="Delete client"
                     @click="to_delete = client.id"
                     v-b-modal.delete-client-modal
                     type="button"
