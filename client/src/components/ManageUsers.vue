@@ -31,7 +31,7 @@
               @click="promoteUser(0, user.id)"
               type="button"
               variant="danger"
-            ><b-icon-chevron-down style="width: 20px; height: 20px;"></b-icon-chevron-down>
+            ><b-icon-chevron-double-down style="width: 20px; height: 20px;"></b-icon-chevron-double-down>
             </b-button>
             <b-button
               v-else
@@ -39,7 +39,7 @@
               @click="promoteUser(1, user.id)"
               type="button"
               variant="success"
-            ><b-icon-chevron-up style="width: 20px; height: 20px;"></b-icon-chevron-up>
+            ><b-icon-chevron-double-up style="width: 20px; height: 20px;"></b-icon-chevron-double-up>
             </b-button>
             <b-button
               v-b-tooltip.hover title="Reset password"

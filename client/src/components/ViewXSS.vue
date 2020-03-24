@@ -41,7 +41,7 @@
               v-b-modal.delete-xss-modal
               type="button"
               variant="danger"
-            >Delete
+            ><b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
             </b-button>
           </td>
         </tr>

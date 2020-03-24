@@ -37,8 +37,8 @@
             sm="8"
             class="text-right"
           >
-            <b-button>
-              <b-icon-arrow-repeat @click="getClients" style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
+            <b-button v-b-tooltip.hover title="Refresh data" @click="getClients">
+              <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
             <b-button v-if="user.is_admin" variant="info" v-b-modal.manage-users-modal>
               Manage users
@@ -113,7 +113,7 @@
                     v-b-modal.delete-client-modal
                     type="button"
                     variant="danger"
-                  >Delete
+                  ><b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
                   </b-button>
                   <b-button
                     v-else

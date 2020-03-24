@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "bootstrap-vue": "^2.0.0-rc.19",
+    "bootstrap": "^4.4.1",
+    "bootstrap-vue": "^2.8.0",
     "moment-timezone": "^0.5.25",
     "vue": "^2.5.2",
     "vue-moment": "^4.0.0",
