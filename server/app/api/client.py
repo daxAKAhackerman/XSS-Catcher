@@ -5,6 +5,8 @@ from app.api import bp
 from flask_login import login_required, current_user
 from app.validators import not_empty, check_length
 
+import json
+
 
 @bp.route('/client', methods=['PUT'])
 @login_required
@@ -121,15 +123,15 @@ def get_client_loot(id):
 
     for hit in xss:
         if hit.cookies != None:
-            loot['cookies'][hit.id] = hit.cookies
+            loot['cookies'][hit.id] = json.loads(hit.cookies)
 
         if hit.local_storage != None:
-            loot['local_storage'][hit.id] = hit.local_storage
+            loot['local_storage'][hit.id] = json.loads(hit.local_storage)
 
         if hit.session_storage != None:
-            loot['session_storage'][hit.id] = hit.session_storage
+            loot['session_storage'][hit.id] = json.loads(hit.session_storage)
 
         if hit.other_data != None: 
-            loot['other_data'][hit.id] = hit.other_data
+            loot['other_data'][hit.id] = json.loads(hit.other_data)
 
     return jsonify(loot), 200

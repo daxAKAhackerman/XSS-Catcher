@@ -7,113 +7,56 @@
     hide-footer
     size="xl"
   >
-    <b-form>
 
-      <b-form-group
-        id="input-group-timestamp"
-        label="Timestamp:"
-        label-cols="3"
-        label-for="input-field-timestamp"
-      >
-        <b-form-input
-          id="input-field-timestamp"
-          disabled
-          v-model="converted_timestamp"
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-referer"
-        label="Referer:"
-        label-cols="3"
-        label-for="input-field-referer"
-      >
-        <b-form-input
-          id="input-field-referer"
-          v-model="data.referer"
-          disabled
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-ip_addr"
-        label="IP address:"
-        label-cols="3"
-        label-for="input-field-ip_addr"
-      >
-        <b-form-input
-          id="input-field-ip_addr"
-          v-model="data.ip_addr"
-          disabled
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-user_agent"
-        label="User agent:"
-        label-cols="3"
-        label-for="input-field-user_agent"
-      >
-        <b-form-input
-          id="input-field-user_agent"
-          v-model="data.user_agent"
-          disabled
-        ></b-form-input>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-cookies"
-        label="Captured cookies:"
-        label-cols="3"
-        label-for="input-field-cookies"
-      >
-        <b-form-textarea
-          id="input-field-cookies"
-          v-model="data.cookies"
-          disabled
-        ></b-form-textarea>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-local_storage"
-        label="Captured local storage:"
-        label-cols="3"
-        label-for="input-field-local_storage"
-      >
-        <b-form-textarea
-          id="input-field-local_storage"
-          v-model="data.local_storage"
-          disabled
-        ></b-form-textarea>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-session_storage"
-        label="Captured session storage:"
-        label-cols="3"
-        label-for="input-field-session_storage"
-      >
-        <b-form-textarea
-          id="input-field-session_storage"
-          v-model="data.session_storage"
-          disabled
-        ></b-form-textarea>
-      </b-form-group>
-
-      <b-form-group
-        id="input-group-other_data"
-        label="Other captured data:"
-        label-cols="3"
-        label-for="input-field-other_data"
-      >
-        <b-form-textarea
-          id="input-field-other_data"
-          v-model="data.other_data"
-          disabled
-        ></b-form-textarea>
-      </b-form-group>
-
-    </b-form>
+    <table class="table" style="table-layout: fixed; width: 100%">
+      <tr>
+        <td valign="top"><b>Timestamp: </b></td>
+        <td width="80%">{{ converted_timestamp }}</td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Referer: </b></td>
+        <td>{{ data.referer }}</td>
+      </tr>
+      <tr>
+        <td valign="top"><b>IP address: </b></td>
+        <td>{{ data.ip_addr }}</td>
+      </tr>
+      <tr>
+        <td valign="top"><b>User agent: </b></td>
+        <td>{{ data.user_agent }}</td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Captured cookies: </b></td>
+        <td><code>{{ data.cookies }}</code></td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Captured local storage: </b></td>
+        <td><code>{{ data.local_storage }}</code></td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Captured session storage: </b></td>
+        <td><code>{{ data.session_storage }}</code></td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Other captured data: </b></td>
+        <td>
+          <div v-for="(value, key) in data.other_data" v-bind:key="key" style="word-wrap: break-word">
+            <div v-if="key == 'fingerprint'">
+              <h4>Fingerprint</h4>
+              <p><vue-json-pretty :showLength=true :deep=0 :data=value></vue-json-pretty></p>
+            </div>
+            <div v-else-if="key == 'screenshot'">
+              <h4>Screenshot</h4>
+              <p><img style="max-width:100%" :src=value /></p>
+            </div>
+            <div v-else>
+              <h4>Data</h4>
+              <p><code>{{ key }} => {{ value}}</code></p>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
 
   </b-modal>
 
@@ -121,9 +64,13 @@
 
 <script>
 import moment from 'moment'
+import VueJsonPretty from 'vue-json-pretty'
 
 export default {
   props: ['data'],
+  components: {
+    VueJsonPretty
+  },
   computed: {
     converted_timestamp: {
       get () {

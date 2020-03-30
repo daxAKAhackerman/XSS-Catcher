@@ -45,6 +45,13 @@
         >
           Get origin URL
         </b-form-checkbox>
+        <b-form-checkbox
+          v-model="options.all"
+          name="check-button"
+          switch
+        >
+          All of the above plus screenshot and host fingerprinting
+        </b-form-checkbox>
 
         <b-form-radio v-model="options.code_type" name="radio-button" value="js">JavaScript</b-form-radio>
         <b-form-radio v-model="options.code_type" name="radio-button" value="html">HTML</b-form-radio>
@@ -88,7 +95,8 @@ export default {
         stored: false,
         geturl: false,
         code_type: 'html',
-        other: ''
+        other: '',
+        all: false
       },
       xss_payload: ''
     }
@@ -98,6 +106,10 @@ export default {
       evt.preventDefault()
 
       let path = basePath + '/xss/generate/' + this.client_id + '?url=' + encodeURIComponent(location.origin) + '&'
+
+      if (this.options.all) {
+        path += 'i_want_it_all=1&'
+      }
 
       if (this.options.cookies) {
         path += 'cookies=1&'

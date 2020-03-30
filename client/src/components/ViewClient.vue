@@ -26,7 +26,7 @@
         ></b-form-input>
         <b-form-input
           v-else
-          disabled
+          readonly
           id="input-field-name"
           v-model="client.name"
         ></b-form-input>
@@ -45,7 +45,7 @@
         ></b-form-input>
         <b-form-input
           v-else
-          disabled
+          readonly
           id="input-field-description"
           v-model="client.description"
         ></b-form-input>
@@ -60,7 +60,7 @@
         <b-form-input
           id="input-field-owner"
           v-model="client.owner"
-          disabled
+          readonly
         ></b-form-input>
       </b-form-group>
       <div class="text-right">

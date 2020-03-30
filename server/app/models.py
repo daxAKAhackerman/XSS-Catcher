@@ -5,6 +5,7 @@ from sqlalchemy import DateTime
 from sqlalchemy.sql.expression import func
 import random
 import string
+import json
 
 
 class Client(db.Model):
@@ -30,7 +31,9 @@ class Client(db.Model):
         return data
 
     def to_dict_client(self):
-        owner = User.query.filter_by(id=self.owner_id).first().username
+        owner = None
+        if self.owner_id != None:
+            owner = User.query.filter_by(id=self.owner_id).first().username
         if owner == None:
             owner = 'Nobody'
         data = {
@@ -65,15 +68,16 @@ class XSS(db.Model):
     xss_type = db.Column(db.String(9))
 
     def to_dict(self):
+
         data = {
             'id': self.id,
             'referer': self.referer,
             'user_agent': self.user_agent,
             'ip_addr': self.ip_addr,
-            'cookies': self.cookies,
-            'local_storage': self.local_storage,
-            'session_storage': self.session_storage,
-            'other_data': self.other_data,
+            'cookies': json.loads(self.cookies) if self.cookies != None else self.cookies,
+            'local_storage': json.loads(self.local_storage) if self.local_storage != None else self.local_storage,
+            'session_storage': json.loads(self.session_storage) if self.session_storage != None else self.session_storage,
+            'other_data': json.loads(self.other_data) if self.other_data != None else self.other_data,
             'timestamp': self.timestamp,
         }
         return data

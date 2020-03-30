@@ -1,11 +1,13 @@
 # XSS Catcher
-XSS Catcher is a simple application that facilitates blind Cross-Site Scripting attacks and attacks that aim to gather data (e.g. cookies). 
+XSS Catcher is a simple application that facilitates blind Cross-Site Scripting attacks and attacks that aim to gather data (e.g. cookies, session/local storage, screenshots, etc.). 
 ## Features
-* Generates simple customizable XSS payloads. 
-* Separates the gathered data by client. 
-* Multi-user. 
+* Generates simple customizable XSS payloads
+* Separates the gathered data by client
+* Multi-user with administrative and low privilege users
 * Stores informations about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
 * Allows capture of cookies, local storage, session storage and any other specified parameters
+* Payload can be customized by the users as he pleases. Simply pass your data in the query string or POST body and the application will catch it! 
+* Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprint2](https://github.com/Valve/fingerprintjs2)
 * Granular deletion of captured data
 ## Install
 ```bash

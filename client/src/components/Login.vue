@@ -130,6 +130,9 @@ export default {
             name: 'Index'
           })
         })
+        .catch(error => {
+          void (error)
+        })
     }
   },
   created () {
