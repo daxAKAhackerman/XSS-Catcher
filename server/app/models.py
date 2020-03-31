@@ -56,8 +56,8 @@ class Client(db.Model):
 
 class XSS(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    referer = db.Column(db.String(256))
-    user_agent = db.Column(db.String(128))
+    referer = db.Column(db.TEXT)
+    user_agent = db.Column(db.TEXT)
     ip_addr = db.Column(db.String(15))
     cookies = db.Column(db.TEXT)
     local_storage = db.Column(db.TEXT)

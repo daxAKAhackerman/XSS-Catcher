@@ -24,8 +24,8 @@ DROP TABLE IF EXISTS `XSS`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `XSS` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `referer` varchar(256) DEFAULT NULL,
-  `user_agent` varchar(128) DEFAULT NULL,
+  `referer` text DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
   `ip_addr` varchar(15) DEFAULT NULL,
   `cookies` text DEFAULT NULL,
   `local_storage` text DEFAULT NULL,
