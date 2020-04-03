@@ -66,6 +66,8 @@ def catch_xss(flavor, uid):
                 other_data = {}
             if param == 'fingerprint':
                 value = json.loads(value)
+            if param == 'dom':
+                value = '<html>\n{}\n</html>'.format(value)
             other_data[param] = value
 
     if other_data != None: 

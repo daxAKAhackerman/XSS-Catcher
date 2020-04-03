@@ -112,10 +112,21 @@
               <div v-else-if="key == 'fingerprint'">
                 <h4>Fingerprint</h4>
                 <p><vue-json-pretty
-                  :deep=2
+                  :deep=0
                   :showLength=true
                   :data=value
                 ></vue-json-pretty></p>
+              </div>
+              <div v-else-if="key == 'dom'">
+                <h4>DOM</h4>
+                <p>
+                  <a href="#" v-b-toggle.collapse-1 variant="primary">[Click to view DOM...]</a>
+                  <b-collapse id="collapse-1">
+                    <div v-highlight >
+                      <pre class="language-html"><code>{{ value }}</code></pre>
+                    </div>
+                  </b-collapse>
+                </p>
               </div>
               <div v-else>
                 <h4>Data</h4>

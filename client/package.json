@@ -18,6 +18,7 @@
     "moment-timezone": "^0.5.25",
     "tslib": "^1.11.1",
     "vue": "^2.5.2",
+    "vue-code-highlight": "^0.7.4",
     "vue-json-pretty": "^1.6.3",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1",

