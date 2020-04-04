@@ -24,13 +24,9 @@ DROP TABLE IF EXISTS `XSS`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `XSS` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `referer` text DEFAULT NULL,
-  `user_agent` text DEFAULT NULL,
+  `headers` text DEFAULT NULL,
   `ip_addr` varchar(15) DEFAULT NULL,
-  `cookies` text DEFAULT NULL,
-  `local_storage` text DEFAULT NULL,
-  `session_storage` text DEFAULT NULL,
-  `other_data` text DEFAULT NULL,
+  `data` text DEFAULT NULL,
   `timestamp` datetime DEFAULT NULL,
   `client_id` int(11) DEFAULT NULL,
   `xss_type` varchar(9) DEFAULT NULL,
@@ -117,4 +113,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-18 12:23:02
+-- Dump completed on 2020-04-04  2:58:26
