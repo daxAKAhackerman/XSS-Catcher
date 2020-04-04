@@ -16,8 +16,6 @@ def catch_xss(flavor, uid):
     if client == None:
         return jsonify({'status': 'OK'}), 200
 
-    referer = request.referrer
-    user_agent = request.user_agent
     if flavor == 'r':
         xss_type = 'reflected'
     else:
@@ -32,49 +30,49 @@ def catch_xss(flavor, uid):
     elif request.method == 'POST': 
         parameters = request.form
 
-    other_data = None
-    cookies = None
-    local_storage = None
-    session_storage = None
+    headers = []
+    for header in request.headers:
+        headers.append({header[0]: header[1]})
+
+
+    data = {}
 
     for param, value in parameters.items():
 
         if param == 'cookies':
-
             if value != '':
-                cookies = {}
-                print(value)
+                if 'cookies' not in data.keys():
+                    data['cookies'] = []
                 cookies_list = value.split('; ')
-                print(cookies_list)
                 for cookie in cookies_list:
                     cookie_name, cookie_value = cookie.split('=')
-                    cookies[cookie_name] = cookie_value
-                cookies = json.dumps(cookies)
+                    data['cookies'].append({cookie_name: cookie_value})
 
         elif param == 'local_storage':
-            local_storage = value
-            if local_storage == '' or local_storage == '{}':
-                local_storage = None
+            if value != '' and value != '{}':
+                if 'local_storage' not in data.keys():
+                    data['local_storage'] = []
+                local_storage = json.loads(value)
+                for element in local_storage.items():
+                    data['local_storage'].append({element[0]: element[1]}) 
 
         elif param == 'session_storage':
-            session_storage = value
-            if session_storage == '' or session_storage == '{}':
-                session_storage = None
-
+            if value != '' and value != '{}':
+                if 'session_storage' not in data.keys():
+                    data['session_storage'] = []
+                session_storage = json.loads(value)
+                for element in session_storage.items():
+                    data['session_storage'].append({element[0]: element[1]}) 
         else:
-            if other_data == None:
-                other_data = {}
-            if param == 'fingerprint':
-                value = json.loads(value)
-            if param == 'dom':
-                value = '<html>\n{}\n</html>'.format(value)
-            other_data[param] = value
+            if value != '' and value != '{}':
+                if param == 'fingerprint':
+                    data['fingerprint'] = json.loads(value)
+                if param == 'dom':
+                    data['dom'] = '<html>\n{}\n</html>'.format(value)
+                else: 
+                    data[param] = value
 
-    if other_data != None: 
-        other_data = json.dumps(other_data)
-
-    xss = XSS(referer=referer, user_agent=str(user_agent), ip_addr=ip_addr,
-              cookies=cookies, client_id=client.id, xss_type=xss_type, local_storage=local_storage, session_storage=session_storage, other_data=other_data)
+    xss = XSS(headers=json.dumps(headers), ip_addr=ip_addr, client_id=client.id, xss_type=xss_type, data=json.dumps(data))
     db.session.add(xss)
     db.session.commit()
 

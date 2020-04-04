@@ -112,26 +112,17 @@ def get_client_xss(id, flavor):
 @login_required
 def get_client_loot(id):
 
-    loot = {
-        'cookies': {},
-        'local_storage': {},
-        'session_storage': {},
-        'other_data': {}
-    }
+    loot = {}
 
     xss = XSS.query.filter_by(client_id=id).all()
 
     for hit in xss:
-        if hit.cookies != None:
-            loot['cookies'][hit.id] = json.loads(hit.cookies)
-
-        if hit.local_storage != None:
-            loot['local_storage'][hit.id] = json.loads(hit.local_storage)
-
-        if hit.session_storage != None:
-            loot['session_storage'][hit.id] = json.loads(hit.session_storage)
-
-        if hit.other_data != None: 
-            loot['other_data'][hit.id] = json.loads(hit.other_data)
+        for element in json.loads(hit.data).items():
+            if element[0] not in loot.keys():
+                loot[element[0]] = []
+            if element[0] == 'fingerprint':
+                loot[element[0]].append(json.loads(element[1]))
+            else:
+                loot[element[0]].append(element[1])
 
     return jsonify(loot), 200

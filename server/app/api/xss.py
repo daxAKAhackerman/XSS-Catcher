@@ -114,7 +114,7 @@ def gen_xss(id):
         payload += '"'
 
     if code_type == 'js':
-        payload += '; '
+        payload += ';'
     else:
         if require_js:
             payload += '</script>'

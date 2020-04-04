@@ -14,55 +14,66 @@
         <td width="80%">{{ converted_timestamp }}</td>
       </tr>
       <tr>
-        <td valign="top"><b>Referer: </b></td>
-        <td>{{ data.referer }}</td>
-      </tr>
-      <tr>
         <td valign="top"><b>IP address: </b></td>
         <td>{{ data.ip_addr }}</td>
       </tr>
       <tr>
-        <td valign="top"><b>User agent: </b></td>
-        <td>{{ data.user_agent }}</td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Captured cookies: </b></td>
-        <td><code>{{ data.cookies }}</code></td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Captured local storage: </b></td>
-        <td><code>{{ data.local_storage }}</code></td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Captured session storage: </b></td>
-        <td><code>{{ data.session_storage }}</code></td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Other captured data: </b></td>
+        <td valign="top"><b>HTTP headers: </b></td>
         <td>
-          <div v-for="(value, key) in data.other_data" v-bind:key="key" style="word-wrap: break-word">
-            <div v-if="key == 'fingerprint'">
-              <h4>Fingerprint</h4>
-              <p><vue-json-pretty :showLength=true :deep=0 :data=value></vue-json-pretty></p>
-            </div>
-            <div v-else-if="key == 'screenshot'">
-              <h4>Screenshot</h4>
-              <p><img style="max-width:100%" :src=value /></p>
-            </div>
-            <div v-else-if="key == 'dom'">
-              <h4>DOM</h4>
+          <div v-highlight >
+            <pre class="language-http"><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name"><div v-for="(header_value_deep, header_name_deep) in header_value" v-bind:key="header_name_deep">{{ header_name_deep }}: {{ header_value_deep }}
+</div></div></code></pre>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><b>Captured data: </b></td>
+        <td>
+          <div v-for="(data_value, data_name) in data.data" v-bind:key="data_name" style="word-wrap: break-word">
+            <div v-if="data_name == 'screenshot'">
+              <h4>{{ data_name }}</h4>
               <p>
-                <a href="#" v-b-toggle.collapse-1 variant="primary">[Click to view DOM...]</a>
-                <b-collapse id="collapse-1">
+                <a href="#" v-b-toggle="'collapse-screenshot'">[Click to view screenshot...]</a>
+                <b-collapse id="collapse-screenshot">
+                  <img style="max-width:100%" :src=data_value />
+                </b-collapse>
+              </p>
+              <p></p>
+            </div>
+            <div v-else-if="data_name == 'fingerprint'">
+              <h4>{{ data_name }}</h4>
+              <p>
+                <vue-json-pretty :deep=0 :showLength=true :data=data_value></vue-json-pretty>
+              </p>
+              <p></p>
+            </div>
+            <div v-else-if="data_name == 'dom'">
+              <h4>{{ data_name }}</h4>
+              <p>
+                <a href="#" v-b-toggle="'collapse-dom'">[Click to view DOM...]</a>
+                <b-collapse id="collapse-dom">
                   <div v-highlight >
-                    <pre class="language-html"><code>{{ value }}</code></pre>
+                    <pre class="language-html"><code>{{ data_value }}</code></pre>
                   </div>
                 </b-collapse>
               </p>
+              <p></p>
+            </div>
+            <div v-else-if="data_name == 'cookies' || data_name == 'local_storage' || data_name == 'session_storage'">
+              <h4>{{ data_name }}</h4>
+                <div v-for="(value, param) in data_value" v-bind:key="param">
+                  <div v-for="(value_deep, param_deep) in value" v-bind:key="param_deep">
+                    <code>{{ param_deep }} => {{ value_deep }}</code>
+                  </div>
+                </div>
+              <p></p>
             </div>
             <div v-else>
-              <h4>Data</h4>
-              <p><code>{{ key }} => {{ value}}</code></p>
+              <h4>{{ data_name }}</h4>
+              <p>
+                <code>{{ data_value }}</code>
+              </p>
+              <p></p>
             </div>
           </div>
         </td>

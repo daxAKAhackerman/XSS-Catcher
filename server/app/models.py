@@ -23,10 +23,7 @@ class Client(db.Model):
             'name': self.name,
             'reflected': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='reflected').count(),
             'stored': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='stored').count(),
-            'cookies': (XSS.query.filter_by(client_id=self.id).filter(XSS.cookies != None).count() +
-                        XSS.query.filter_by(client_id=self.id).filter(XSS.local_storage != None).count() +
-                        XSS.query.filter_by(client_id=self.id).filter(XSS.session_storage != None).count() +
-                        XSS.query.filter_by(client_id=self.id).filter(XSS.other_data != None).count())
+            'cookies': XSS.query.filter_by(client_id=self.id).count() 
         }
         return data
 
@@ -56,13 +53,9 @@ class Client(db.Model):
 
 class XSS(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    referer = db.Column(db.TEXT)
-    user_agent = db.Column(db.TEXT)
+    headers = db.Column(db.TEXT)
     ip_addr = db.Column(db.String(15))
-    cookies = db.Column(db.TEXT)
-    local_storage = db.Column(db.TEXT)
-    session_storage = db.Column(db.TEXT)
-    other_data = db.Column(db.TEXT)
+    data = db.Column(db.TEXT)
     timestamp = db.Column(DateTime, default=func.now(), onupdate=func.now())
     client_id = db.Column(db.Integer, db.ForeignKey('client.id'))
     xss_type = db.Column(db.String(9))
@@ -71,15 +64,13 @@ class XSS(db.Model):
 
         data = {
             'id': self.id,
-            'referer': self.referer,
-            'user_agent': self.user_agent,
+            'headers': json.loads(self.headers),
             'ip_addr': self.ip_addr,
-            'cookies': json.loads(self.cookies) if self.cookies != None else self.cookies,
-            'local_storage': json.loads(self.local_storage) if self.local_storage != None else self.local_storage,
-            'session_storage': json.loads(self.session_storage) if self.session_storage != None else self.session_storage,
-            'other_data': json.loads(self.other_data) if self.other_data != None else self.other_data,
+            'data': json.loads(self.data) if self.data != None else self.data,
             'timestamp': self.timestamp,
         }
+        if 'fingerprint' in data['data'].keys():
+            data['data']['fingerprint'] = json.loads(data['data']['fingerprint'])
         return data
 
 
