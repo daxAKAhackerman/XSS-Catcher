@@ -5,7 +5,7 @@
     id="view-XSS-modal"
     title="Triggered XSS"
     hide-footer
-    size="xl"
+    size="lg"
     @show="getXSS"
     @hide="cleanup"
   >
@@ -14,7 +14,6 @@
       <thead>
         <tr>
           <th scope="col">Timestamp</th>
-          <th scope="col">Referer</th>
           <th scope="col">IP address</th>
           <th scope="col" class="text-right">Action</th>
         </tr>
@@ -25,7 +24,6 @@
           v-bind:key="hit.id"
         >
           <td>{{ convertTimestamp(hit.timestamp) }}</td>
-          <td>{{ hit.referer }}</td>
           <td>{{ hit.ip_addr}}</td>
           <td class="text-right">
             <b-button

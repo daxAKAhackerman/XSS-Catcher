@@ -57,11 +57,8 @@
         label-cols="3"
         label-for="input-field-owner"
       >
-        <b-form-input
-          id="input-field-owner"
-          v-model="client.owner"
-          readonly
-        ></b-form-input>
+        <b-form-select v-if="is_admin" id="input-field-owner" v-model="client.owner" :options="users_list" required></b-form-select>
+        <b-form-input v-else readonly id="input-field-owner" v-model="client.owner"></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button
@@ -100,7 +97,19 @@ export default {
     return {
       client: {},
       show_alert: false,
-      alert_msg: ''
+      alert_msg: '',
+      users: {}
+    }
+  },
+  computed: {
+    users_list: {
+      get () {
+        let list = []
+        for (let value of Object.values(this.users)) {
+          list.push(value.username)
+        }
+        return list
+      }
     }
   },
   methods: {
@@ -110,6 +119,7 @@ export default {
       axios.get(path)
         .then(response => {
           this.client = response.data
+          this.getUsers()
         })
         .catch(error => {
           if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
@@ -120,8 +130,17 @@ export default {
 
       var payload = new URLSearchParams()
 
+      let owner = ''
+
+      for (let value of Object.values(this.users)) {
+        if (value.username === this.client.owner) {
+          owner = value.id
+        }
+      }
+
       payload.append('name', this.client.name)
       payload.append('description', this.client.description)
+      payload.append('owner', owner)
 
       axios.post(path, payload)
         .then(response => {
@@ -132,6 +151,17 @@ export default {
             this.alert_msg = error.response.data.detail
             this.show_alert = true
           }
+        })
+    },
+    getUsers () {
+      const path = basePath + '/user/all'
+
+      axios.get(path)
+        .then(response => {
+          this.users = response.data
+        })
+        .catch(error => {
+          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
         })
     },
     cleanup () {

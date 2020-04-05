@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from app import db
-from app.models import Client, XSS
+from app.models import Client, XSS, User
 from app.api import bp
 from flask_login import login_required, current_user
 from app.validators import not_empty, check_length
@@ -71,6 +71,14 @@ def get_client(id):
                 client.description = data['description']
             else:
                 return jsonify({'status': 'error', 'detail': 'Invalid description (too long)'}), 400
+
+        if 'owner' in data.keys():
+            if not current_user.is_admin:
+                return jsonify({'status': 'error', 'detail': 'Only an admin can do that'}), 403
+            user = User.query.filter_by(id=data['owner']).first()
+            if user == None:
+                return jsonify({'status': 'error', 'detail': 'This user does not exist'}), 400
+            client.owner_id = data['owner']
 
         db.session.commit()
 
