@@ -148,16 +148,11 @@ def delete_loot(id, loot_type):
     if current_user.id != xss.client.owner_id and not current_user.is_admin:
         return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s data'}), 403
 
-    if loot_type == 'local_storage':
-        xss.local_storage = None
-    elif loot_type == 'session_storage':
-        xss.session_storage = None
-    elif loot_type == 'cookies':
-        xss.cookies = None
-    elif loot_type == 'other_data':
-        xss.other_data = None
-    else:
-        return jsonify({'status': 'error', 'detail': 'Unknown loot type'}), 400
+    data = json.loads(xss.data)
+
+    data.pop(loot_type, None)
+
+    xss.data = json.dumps(data)
 
     db.session.commit()
 

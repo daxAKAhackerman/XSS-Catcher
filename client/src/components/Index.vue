@@ -96,7 +96,7 @@
                   <b-link
                     @click="viewed_client=client"
                     v-b-modal.view-data-modal
-                  >{{ client.cookies }}
+                  >{{ client.data }}
                   </b-link>
                 </td>
                 <td>

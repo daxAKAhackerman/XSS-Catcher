@@ -19,37 +19,37 @@
               <div style="word-wrap: break-word">
                 <div v-if="element_name == 'screenshot'">
                   <p>
-                    <a href="#" v-b-toggle="'collapse-img-' + String(index)">[Click to view screenshot...]</a>
-                    <b-collapse :id="'collapse-img-' + String(index)">
-                      <img style="max-width:100%" :src=data />
+                    <a href="#" v-b-toggle="'collapse-img-' + String(Object.keys(data)[0])">[Click to view screenshot...]</a>
+                    <b-collapse :id="'collapse-img-' + String(Object.keys(data)[0])">
+                      <img style="max-width:100%" :src=Object.values(data)[0] />
                     </b-collapse>
                   </p>
                 </div>
                 <div v-else-if="element_name == 'fingerprint'">
                   <p>
-                    <vue-json-pretty :deep=0 :showLength=true :data=data></vue-json-pretty>
+                    <vue-json-pretty :deep=0 :showLength=true :data=Object.values(data)[0]></vue-json-pretty>
                   </p>
                 </div>
                 <div v-else-if="element_name == 'dom'">
                   <p>
-                    <a href="#" v-b-toggle="'collapse-dom-' + String(index)">[Click to view DOM...]</a>
-                    <b-collapse :id="'collapse-dom-' + String(index)">
+                    <a href="#" v-b-toggle="'collapse-dom-' + String(Object.keys(data)[0])">[Click to view DOM...]</a>
+                    <b-collapse :id="'collapse-dom-' + String(Object.keys(data)[0])">
                       <div v-highlight >
-                        <pre class="language-html"><code>{{ data }}</code></pre>
+                        <pre class="language-html"><code>{{ Object.values(data)[0] }}</code></pre>
                       </div>
                     </b-collapse>
                   </p>
                 </div>
                 <div v-else-if="element_name == 'cookies' || element_name == 'local_storage' || element_name == 'session_storage'">
                   <div v-for="(value, param) in data" v-bind:key="param">
-                    <div v-for="(value_deep, param_deep) in value" v-bind:key="param_deep">
+                    <div v-for="(value_deep, param_deep) in Object.values(value)[0]" v-bind:key="param_deep">
                       <code>{{ param_deep }} => {{ value_deep }}</code>
                     </div>
                   </div>
                 </div>
                 <div v-else>
                   <p>
-                    <code>{{ data }}</code>
+                    <code>{{ Object.values(data)[0] }}</code>
                   </p>
                 </div>
               </div>
@@ -58,7 +58,7 @@
               <b-button
                 v-if="owner_id === user_id || is_admin"
                 v-b-tooltip.hover title="Delete data"
-                @click="to_delete_type = 'other_data'; to_delete = other_id"
+                @click="to_delete_type = element_name; to_delete = Object.keys(data)[0]"
                 v-b-modal.delete-data-modal
                 type="button"
                 variant="danger"

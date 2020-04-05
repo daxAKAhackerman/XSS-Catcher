@@ -121,8 +121,8 @@ def get_client_loot(id):
             if element[0] not in loot.keys():
                 loot[element[0]] = []
             if element[0] == 'fingerprint':
-                loot[element[0]].append(json.loads(element[1]))
+                loot[element[0]].append({hit.id: json.loads(element[1])})
             else:
-                loot[element[0]].append(element[1])
+                loot[element[0]].append({hit.id: element[1]})
 
     return jsonify(loot), 200

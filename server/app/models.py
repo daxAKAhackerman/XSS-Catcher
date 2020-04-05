@@ -17,13 +17,17 @@ class Client(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def to_dict_clients(self):
+        data_num = 0
+        xss = XSS.query.filter_by(client_id=self.id).all()
+        for hit in xss:
+            data_num += len(json.loads(hit.data))
         data = {
             'owner_id': self.owner_id,
             'id': self.id,
             'name': self.name,
             'reflected': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='reflected').count(),
             'stored': XSS.query.filter_by(client_id=self.id).filter_by(xss_type='stored').count(),
-            'cookies': XSS.query.filter_by(client_id=self.id).count() 
+            'data': data_num
         }
         return data
 
