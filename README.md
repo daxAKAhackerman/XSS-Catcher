@@ -21,10 +21,15 @@ docker-compose up -d
 * Default credentials to connect to the Web interface are **admin:xss**
 * Default Web port is **8888**
 ## Pictures
+### Dashboard
 ![Alt text](/pictures/dashboard.png?raw=true "Dashboard")
+### Payload generation
 ![Alt text](/pictures/payload.png?raw=true "Payload generation")
+### Captured XSS
 ![Alt text](/pictures/xss.png?raw=true "Captured XSS")
+### XSS details
 ![Alt text](/pictures/details.png?raw=true "XSS details")
+### Captured data
 ![Alt text](/pictures/data.png?raw=true "Captured data")
 
 > The bootstrap theme used can be found [here](https://bootswatch.com/slate/)
