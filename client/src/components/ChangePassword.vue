@@ -7,22 +7,14 @@
     @hidden="cleanup"
     :visible="$parent.show_password_modal"
   >
-    <b-form
-      @submit="changePassword"
-      @reset="cleanup"
-    >
+    <b-form @submit="changePassword" @reset="cleanup">
       <b-form-group
         id="input-group-op"
         label="Old password:"
         label-cols="3"
         label-for="input-field-op"
       >
-        <b-form-input
-          v-model="old_password"
-          id="input-field-op"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="old_password" id="input-field-op" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -31,12 +23,7 @@
         label-cols="3"
         label-for="input-field-np"
       >
-        <b-form-input
-          v-model="new_password1"
-          id="input-field-np"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="new_password1" id="input-field-np" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -45,85 +32,76 @@
         label-cols="3"
         label-for="input-field-np2"
       >
-        <b-form-input
-          v-model="new_password2"
-          id="input-field-np2"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button
-          type="submit"
-          variant="info"
-        >Save
-        </b-button>
+        <b-button type="submit" variant="info">Save</b-button>
         <b-button type="reset">Cancel</b-button>
       </div>
     </b-form>
     <br v-if="show_alert" />
-    <b-alert
-      show
-      variant="danger"
-      v-if="show_alert"
-    >{{ alert_msg }}</b-alert>
+    <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>
   </b-modal>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
-axios.defaults.headers.post['Content-Type'] =
-  'application/x-www-form-urlencoded'
+axios.defaults.headers.post["Content-Type"] =
+  "application/x-www-form-urlencoded";
 
-const basePath = '/api'
+const basePath = "/api";
 
 export default {
-  data () {
+  data() {
     return {
-      old_password: '',
-      new_password1: '',
-      new_password2: '',
+      old_password: "",
+      new_password1: "",
+      new_password2: "",
       show_alert: false,
-      alert_msg: ''
-    }
+      alert_msg: ""
+    };
   },
   methods: {
-    changePassword () {
-      const path = basePath + '/user/change_password'
+    changePassword() {
+      const path = basePath + "/user/change_password";
 
-      var payload = new URLSearchParams()
+      var payload = new URLSearchParams();
 
-      payload.append('old_password', this.old_password)
-      payload.append('password1', this.new_password1)
-      payload.append('password2', this.new_password2)
+      payload.append("old_password", this.old_password);
+      payload.append("password1", this.new_password1);
+      payload.append("password2", this.new_password2);
 
-      axios.post(path, payload)
+      axios
+        .post(path, payload)
         .then(response => {
-          this.cleanup()
+          void response;
+          this.cleanup();
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            this.show_alert = true
-            this.alert_msg = error.response.data.detail
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            this.show_alert = true;
+            this.alert_msg = error.response.data.detail;
           }
-        })
+        });
     },
-    cleanup () {
-      this.old_password = ''
-      this.new_password1 = ''
-      this.new_password2 = ''
-      this.show_alert = false
-      this.alert_msg = ''
-      this.$refs.changePasswordModal.hide()
-      if (this.$route.name !== 'Index') {
+    cleanup() {
+      this.old_password = "";
+      this.new_password1 = "";
+      this.new_password2 = "";
+      this.show_alert = false;
+      this.alert_msg = "";
+      this.$refs.changePasswordModal.hide();
+      if (this.$route.name !== "Index") {
         this.$router.push({
-          name: 'Index'
-        })
+          name: "Index"
+        });
       }
     }
   }
-}
+};
 </script>
 
 <style>

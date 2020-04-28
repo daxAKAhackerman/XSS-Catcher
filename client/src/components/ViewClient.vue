@@ -1,5 +1,4 @@
 <template>
-
   <b-modal
     ref="viewClientModal"
     id="view-client-modal"
@@ -8,11 +7,7 @@
     @show="getClient"
     @hide="cleanup"
   >
-    <b-form
-      @submit="postClient"
-      @reset="cleanup"
-    >
-
+    <b-form @submit="postClient" @reset="cleanup">
       <b-form-group
         id="input-group-name"
         label="Short name:"
@@ -24,12 +19,7 @@
           id="input-field-name"
           v-model="client.name"
         ></b-form-input>
-        <b-form-input
-          v-else
-          readonly
-          id="input-field-name"
-          v-model="client.name"
-        ></b-form-input>
+        <b-form-input v-else readonly id="input-field-name" v-model="client.name"></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -43,12 +33,7 @@
           id="input-field-description"
           v-model="client.description"
         ></b-form-input>
-        <b-form-input
-          v-else
-          readonly
-          id="input-field-description"
-          v-model="client.description"
-        ></b-form-input>
+        <b-form-input v-else readonly id="input-field-description" v-model="client.description"></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -57,124 +42,129 @@
         label-cols="3"
         label-for="input-field-owner"
       >
-        <b-form-select v-if="is_admin" id="input-field-owner" v-model="client.owner" :options="users_list" required></b-form-select>
+        <b-form-select
+          v-if="is_admin"
+          id="input-field-owner"
+          v-model="client.owner"
+          :options="users_list"
+          required
+        ></b-form-select>
         <b-form-input v-else readonly id="input-field-owner" v-model="client.owner"></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button
-          v-if="owner_id === user_id || is_admin"
-          type="submit"
-          variant="info"
-        >Save</b-button>
-        <b-button
-          type="reset"
-          variant="secondary"
-        >Cancel</b-button>
+        <b-button v-if="owner_id === user_id || is_admin" type="submit" variant="info">Save</b-button>
+        <b-button type="reset" variant="secondary">Cancel</b-button>
       </div>
     </b-form>
     <br v-if="show_alert" />
-    <b-alert
-      show
-      variant="danger"
-      v-if="show_alert"
-    >{{ alert_msg }}</b-alert>
+    <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>
   </b-modal>
-
 </template>
 
 <script>
+import axios from "axios";
 
-import axios from 'axios'
+axios.defaults.headers.post["Content-Type"] =
+  "application/x-www-form-urlencoded";
 
-axios.defaults.headers.post['Content-Type'] =
-  'application/x-www-form-urlencoded'
-
-const basePath = '/api'
+const basePath = "/api";
 
 export default {
-  props: ['client_id', 'is_admin', 'owner_id', 'user_id'],
-  data () {
+  props: ["client_id", "is_admin", "owner_id", "user_id"],
+  data() {
     return {
       client: {},
       show_alert: false,
-      alert_msg: '',
+      alert_msg: "",
       users: {}
-    }
+    };
   },
   computed: {
     users_list: {
-      get () {
-        let list = []
+      get() {
+        let list = [];
         for (let value of Object.values(this.users)) {
-          list.push(value.username)
+          list.push(value.username);
         }
-        return list
+        return list;
       }
     }
   },
   methods: {
-    getClient () {
-      const path = basePath + '/client/' + this.client_id
+    getClient() {
+      const path = basePath + "/client/" + this.client_id;
 
-      axios.get(path)
+      axios
+        .get(path)
         .then(response => {
-          this.client = response.data
-          this.getUsers()
+          this.client = response.data;
+          this.getUsers();
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
-        })
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            void error;
+          }
+        });
     },
-    postClient () {
-      const path = basePath + '/client/' + this.client_id
+    postClient() {
+      const path = basePath + "/client/" + this.client_id;
 
-      var payload = new URLSearchParams()
+      var payload = new URLSearchParams();
 
-      let owner = ''
+      let owner = "";
 
       for (let value of Object.values(this.users)) {
         if (value.username === this.client.owner) {
-          owner = value.id
+          owner = value.id;
         }
       }
 
-      payload.append('name', this.client.name)
-      payload.append('description', this.client.description)
-      payload.append('owner', owner)
+      payload.append("name", this.client.name);
+      payload.append("description", this.client.description);
+      payload.append("owner", owner);
 
-      axios.post(path, payload)
+      axios
+        .post(path, payload)
         .then(response => {
-          this.cleanup()
+          void response;
+          this.cleanup();
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {
-            this.alert_msg = error.response.data.detail
-            this.show_alert = true
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            this.alert_msg = error.response.data.detail;
+            this.show_alert = true;
           }
-        })
+        });
     },
-    getUsers () {
-      const path = basePath + '/user/all'
+    getUsers() {
+      const path = basePath + "/user/all";
 
-      axios.get(path)
+      axios
+        .get(path)
         .then(response => {
-          this.users = response.data
+          this.users = response.data;
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
-        })
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            void error;
+          }
+        });
     },
-    cleanup () {
-      this.show_alert = false
-      this.alert_msg = ''
-      this.client = {}
-      this.$refs.viewClientModal.hide()
-      this.$parent.getClients()
+    cleanup() {
+      this.show_alert = false;
+      this.alert_msg = "";
+      this.client = {};
+      this.$refs.viewClientModal.hide();
+      this.$parent.getClients();
     }
   }
-
-}
-
+};
 </script>
 
 <style></style>

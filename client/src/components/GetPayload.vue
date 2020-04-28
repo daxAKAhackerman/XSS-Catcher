@@ -9,55 +9,34 @@
   >
     <b-form @submit="getPayload" @reset="cleanup">
       <b-form-group class="text-left">
-        <p style="overflow-wrap:break-word" v-if="xss_payload !== ''"><kbd>{{ xss_payload }}</kbd></p>
-        <b-form-checkbox
-          v-model="options.stored"
-          name="check-button"
-          switch
-        >
-          Stored XSS
-        </b-form-checkbox>
-        <b-form-checkbox
-          v-model="options.cookies"
-          name="check-button"
-          switch
-        >
-          Steal cookies
-        </b-form-checkbox>
+        <b-form-group v-if="xss_payload !== ''">
+          <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
+          <br />
+          <b-link v-clipboard:copy="xss_payload">Copy to clipboard</b-link>
+        </b-form-group>
+        <b-form-checkbox v-model="options.stored" name="check-button" switch>Stored XSS</b-form-checkbox>
+        <b-form-checkbox v-model="options.cookies" name="check-button" switch>Steal cookies</b-form-checkbox>
         <b-form-checkbox
           v-model="options.local_storage"
           name="check-button"
           switch
-        >
-          Steal local storage
-        </b-form-checkbox>
+        >Steal local storage</b-form-checkbox>
         <b-form-checkbox
           v-model="options.session_storage"
           name="check-button"
           switch
-        >
-          Steal session storage
-        </b-form-checkbox>
-        <b-form-checkbox
-          v-model="options.geturl"
-          name="check-button"
-          switch
-        >
-          Get origin URL
-        </b-form-checkbox>
+        >Steal session storage</b-form-checkbox>
+        <b-form-checkbox v-model="options.geturl" name="check-button" switch>Get origin URL</b-form-checkbox>
         <b-form-checkbox
           v-model="options.all"
           name="check-button"
           switch
-        >
-          All of the above plus screenshot and host fingerprinting
-        </b-form-checkbox>
+        >All of the above plus screenshot and host fingerprinting</b-form-checkbox>
 
         <b-form-radio v-model="options.code_type" name="radio-button" value="js">JavaScript</b-form-radio>
         <b-form-radio v-model="options.code_type" name="radio-button" value="html">HTML</b-form-radio>
       </b-form-group>
-      <b-form-group
-      label="Other data: ">
+      <b-form-group label="Other data: ">
         <b-form-input
           v-model="options.other"
           name="input"
@@ -66,10 +45,7 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button
-          type="submit"
-          variant="info"
-        >Generate</b-button>
+        <b-button type="submit" variant="info">Generate</b-button>
         <b-button type="reset">Cancel</b-button>
       </div>
     </b-form>
@@ -77,16 +53,16 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
-axios.defaults.headers.post['Content-Type'] =
-  'application/x-www-form-urlencoded'
+axios.defaults.headers.post["Content-Type"] =
+  "application/x-www-form-urlencoded";
 
-const basePath = '/api'
+const basePath = "/api";
 
 export default {
-  props: ['client_id'],
-  data () {
+  props: ["client_id"],
+  data() {
     return {
       options: {
         cookies: false,
@@ -94,79 +70,88 @@ export default {
         session_storage: false,
         stored: false,
         geturl: false,
-        code_type: 'html',
-        other: '',
+        code_type: "html",
+        other: "",
         all: false
       },
-      xss_payload: ''
-    }
+      xss_payload: ""
+    };
   },
   methods: {
-    getPayload (evt) {
-      evt.preventDefault()
+    getPayload(evt) {
+      evt.preventDefault();
 
-      let path = basePath + '/xss/generate/' + this.client_id + '?url=' + encodeURIComponent(location.origin) + '&'
+      let path =
+        basePath +
+        "/xss/generate/" +
+        this.client_id +
+        "?url=" +
+        encodeURIComponent(location.origin) +
+        "&";
 
       if (this.options.all) {
-        path += 'i_want_it_all=1&'
+        path += "i_want_it_all=1&";
       }
 
       if (this.options.cookies) {
-        path += 'cookies=1&'
+        path += "cookies=1&";
       }
 
       if (this.options.local_storage) {
-        path += 'local_storage=1&'
+        path += "local_storage=1&";
       }
 
       if (this.options.session_storage) {
-        path += 'session_storage=1&'
+        path += "session_storage=1&";
       }
 
       if (this.options.stored) {
-        path += 'stored=1&'
+        path += "stored=1&";
       }
 
       if (this.options.geturl) {
-        path += 'geturl=1&'
+        path += "geturl=1&";
       }
 
       if (this.options.other) {
-        path += this.options.other + '&'
+        path += this.options.other + "&";
       }
 
-      path += 'code=' + this.options.code_type
+      path += "code=" + this.options.code_type;
 
-      if (path.substr(-1) === '&') {
-        path = path.substr(0, path.length - 1)
+      if (path.substr(-1) === "&") {
+        path = path.substr(0, path.length - 1);
       }
 
-      axios.get(path)
+      axios
+        .get(path)
         .then(response => {
-          this.xss_payload = response.data
-          this.$forceUpdate()
+          this.xss_payload = response.data;
+          this.$forceUpdate();
         })
         .catch(error => {
-          if (error.response.status === 401) { this.$router.push({ name: 'Login' }) } else {}
-        })
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            void error;
+          }
+        });
     },
-    cleanup () {
-      this.xss_payload = ''
+    cleanup() {
+      this.xss_payload = "";
       this.options = {
         cookies: false,
         local_storage: false,
         session_storage: false,
         stored: false,
-        code_type: 'html',
-        other: ''
-      }
-      this.$refs.getPayloadModal.hide()
-      this.$parent.getClients()
+        code_type: "html",
+        other: ""
+      };
+      this.$refs.getPayloadModal.hide();
+      this.$parent.getClients();
     }
   }
-
-}
-
+};
 </script>
 
 <style>
