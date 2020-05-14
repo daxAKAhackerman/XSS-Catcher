@@ -36,62 +36,79 @@
         </b-row>
         <br />
         <b-row>
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">Client name</th>
-                <th scope="col">Stored XSS</th>
-                <th scope="col">Reflected XSS</th>
-                <th scope="col">Data collected</th>
-                <th scope="col">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="client in orderBy(clients, 'name')" v-bind:key="client.id">
-                <td>
-                  <b-link
-                    @click="viewed_client=client"
-                    v-b-modal.view-client-modal
-                  >{{ client.name }}</b-link>
-                </td>
-                <td>
-                  <b-link
-                    @click="xss_type='stored'; viewed_client=client"
-                    v-b-modal.view-XSS-modal
-                  >{{ client.stored }}</b-link>
-                </td>
-                <td>
-                  <b-link
-                    @click="xss_type='reflected'; viewed_client=client"
-                    v-b-modal.view-XSS-modal
-                  >{{ client.reflected }}</b-link>
-                </td>
-                <td>
-                  <b-link @click="viewed_client=client" v-b-modal.view-data-modal>{{ client.data }}</b-link>
-                </td>
-                <td>
-                  <b-button
-                    @click="viewed_client=client"
-                    v-b-modal.get-payload-modal
-                    type="button"
-                    variant="info"
-                  >Generate payload</b-button>
-                  <b-button
-                    v-if="client.owner_id === user.id || user.is_admin"
-                    v-b-tooltip.hover
-                    title="Delete client"
-                    @click="to_delete = client.id"
-                    v-b-modal.delete-client-modal
-                    type="button"
-                    variant="danger"
-                  >
-                    <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
-                  </b-button>
-                  <b-button v-else disabled type="button" variant="danger">Delete</b-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <b-col offset-sm="8" sm="4">
+            <b-input-group>
+              <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
+              <b-input-group-append>
+                <b-button size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+              </b-input-group-append>
+            </b-input-group>
+          </b-col>
+        </b-row>
+        <br />
+        <b-row>
+          <b-table
+            :current-page="currentPage"
+            :per-page="perPage"
+            :items="clients"
+            :fields="fields"
+            :filter="search"
+            hover
+          >
+            <template v-slot:cell(name)="row">
+              <b-link
+                @click="viewed_client=row.item"
+                v-b-modal.view-client-modal
+              >{{ row.item.name }}</b-link>
+            </template>
+            <template v-slot:cell(stored)="row">
+              <b-link
+                @click="xss_type='stored'; viewed_client=row.item"
+                v-b-modal.view-XSS-modal
+              >{{ row.item.stored }}</b-link>
+            </template>
+            <template v-slot:cell(reflected)="row">
+              <b-link
+                @click="xss_type='reflected'; viewed_client=row.item"
+                v-b-modal.view-XSS-modal
+              >{{ row.item.reflected }}</b-link>
+            </template>
+            <template v-slot:cell(data)="row">
+              <b-link @click="viewed_client=row.item" v-b-modal.view-data-modal>{{ row.item.data }}</b-link>
+            </template>
+            <template v-slot:cell(action)="row">
+              <b-button
+                @click="viewed_client=row.item"
+                v-b-modal.get-payload-modal
+                type="button"
+                variant="info"
+              >Generate payload</b-button>
+              <b-button
+                v-if="row.item.owner_id === user.id || user.is_admin"
+                v-b-tooltip.hover
+                title="Delete client"
+                @click="to_delete = row.item.id"
+                v-b-modal.delete-client-modal
+                type="button"
+                variant="danger"
+              >
+                <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+              </b-button>
+              <b-button v-else disabled type="button" variant="danger">Delete</b-button>
+            </template>
+          </b-table>
+        </b-row>
+        <b-row>
+          <b-col sm="3">
+            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"></b-pagination>
+          </b-col>
+          <b-col offset-sm="7" sm="2">
+            <b-form-select
+              size="sm"
+              v-model="perPage"
+              :options="[{ value: 5, text: '-- Per page --' },{ value: 5, text: '5' },{ value: 10, text: '10' },{ value: 25, text: '25' }]"
+            >-- Per page --</b-form-select>
+          </b-col>
         </b-row>
       </b-col>
     </b-row>
@@ -161,12 +178,43 @@ export default {
   mixins: [Vue2Filters.mixin],
   data() {
     return {
-      clients: {},
+      fields: [
+        {
+          key: "name",
+          sortable: true,
+          label: "Client name"
+        },
+        {
+          key: "stored",
+          sortable: true,
+          label: "Stored XSS"
+        },
+        {
+          key: "reflected",
+          sortable: true,
+          label: "Reflected XSS"
+        },
+        {
+          key: "data",
+          sortable: true,
+          label: "Data collected"
+        },
+        {
+          key: "action",
+          sortable: false,
+          label: "Action"
+        }
+      ],
+      clients: [],
       viewed_client: "",
       xss_type: "",
       to_delete: 0,
       show_password_modal: false,
-      user: {}
+      user: {},
+      perPage: 5,
+      currentPage: 1,
+      totalRows: 0,
+      search: ""
     };
   },
   methods: {
@@ -176,6 +224,7 @@ export default {
         .get(path)
         .then(response => {
           this.clients = response.data;
+          this.totalRows = this.clients.length;
         })
         .catch(error => {
           if (error.response.status === 401) {
