@@ -48,6 +48,7 @@
         <br />
         <b-row>
           <b-table
+            @filtered="onFiltered"
             :current-page="currentPage"
             :per-page="perPage"
             :items="clients"
@@ -281,6 +282,9 @@ export default {
             void error;
           }
         });
+    },
+    onFiltered(filteredItems) {
+      this.totalRows = filteredItems.length;
     }
   },
   created() {
