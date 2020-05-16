@@ -11,6 +11,7 @@
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.13.0",
     "core-js": "^3.6.4",
+    "jquery": "^3.5.1",
     "moment-timezone": "^0.5.28",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",

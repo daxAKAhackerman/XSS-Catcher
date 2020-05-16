@@ -2,7 +2,7 @@
   <b-container>
     <b-row>
       <b-col sm="9" class="text-left">
-        <h1>XSS-Catcher</h1>
+        <b-img height="75px" src="/logo.png" /><b-img height="40px" src="/title.png"/>
       </b-col>
       <b-col sm="3" class="text-right">
         <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">

@@ -1,5 +1,16 @@
 <template>
   <b-container>
+    <b-row>
+      <b-col>
+        <b-img height="200px" src="/logo.png" />
+      </b-col>
+    </b-row>
+    <b-row>
+      <b-col>
+        <b-img height="50px" src="/title.png" />
+      </b-col>
+    </b-row>
+    <br />
     <b-row align-v="center">
       <b-col md="4" offset-sm="4">
         <b-card>

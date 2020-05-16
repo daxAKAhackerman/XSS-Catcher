@@ -8,40 +8,28 @@
     @show="getXSS"
     @hide="cleanup"
   >
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col">Timestamp</th>
-          <th scope="col">IP address</th>
-          <th scope="col" class="text-right">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="hit in orderBy(dataXSS, 'id', -1)" v-bind:key="hit.id">
-          <td>{{ convertTimestamp(hit.timestamp) }}</td>
-          <td>{{ hit.ip_addr}}</td>
-          <td class="text-right">
-            <b-button
-              type="button"
-              variant="info"
-              v-b-modal.view-details-modal
-              @click="viewedXSS=hit"
-            >View details</b-button>
-            <b-button
-              v-if="owner_id === user_id || is_admin"
-              v-b-tooltip.hover
-              title="Delete XSS"
-              @click="to_delete = hit.id"
-              v-b-modal.delete-xss-modal
-              type="button"
-              variant="danger"
-            >
-              <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
-            </b-button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <b-table :sort-by.sync="sortBy" :items="dataXSS" :fields="fields" hover>
+      <template v-slot:cell(timestamp)="row">{{ convertTimestamp(row.item.timestamp) }}</template>
+      <template class="text-right" v-slot:cell(action)="row">
+        <b-button
+          type="button"
+          variant="info"
+          v-b-modal.view-details-modal
+          @click="viewedXSS=row.item"
+        >View details</b-button>
+        <b-button
+          v-if="owner_id === user_id || is_admin"
+          v-b-tooltip.hover
+          title="Delete XSS"
+          @click="to_delete = row.item.id"
+          v-b-modal.delete-xss-modal
+          type="button"
+          variant="danger"
+        >
+          <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+        </b-button>
+      </template>
+    </b-table>
 
     <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteXSS" @reset="$refs.deleteXSSModal.hide()">
@@ -74,6 +62,26 @@ export default {
   mixins: [Vue2Filters.mixin],
   data() {
     return {
+      fields: [
+        {
+          key: "timestamp",
+          sortable: true,
+          label: "Timestamp",
+          sortDirection: "desc"
+        },
+        {
+          key: "ip_addr",
+          sortable: true,
+          label: "IP address"
+        },
+        {
+          key: "action",
+          sortable: false,
+          label: "Action",
+          class: "text-right"
+        }
+      ],
+      sortBy: "timestamp",
       dataXSS: {},
       viewedXSS: {},
       to_delete: 0

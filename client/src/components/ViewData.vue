@@ -10,10 +10,10 @@
   >
     <div v-for="(element_value, element_name) in data" v-bind:key="element_name">
       <h4>{{ element_name }}</h4>
-      <table class="table table-hover" style="table-layout: fixed; width: 100%">
-        <tbody>
-          <tr v-for="(data, index) in element_value" v-bind:key="index">
-            <td width="90%" class="text-left">
+      <b-table-simple hover style="table-layout: fixed; width: 100%">
+        <b-tbody>
+          <b-tr v-for="(data, index) in element_value" v-bind:key="index">
+            <b-td width="90%" class="text-left">
               <div style="word-wrap: break-word">
                 <div v-if="element_name == 'screenshot'">
                   <p>
@@ -62,8 +62,8 @@
                   </p>
                 </div>
               </div>
-            </td>
-            <td class="text-right">
+            </b-td>
+            <b-td class="text-right">
               <b-button
                 v-if="owner_id === user_id || is_admin"
                 v-b-tooltip.hover
@@ -75,10 +75,10 @@
               >
                 <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
               </b-button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </b-td>
+          </b-tr>
+        </b-tbody>
+      </b-table-simple>
     </div>
 
     <b-modal ref="deleteDataModal" id="delete-data-modal" title="Are you sure?" hide-footer>
