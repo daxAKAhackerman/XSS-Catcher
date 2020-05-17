@@ -5,7 +5,7 @@
     title="Triggered XSS"
     hide-footer
     size="lg"
-    @show="getXSS"
+    @show="getXSSList"
     @hide="cleanup"
   >
     <b-row>
@@ -13,7 +13,12 @@
         <b-input-group>
           <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
           <b-input-group-append>
-            <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+            <b-button
+              variant="outline-secondary"
+              size="sm"
+              :disabled="!search"
+              @click="search = ''"
+            >Clear</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-col>
@@ -28,6 +33,8 @@
       :items="dataXSS"
       :fields="fields"
       :filter="search"
+      :sort-desc.sync="sortDesc"
+      :sort-direction="sortDirection"
       hover
     >
       <template v-slot:cell(timestamp)="row">{{ convertTimestamp(row.item.timestamp) }}</template>
@@ -36,7 +43,7 @@
           type="button"
           variant="outline-info"
           v-b-modal.view-details-modal
-          @click="viewedXSS=row.item"
+          @click="xss_id=row.item.id"
         >View details</b-button>
         <b-button
           v-if="owner_id === user_id || is_admin"
@@ -72,7 +79,7 @@
       </b-form>
     </b-modal>
 
-    <ViewDetails :data="viewedXSS" />
+    <ViewDetails :xss_id="xss_id" :xss_type="xss_type" :client_id="client_id" />
   </b-modal>
 </template>
 
@@ -98,10 +105,9 @@ export default {
     return {
       fields: [
         {
-          key: "timestamp",
+          key: "formattedTimestamp",
           sortable: true,
-          label: "Timestamp",
-          sortDirection: "desc"
+          label: "Timestamp"
         },
         {
           key: "ip_addr",
@@ -115,9 +121,11 @@ export default {
           class: "text-right"
         }
       ],
-      sortBy: "timestamp",
-      dataXSS: {},
-      viewedXSS: {},
+      sortBy: "formattedTimestamp",
+      sortDesc: true,
+      sortDirection: "desc",
+      dataXSS: [],
+      xss_id: 0,
       to_delete: 0,
       perPage: 5,
       currentPage: 1,
@@ -127,7 +135,7 @@ export default {
     };
   },
   methods: {
-    getXSS() {
+    getXSSList() {
       const path = basePath + "/client/" + this.client_id + "/" + this.xss_type;
 
       axios
@@ -156,7 +164,7 @@ export default {
         .delete(path)
         .then(response => {
           void response;
-          this.getXSS();
+          this.getXSSList();
           this.$refs.deleteXSSModal.hide();
         })
         .catch(error => {
@@ -175,8 +183,8 @@ export default {
       this.totalRows = filteredItems.length;
     },
     cleanup() {
-      this.dataXSS = {};
-      this.viewedXSS = {};
+      this.dataXSS = [];
+      this.xss_id = 0;
       this.to_delete = 0;
       this.$parent.getClients();
     }

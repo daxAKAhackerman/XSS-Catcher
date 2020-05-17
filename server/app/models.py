@@ -41,7 +41,6 @@ class Client(db.Model):
             'owner': owner,
             'id': self.id,
             'name': self.name,
-            'uid': self.uid,
             'description': self.description
         }
         return data
@@ -77,6 +76,13 @@ class XSS(db.Model):
             data['data']['fingerprint'] = json.loads(data['data']['fingerprint'])
         return data
 
+    def to_dict_short(self):
+        data = {
+            'id': self.id,
+            'ip_addr': self.ip_addr,
+            'timestamp': self.timestamp,
+        }
+        return data
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)

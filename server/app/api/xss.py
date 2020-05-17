@@ -139,21 +139,31 @@ def delete_xss(id):
     return jsonify({'status': 'OK'}), 200
 
 
-@bp.route('/xss/<id>/<loot_type>', methods=['DELETE'])
+@bp.route('/xss/<id>/<loot_type>', methods=['GET', 'DELETE'])
 @login_required
-def delete_loot(id, loot_type):
+def loot(id, loot_type):
 
-    xss = XSS.query.filter_by(id=id).first_or_404()
+    if request.method == 'DELETE':
 
-    if current_user.id != xss.client.owner_id and not current_user.is_admin:
-        return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s data'}), 403
+        xss = XSS.query.filter_by(id=id).first_or_404()
 
-    data = json.loads(xss.data)
+        if current_user.id != xss.client.owner_id and not current_user.is_admin:
+            return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s data'}), 403
 
-    data.pop(loot_type, None)
+        data = json.loads(xss.data)
 
-    xss.data = json.dumps(data)
+        data.pop(loot_type, None)
 
-    db.session.commit()
+        xss.data = json.dumps(data)
 
-    return jsonify({'status': 'OK'}), 200
+        db.session.commit()
+
+        return jsonify({'status': 'OK'}), 200
+
+    elif request.method == 'GET':
+
+        xss = XSS.query.filter_by(id=id).first_or_404()
+
+        data = json.loads(xss.data)
+        
+        return jsonify({'data': data[loot_type]}), 200

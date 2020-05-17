@@ -22,7 +22,8 @@ def create_client():
 
     if not_empty(data['name']) and check_length(data['name'], 32) and check_length(data['description'], 128):
 
-        new_client = Client(name=data['name'], description=data['description'], owner_id=current_user.id)
+        new_client = Client(
+            name=data['name'], description=data['description'], owner_id=current_user.id)
 
         new_client.gen_uid()
 
@@ -55,7 +56,7 @@ def get_client(id):
 
         if 'name' in data.keys():
 
-            if client.name != data['name']: 
+            if client.name != data['name']:
                 if Client.query.filter_by(name=data['name']).first() != None:
                     return jsonify({'status': 'error', 'detail': 'Another client already uses this name'}), 400
 
@@ -63,7 +64,6 @@ def get_client(id):
                 client.name = data['name']
             else:
                 return jsonify({'status': 'error', 'detail': 'Invalid name (too long or empty)'}), 400
-
 
         if 'description' in data.keys():
 
@@ -99,10 +99,9 @@ def get_client(id):
         return jsonify({'status': 'OK'}), 200
 
 
-
 @bp.route('/client/<id>/<flavor>', methods=['GET'])
 @login_required
-def get_client_xss(id, flavor):
+def get_client_xss_list(id, flavor):
 
     if flavor != 'reflected' and flavor != 'stored':
         return jsonify({'status': 'error', 'detail': 'Unknown XSS type'}), 400
@@ -111,9 +110,22 @@ def get_client_xss(id, flavor):
     xss = XSS.query.filter_by(client_id=id).filter_by(xss_type=flavor).all()
 
     for hit in xss:
-        xss_list.append(hit.to_dict())
+        xss_list.append(hit.to_dict_short())
 
     return jsonify(xss_list), 200
+
+
+@bp.route('/client/<id>/<flavor>/<xss_id>', methods=['GET'])
+@login_required
+def get_client_xss(id, flavor, xss_id):
+
+    if flavor != 'reflected' and flavor != 'stored':
+        return jsonify({'status': 'error', 'detail': 'Unknown XSS type'}), 400
+
+    xss = XSS.query.filter_by(client_id=id).filter_by(
+        xss_type=flavor).filter_by(id=xss_id).first_or_404()
+
+    return jsonify(xss.to_dict()), 200
 
 
 @bp.route('/client/<id>/loot', methods=['GET'])
@@ -128,7 +140,7 @@ def get_client_loot(id):
         for element in json.loads(hit.data).items():
             if element[0] not in loot.keys():
                 loot[element[0]] = []
-            if element[0] == 'fingerprint':
+            elif element[0] == 'fingerprint':
                 loot[element[0]].append({hit.id: json.loads(element[1])})
             else:
                 loot[element[0]].append({hit.id: element[1]})

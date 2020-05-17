@@ -13,7 +13,12 @@
         <b-input-group>
           <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
           <b-input-group-append>
-            <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+            <b-button
+              variant="outline-secondary"
+              size="sm"
+              :disabled="!search"
+              @click="search = ''"
+            >Clear</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-col>
@@ -98,7 +103,7 @@
     <b-modal ref="deleteDataModal" id="delete-data-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteData" @reset="$refs.deleteDataModal.hide()">
         <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
-        <b-button type="reset" variant="outline-danger">Cancel</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </b-form>
     </b-modal>
   </b-modal>
@@ -133,7 +138,8 @@ export default {
       data: {},
       to_delete: 0,
       to_delete_type: "",
-      search: ""
+      search: "",
+      componentKey: 0
     };
   },
   methods: {
