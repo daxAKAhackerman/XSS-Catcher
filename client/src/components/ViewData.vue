@@ -8,77 +8,91 @@
     @show="getData"
     @hide="cleanup"
   >
+    <b-row>
+      <b-col offset-sm="8" sm="4">
+        <b-input-group>
+          <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
+          <b-input-group-append>
+            <b-button size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-col>
+    </b-row>
     <div v-for="(element_value, element_name) in data" v-bind:key="element_name">
       <h4>{{ element_name }}</h4>
-      <b-table-simple hover style="table-layout: fixed; width: 100%">
-        <b-tbody>
-          <b-tr v-for="(data, index) in element_value" v-bind:key="index">
-            <b-td width="90%" class="text-left">
-              <div style="word-wrap: break-word">
-                <div v-if="element_name == 'screenshot'">
-                  <p>
-                    <a
-                      href="#"
-                      v-b-toggle="'collapse-img-' + String(Object.keys(data)[0])"
-                    >[Click to view screenshot...]</a>
-                    <b-collapse :id="'collapse-img-' + String(Object.keys(data)[0])">
-                      <img style="max-width:100%" :src="Object.values(data)[0]" />
-                    </b-collapse>
-                  </p>
-                </div>
-                <div v-else-if="element_name == 'fingerprint'">
-                  <p>
-                    <vue-json-pretty :deep="0" :showLength="true" :data="Object.values(data)[0]"></vue-json-pretty>
-                  </p>
-                </div>
-                <div v-else-if="element_name == 'dom'">
-                  <p>
-                    <a
-                      href="#"
-                      v-b-toggle="'collapse-dom-' + String(Object.keys(data)[0])"
-                    >[Click to view DOM...]</a>
-                    <b-collapse :id="'collapse-dom-' + String(Object.keys(data)[0])">
-                      <div v-highlight>
-                        <pre class="language-html"><code>{{ Object.values(data)[0] }}</code></pre>
-                      </div>
-                    </b-collapse>
-                  </p>
-                </div>
-                <div
-                  v-else-if="element_name == 'cookies' || element_name == 'local_storage' || element_name == 'session_storage'"
-                >
-                  <div v-for="(value, param) in data" v-bind:key="param">
-                    <div
-                      v-for="(value_deep, param_deep) in Object.values(value)[0]"
-                      v-bind:key="param_deep"
-                    >
-                      <code>{{ param_deep }} => {{ value_deep }}</code>
-                    </div>
+
+      <b-table
+        :fields="fields"
+        :items="data[element_name]"
+        :filter="search"
+        hover
+        style="table-layout: fixed; width: 100%"
+        thead-class="invisible"
+      >
+        <template v-slot:cell(data)="row">
+          <div style="word-wrap: break-word">
+            <div v-if="element_name == 'screenshot'">
+              <p>
+                <a
+                  href="#"
+                  v-b-toggle="'collapse-img-' + String(Object.keys(row.item)[0])"
+                >[Click to view screenshot...]</a>
+                <b-collapse :id="'collapse-img-' + String(Object.keys(row.item)[0])">
+                  <img style="max-width:100%" :src="Object.values(row.item)[0]" />
+                </b-collapse>
+              </p>
+            </div>
+            <div v-else-if="element_name == 'fingerprint'">
+              <p>
+                <vue-json-pretty :deep="0" :showLength="true" :data="Object.values(row.item)[0]"></vue-json-pretty>
+              </p>
+            </div>
+            <div v-else-if="element_name == 'dom'">
+              <p>
+                <a
+                  href="#"
+                  v-b-toggle="'collapse-dom-' + String(Object.keys(row.item)[0])"
+                >[Click to view DOM...]</a>
+                <b-collapse :id="'collapse-dom-' + String(Object.keys(row.item)[0])">
+                  <div v-highlight>
+                    <pre class="language-html"><code>{{ Object.values(row.item)[0] }}</code></pre>
                   </div>
-                </div>
-                <div v-else>
-                  <p>
-                    <code>{{ Object.values(data)[0] }}</code>
-                  </p>
+                </b-collapse>
+              </p>
+            </div>
+            <div
+              v-else-if="element_name == 'cookies' || element_name == 'local_storage' || element_name == 'session_storage'"
+            >
+              <div v-for="(value, param) in row.item" v-bind:key="param">
+                <div
+                  v-for="(value_deep, param_deep) in Object.values(value)[0]"
+                  v-bind:key="param_deep"
+                >
+                  <code>{{ param_deep }} => {{ value_deep }}</code>
                 </div>
               </div>
-            </b-td>
-            <b-td class="text-right">
-              <b-button
-                v-if="owner_id === user_id || is_admin"
-                v-b-tooltip.hover
-                title="Delete data"
-                @click="to_delete_type = element_name; to_delete = Object.keys(data)[0]"
-                v-b-modal.delete-data-modal
-                type="button"
-                variant="danger"
-              >
-                <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
-              </b-button>
-            </b-td>
-          </b-tr>
-        </b-tbody>
-      </b-table-simple>
+            </div>
+            <div v-else>
+              <p>
+                <code>{{ Object.values(row.item)[0] }}</code>
+              </p>
+            </div>
+          </div>
+        </template>
+        <template v-slot:cell(action)="row">
+          <b-button
+            v-if="owner_id === user_id || is_admin"
+            v-b-tooltip.hover
+            title="Delete data"
+            @click="to_delete_type = element_name; to_delete = Object.keys(row.item)[0]"
+            v-b-modal.delete-data-modal
+            type="button"
+            variant="danger"
+          >
+            <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+          </b-button>
+        </template>
+      </b-table>
     </div>
 
     <b-modal ref="deleteDataModal" id="delete-data-modal" title="Are you sure?" hide-footer>
@@ -106,9 +120,20 @@ export default {
   },
   data() {
     return {
+      fields: [
+        {
+          key: "data",
+          class: "text-left width90"
+        },
+        {
+          key: "action",
+          class: "text-right"
+        }
+      ],
       data: {},
       to_delete: 0,
-      to_delete_type: ""
+      to_delete_type: "",
+      search: ""
     };
   },
   methods: {
@@ -157,4 +182,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.width90 {
+  width: 90%;
+}
+.invisible {
+  display: none;
+}
+</style>

@@ -8,7 +8,28 @@
     @show="getXSS"
     @hide="cleanup"
   >
-    <b-table :sort-by.sync="sortBy" :items="dataXSS" :fields="fields" hover>
+    <b-row>
+      <b-col offset-sm="8" sm="4">
+        <b-input-group>
+          <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
+          <b-input-group-append>
+            <b-button size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-col>
+    </b-row>
+    <br />
+    <b-table
+      :filterIncludedFields="filterOn"
+      @filtered="onFiltered"
+      :current-page="currentPage"
+      :per-page="perPage"
+      :sort-by.sync="sortBy"
+      :items="dataXSS"
+      :fields="fields"
+      :filter="search"
+      hover
+    >
       <template v-slot:cell(timestamp)="row">{{ convertTimestamp(row.item.timestamp) }}</template>
       <template class="text-right" v-slot:cell(action)="row">
         <b-button
@@ -30,6 +51,19 @@
         </b-button>
       </template>
     </b-table>
+
+    <b-row>
+      <b-col sm="3">
+        <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"></b-pagination>
+      </b-col>
+      <b-col offset-sm="6" sm="3">
+        <b-form-select
+          size="sm"
+          v-model="perPage"
+          :options="[{ value: 5, text: '-- Per page --' },{ value: 5, text: '5' },{ value: 10, text: '10' },{ value: 25, text: '25' }]"
+        >-- Per page --</b-form-select>
+      </b-col>
+    </b-row>
 
     <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteXSS" @reset="$refs.deleteXSSModal.hide()">
@@ -84,7 +118,12 @@ export default {
       sortBy: "timestamp",
       dataXSS: {},
       viewedXSS: {},
-      to_delete: 0
+      to_delete: 0,
+      perPage: 5,
+      currentPage: 1,
+      totalRows: 0,
+      search: "",
+      filterOn: ["formattedTimestamp", "ip_addr"]
     };
   },
   methods: {
@@ -95,6 +134,12 @@ export default {
         .get(path)
         .then(response => {
           this.dataXSS = response.data;
+          for (const index in this.dataXSS) {
+            this.dataXSS[index].formattedTimestamp = this.convertTimestamp(
+              this.dataXSS[index].timestamp
+            );
+          }
+          this.totalRows = this.dataXSS.length;
         })
         .catch(error => {
           if (error.response.status === 401) {
@@ -125,6 +170,9 @@ export default {
     convertTimestamp(timestamp) {
       let timestampLocal = moment(timestamp).format("YYYY-MM-DD @ HH:mm:ss");
       return timestampLocal;
+    },
+    onFiltered(filteredItems) {
+      this.totalRows = filteredItems.length;
     },
     cleanup() {
       this.dataXSS = {};

@@ -109,3 +109,10 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(id)
+
+def create_first_user(app):
+    with app.app_context():
+        user = User(username='admin2')
+        user.set_password('xss')
+        db.session.add(user)
+        db.session.commit()

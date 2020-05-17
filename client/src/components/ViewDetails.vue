@@ -8,27 +8,27 @@
     size="xl"
   >
 
-    <table class="table" style="table-layout: fixed; width: 100%">
-      <tr>
-        <td valign="top"><b>Timestamp: </b></td>
-        <td width="80%">{{ converted_timestamp }}</td>
-      </tr>
-      <tr>
-        <td valign="top"><b>IP address: </b></td>
-        <td>{{ data.ip_addr }}</td>
-      </tr>
-      <tr>
-        <td valign="top"><b>HTTP headers: </b></td>
-        <td>
+    <b-table-simple style="table-layout: fixed; width: 100%">
+      <b-tr>
+        <b-td valign="top"><b>Timestamp: </b></b-td>
+        <b-td width="80%">{{ converted_timestamp }}</b-td>
+      </b-tr>
+      <b-tr>
+        <b-td valign="top"><b>IP address: </b></b-td>
+        <b-td>{{ data.ip_addr }}</b-td>
+      </b-tr>
+      <b-tr>
+        <b-td valign="top"><b>HTTP headers: </b></b-td>
+        <b-td>
           <div v-highlight >
             <pre class="language-http"><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name"><div v-for="(header_value_deep, header_name_deep) in header_value" v-bind:key="header_name_deep">{{ header_name_deep }}: {{ header_value_deep }}
 </div></div></code></pre>
           </div>
-        </td>
-      </tr>
-      <tr>
-        <td valign="top"><b>Captured data: </b></td>
-        <td>
+        </b-td>
+      </b-tr>
+      <b-tr>
+        <b-td valign="top"><b>Captured data: </b></b-td>
+        <b-td>
           <div v-for="(data_value, data_name) in data.data" v-bind:key="data_name" style="word-wrap: break-word">
             <div v-if="data_name == 'screenshot'">
               <h4>{{ data_name }}</h4>
@@ -76,9 +76,9 @@
               <p></p>
             </div>
           </div>
-        </td>
-      </tr>
-    </table>
+        </b-td>
+      </b-tr>
+    </b-table-simple>
 
   </b-modal>
 

@@ -9,7 +9,6 @@ services:
       MYSQL_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
       MYSQL_ROOT_PASSWORD: 'CAcZeESTUDeK4JSBrxlq'
     volumes:
-      - './database:/docker-entrypoint-initdb.d'
       - 'xss-db:/var/lib/mysql'
 
   backend: 
