@@ -112,7 +112,7 @@ def load_user(id):
 
 def create_first_user(app):
     with app.app_context():
-        user = User(username='admin')
+        user = User(username='admin', is_admin=1)
         user.set_password('xss')
         db.session.add(user)
         db.session.commit()
