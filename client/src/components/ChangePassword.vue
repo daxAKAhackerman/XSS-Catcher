@@ -14,7 +14,7 @@
         label-cols="3"
         label-for="input-field-op"
       >
-        <b-form-input v-model="old_password" id="input-field-op" type="password" required></b-form-input>
+        <b-form-input @keyup.enter="changePassword" v-model="old_password" id="input-field-op" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -23,7 +23,7 @@
         label-cols="3"
         label-for="input-field-np"
       >
-        <b-form-input v-model="new_password1" id="input-field-np" type="password" required></b-form-input>
+        <b-form-input @keyup.enter="changePassword" v-model="new_password1" id="input-field-np" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -32,7 +32,7 @@
         label-cols="3"
         label-for="input-field-np2"
       >
-        <b-form-input v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
+        <b-form-input @keyup.enter="changePassword" v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button type="submit" variant="info">Save</b-button>

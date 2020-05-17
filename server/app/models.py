@@ -112,7 +112,11 @@ def load_user(id):
 
 def create_first_user(app):
     with app.app_context():
-        user = User(username='admin', is_admin=1)
-        user.set_password('xss')
-        db.session.add(user)
-        db.session.commit()
+        if db.session.query(User).count() != 0:
+            print('[-] User creation not needed')
+        else: 
+            user = User(username='admin', is_admin=1)
+            user.set_password('xss')
+            db.session.add(user)
+            db.session.commit()
+            print('[+] Initial user created')
