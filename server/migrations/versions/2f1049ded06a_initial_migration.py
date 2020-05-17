@@ -1,8 +1,8 @@
-"""cleaner model
+"""initial migration
 
-Revision ID: 8df646aeb452
+Revision ID: 2f1049ded06a
 Revises: 
-Create Date: 2020-04-03 15:12:04.886819
+Create Date: 2020-05-16 22:08:18.876218
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '8df646aeb452'
+revision = '2f1049ded06a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,7 +39,7 @@ def upgrade():
     )
     op.create_table('XSS',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('header', sa.TEXT(), nullable=True),
+    sa.Column('headers', sa.TEXT(), nullable=True),
     sa.Column('ip_addr', sa.String(length=15), nullable=True),
     sa.Column('data', sa.TEXT(), nullable=True),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
