@@ -35,8 +35,8 @@
         <b-form-input @keyup.enter="changePassword" v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="info">Save</b-button>
-        <b-button type="reset">Cancel</b-button>
+        <b-button type="submit" variant="outline-info">Save</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
     <br v-if="show_alert" />

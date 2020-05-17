@@ -52,8 +52,8 @@
         <b-form-input v-else readonly id="input-field-owner" v-model="client.owner"></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button v-if="owner_id === user_id || is_admin" type="submit" variant="info">Save</b-button>
-        <b-button type="reset" variant="secondary">Cancel</b-button>
+        <b-button v-if="owner_id === user_id || is_admin" type="submit" variant="outline-info">Save</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
     <br v-if="show_alert" />

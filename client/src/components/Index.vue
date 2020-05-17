@@ -20,18 +20,18 @@
       <b-col offset-sm="1" sm="10">
         <b-row>
           <b-col sm="3" class="text-left">
-            <b-button v-b-modal.add-client-modal type="button" variant="success">
+            <b-button v-b-modal.add-client-modal type="button" variant="outline-success">
               Add
               new client
             </b-button>
           </b-col>
           <b-col offset-sm="1" sm="8" class="text-right">
-            <b-button v-b-tooltip.hover title="Refresh data" @click="getClients">
+            <b-button variant="outline-secondary" v-b-tooltip.hover title="Refresh data" @click="getClients">
               <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
-            <b-button v-if="user.is_admin" variant="info" v-b-modal.manage-users-modal>Manage users</b-button>
-            <b-button variant="warning" v-b-modal.change-password-modal>Change password</b-button>
-            <b-button type="button" variant="warning" @click="getLogout">Log out</b-button>
+            <b-button v-if="user.is_admin" variant="outline-info" v-b-modal.manage-users-modal>Manage users</b-button>
+            <b-button variant="outline-warning" v-b-modal.change-password-modal>Change password</b-button>
+            <b-button type="button" variant="outline-warning" @click="getLogout">Log out</b-button>
           </b-col>
         </b-row>
         <br />
@@ -40,7 +40,7 @@
             <b-input-group>
               <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
               <b-input-group-append>
-                <b-button size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+                <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
               </b-input-group-append>
             </b-input-group>
           </b-col>
@@ -82,7 +82,7 @@
                 @click="viewed_client=row.item"
                 v-b-modal.get-payload-modal
                 type="button"
-                variant="info"
+                variant="outline-info"
               >Generate payload</b-button>
               <b-button
                 v-if="row.item.owner_id === user.id || user.is_admin"
@@ -91,11 +91,11 @@
                 @click="to_delete = row.item.id"
                 v-b-modal.delete-client-modal
                 type="button"
-                variant="danger"
+                variant="outline-danger"
               >
                 <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
               </b-button>
-              <b-button v-else disabled type="button" variant="danger">Delete</b-button>
+              <b-button v-else disabled type="button" variant="outline-danger">Delete</b-button>
             </template>
           </b-table>
         </b-row>
@@ -117,8 +117,8 @@
     <b-modal ref="deleteClientModal" id="delete-client-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteClient" @reset="$refs.deleteClientModal.hide()">
         <div class="text-right">
-          <b-button type="submit" variant="danger">Yes, delete this entry</b-button>
-          <b-button type="reset">Cancel</b-button>
+          <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
+          <b-button type="reset" variant="outline-secondary">Cancel</b-button>
         </div>
       </b-form>
     </b-modal>

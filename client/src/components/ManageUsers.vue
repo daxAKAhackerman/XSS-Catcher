@@ -30,7 +30,7 @@
               title="Demote user"
               @click="promoteUser(0, user.id)"
               type="button"
-              variant="danger"
+              variant="outline-danger"
             >
               <b-icon-chevron-double-down style="width: 20px; height: 20px;"></b-icon-chevron-double-down>
             </b-button>
@@ -40,7 +40,7 @@
               title="Promote user"
               @click="promoteUser(1, user.id)"
               type="button"
-              variant="success"
+              variant="outline-success"
             >
               <b-icon-chevron-double-up style="width: 20px; height: 20px;"></b-icon-chevron-double-up>
             </b-button>
@@ -49,7 +49,7 @@
               title="Reset password"
               @click="resetPassword(user.id, user.username)"
               type="button"
-              variant="warning"
+              variant="outline-warning"
             >
               <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
@@ -59,7 +59,7 @@
               @click="to_delete = user.id"
               v-b-modal.delete-user-modal
               type="button"
-              variant="danger"
+              variant="outline-danger"
             >
               <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
             </b-button>
@@ -68,16 +68,16 @@
       </tbody>
     </table>
     <div class="text-right">
-      <b-button variant="success" v-b-modal.create-user-modal>Create user</b-button>
-      <b-button type="reset" @click="cleanup">Cancel</b-button>
+      <b-button variant="outline-success" v-b-modal.create-user-modal>Create user</b-button>
+      <b-button variant="outline-secondary" type="reset" @click="cleanup">Cancel</b-button>
     </div>
     <br v-if="show_alert" />
     <b-alert show :variant="alert_type" v-if="show_alert">{{ alert_msg }}</b-alert>
     <b-modal ref="deleteUserModal" id="delete-user-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteUser" @reset="$refs.deleteUserModal.hide()">
         <div class="text-right">
-          <b-button type="submit" variant="danger">Yes, delete this user</b-button>
-          <b-button type="reset">Cancel</b-button>
+          <b-button type="submit" variant="outline-danger">Yes, delete this user</b-button>
+          <b-button type="reset" variant="outline-secondary">Cancel</b-button>
         </div>
       </b-form>
     </b-modal>

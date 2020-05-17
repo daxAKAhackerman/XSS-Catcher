@@ -45,7 +45,7 @@
                 <b-form-checkbox v-model="form.remember">Remember me:</b-form-checkbox>
               </b-form-checkbox-group>
             </b-form-group>
-            <b-button type="submit" variant="info">Login</b-button>
+            <b-button type="submit" variant="outline-info">Login</b-button>
           </b-form>
           <br />
           <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>

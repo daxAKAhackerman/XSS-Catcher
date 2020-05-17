@@ -45,8 +45,8 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="info">Generate</b-button>
-        <b-button type="reset">Cancel</b-button>
+        <b-button type="submit" variant="outline-info">Generate</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>

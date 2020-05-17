@@ -13,7 +13,7 @@
         <b-input-group>
           <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
           <b-input-group-append>
-            <b-button size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+            <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-col>
@@ -34,7 +34,7 @@
       <template class="text-right" v-slot:cell(action)="row">
         <b-button
           type="button"
-          variant="info"
+          variant="outline-info"
           v-b-modal.view-details-modal
           @click="viewedXSS=row.item"
         >View details</b-button>
@@ -45,7 +45,7 @@
           @click="to_delete = row.item.id"
           v-b-modal.delete-xss-modal
           type="button"
-          variant="danger"
+          variant="outline-danger"
         >
           <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
         </b-button>
@@ -67,8 +67,8 @@
 
     <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
       <b-form @submit="deleteXSS" @reset="$refs.deleteXSSModal.hide()">
-        <b-button type="submit" variant="danger">Yes, delete this entry</b-button>
-        <b-button type="reset">Cancel</b-button>
+        <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </b-form>
     </b-modal>
 

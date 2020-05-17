@@ -21,8 +21,8 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="info">Create user</b-button>
-        <b-button type="reset">Cancel</b-button>
+        <b-button type="submit" variant="outline-info">Create user</b-button>
+        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
     <br v-if="show_alert" />
@@ -41,7 +41,7 @@
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
       <div class="text-right">
-        <b-button @click="$refs.createUserModal.hide()" type="reset">Close</b-button>
+        <b-button @click="$refs.createUserModal.hide()" type="reset" variant="outline-secondary">Close</b-button>
       </div>
     </b-modal>
   </b-modal>
