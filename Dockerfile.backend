@@ -3,8 +3,6 @@ FROM python:latest
 COPY ./server /var/www/html/server
 WORKDIR /var/www/html/server
 RUN python3 -m pip install -r /var/www/html/server/requirements.txt
-RUN python3 -m flask db init
-RUN python3 -m flask db migrate -m "initial migration"
 RUN python3 -m flask db upgrade
 RUN python3 -c "import app; tmpapp = app.create_app(); app.models.create_first_user(tmpapp)"
 

@@ -2,7 +2,7 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y wget software-properties-common && wget https://deb.nodesource.com/setup_10.x && bash setup_10.x
+RUN apt-get update && apt-get -y install curl software-properties-common && curl -sL https://deb.nodesource.com/setup_12.x | bash -
 
 RUN apt-get install -y apache2 nodejs
 
