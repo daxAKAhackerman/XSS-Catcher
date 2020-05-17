@@ -29,4 +29,3 @@ RUN sed -i 's/ServerSignature On/ServerSignature Off/g' /etc/apache2/conf-enable
 
 EXPOSE 80
 
-CMD /usr/sbin/apache2ctl -D FOREGROUND

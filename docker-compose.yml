@@ -15,11 +15,12 @@ services:
     build:
       context: '.'
       dockerfile: 'Dockerfile.backend'
-    depends_on: 
-      - 'db'
+    depends_on:
+      - "db"
     restart: 'unless-stopped'
     environment:
       DATABASE_URL: 'mysql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
+    command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "./startup.sh" ]
 
   frontend:
     build:
@@ -30,6 +31,7 @@ services:
     ports:
      - '8888:80'
     restart: 'unless-stopped'
+    command: [ "/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
 volumes: 
   xss-db:
