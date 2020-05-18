@@ -140,8 +140,8 @@ def get_client_loot(id):
         for element in json.loads(hit.data).items():
             if element[0] not in loot.keys():
                 loot[element[0]] = []
-            elif element[0] == 'fingerprint':
-                loot[element[0]].append({hit.id: json.loads(element[1])})
+            elif element[0] == 'fingerprint' or element[0] == 'dom' or element[0] == 'screenshot':
+                loot[element[0]].append({hit.id: ''})
             else:
                 loot[element[0]].append({hit.id: element[1]})
 

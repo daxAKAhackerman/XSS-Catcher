@@ -73,7 +73,12 @@ class XSS(db.Model):
             'timestamp': self.timestamp,
         }
         if 'fingerprint' in data['data'].keys():
-            data['data']['fingerprint'] = json.loads(data['data']['fingerprint'])
+            data['data']['fingerprint'] = ''
+        if 'dom' in data['data'].keys():
+            data['data']['dom'] = ''
+        if 'screenshot' in data['data'].keys():
+            data['data']['screenshot'] = ''
+
         return data
 
     def to_dict_short(self):
@@ -83,6 +88,7 @@ class XSS(db.Model):
             'timestamp': self.timestamp,
         }
         return data
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -116,11 +122,12 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return User.query.get(id)
 
+
 def create_first_user(app):
     with app.app_context():
         if db.session.query(User).count() != 0:
             print('[-] User creation not needed')
-        else: 
+        else:
             user = User(username='admin', is_admin=1)
             user.set_password('xss')
             db.session.add(user)

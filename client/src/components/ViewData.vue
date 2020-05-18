@@ -42,14 +42,33 @@
                   href="#"
                   v-b-toggle="'collapse-img-' + String(Object.keys(row.item)[0])"
                 >[Click to view screenshot...]</a>
-                <b-collapse :id="'collapse-img-' + String(Object.keys(row.item)[0])">
-                  <img style="max-width:100%" :src="Object.values(row.item)[0]" />
+                <b-collapse
+                  @hidden="cleanSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  @show="getSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  :id="'collapse-img-' + String(Object.keys(row.item)[0])"
+                >
+                  <img :key="componentKey" style="max-width:100%" :src="Object.values(row.item)[0]" />
                 </b-collapse>
               </p>
             </div>
             <div v-else-if="element_name == 'fingerprint'">
               <p>
-                <vue-json-pretty :deep="0" :showLength="true" :data="Object.values(row.item)[0]"></vue-json-pretty>
+                <a
+                  href="#"
+                  v-b-toggle="'collapse-fingerprint-' + String(Object.keys(row.item)[0])"
+                >[Click to view fingerprint...]</a>
+                <b-collapse
+                  @hidden="cleanSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  @show="getSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  :id="'collapse-fingerprint-' + String(Object.keys(row.item)[0])"
+                >
+                  <vue-json-pretty
+                    :key="componentKey"
+                    :deep="2"
+                    :showLength="true"
+                    :data="Object.values(row.item)[0]"
+                  ></vue-json-pretty>
+                </b-collapse>
               </p>
             </div>
             <div v-else-if="element_name == 'dom'">
@@ -58,8 +77,12 @@
                   href="#"
                   v-b-toggle="'collapse-dom-' + String(Object.keys(row.item)[0])"
                 >[Click to view DOM...]</a>
-                <b-collapse :id="'collapse-dom-' + String(Object.keys(row.item)[0])">
-                  <div v-highlight>
+                <b-collapse
+                  @hidden="cleanSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  @show="getSpecificData(String(Object.keys(row.item)[0]), element_name, row.index)"
+                  :id="'collapse-dom-' + String(Object.keys(row.item)[0])"
+                >
+                  <div :key="componentKey" v-highlight>
                     <pre class="language-html"><code>{{ Object.values(row.item)[0] }}</code></pre>
                   </div>
                 </b-collapse>
@@ -69,11 +92,8 @@
               v-else-if="element_name == 'cookies' || element_name == 'local_storage' || element_name == 'session_storage'"
             >
               <div v-for="(value, param) in row.item" v-bind:key="param">
-                <div
-                  v-for="(value_deep, param_deep) in Object.values(value)[0]"
-                  v-bind:key="param_deep"
-                >
-                  <code>{{ param_deep }} => {{ value_deep }}</code>
+                <div v-for="(value_deep, param_deep) in value" v-bind:key="param_deep">
+                  <code>{{ Object.keys(value_deep)[0] }} => {{ Object.values(value_deep)[0] }}</code>
                 </div>
               </div>
             </div>
@@ -177,6 +197,33 @@ export default {
             void error;
           }
         });
+    },
+    getSpecificData(element_id, loot_type, row_index) {
+      const path = basePath + "/xss/" + element_id + "/" + loot_type;
+
+      axios
+        .get(path)
+        .then(response => {
+          if (loot_type === "fingerprint") {
+            this.data[loot_type][row_index][element_id] = JSON.parse(
+              response.data.data
+            );
+          } else {
+            this.data[loot_type][row_index][element_id] = response.data.data;
+          }
+          this.componentKey += 1;
+        })
+        .catch(error => {
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            void error;
+          }
+        });
+    },
+    cleanSpecificData(element_id, loot_type, row_index) {
+      this.data[loot_type][row_index][element_id] = "";
+      this.componentKey += 1;
     },
     cleanup() {
       this.data = {};

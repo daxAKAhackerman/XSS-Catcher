@@ -49,8 +49,12 @@
               <h4>{{ data_name }}</h4>
               <p>
                 <a href="#" v-b-toggle="'collapse-screenshot'">[Click to view screenshot...]</a>
-                <b-collapse id="collapse-screenshot">
-                  <img style="max-width:100%" :src="data_value" />
+                <b-collapse
+                  id="collapse-screenshot"
+                  @hidden="cleanSpecificData(data_name)"
+                  @show="getSpecificData(data_name)"
+                >
+                  <img :key="componentKey" style="max-width:100%" :src="data_value" />
                 </b-collapse>
               </p>
               <p></p>
@@ -58,7 +62,19 @@
             <div v-else-if="data_name == 'fingerprint'">
               <h4>{{ data_name }}</h4>
               <p>
-                <vue-json-pretty :deep="0" :showLength="true" :data="data_value"></vue-json-pretty>
+                <a href="#" v-b-toggle="'collapse-fingerprint'">[Click to view fingerprint...]</a>
+                <b-collapse
+                  id="collapse-fingerprint"
+                  @hidden="cleanSpecificData(data_name)"
+                  @show="getSpecificData(data_name)"
+                >
+                  <vue-json-pretty
+                    :key="componentKey"
+                    :deep="2"
+                    :showLength="true"
+                    :data="data_value"
+                  ></vue-json-pretty>
+                </b-collapse>
               </p>
               <p></p>
             </div>
@@ -66,8 +82,12 @@
               <h4>{{ data_name }}</h4>
               <p>
                 <a href="#" v-b-toggle="'collapse-dom'">[Click to view DOM...]</a>
-                <b-collapse id="collapse-dom">
-                  <div v-highlight>
+                <b-collapse
+                  @hidden="cleanSpecificData(data_name)"
+                  @show="getSpecificData(data_name)"
+                  id="collapse-dom"
+                >
+                  <div :key="componentKey" v-highlight>
                     <pre class="language-html"><code>{{ data_value }}</code></pre>
                   </div>
                 </b-collapse>
@@ -121,7 +141,8 @@ export default {
   },
   data() {
     return {
-      data: {}
+      data: {},
+      componentKey: 0
     };
   },
   methods: {
@@ -153,6 +174,31 @@ export default {
             void error;
           }
         });
+    },
+    getSpecificData(loot_type) {
+      const path = basePath + "/xss/" + this.xss_id + "/" + loot_type;
+
+      axios
+        .get(path)
+        .then(response => {
+          if (loot_type === "fingerprint") {
+            this.data["data"][loot_type] = JSON.parse(response.data.data);
+          } else {
+            this.data["data"][loot_type] = response.data.data;
+          }
+          this.componentKey += 1;
+        })
+        .catch(error => {
+          if (error.response.status === 401) {
+            this.$router.push({ name: "Login" });
+          } else {
+            void error;
+          }
+        });
+    },
+    cleanSpecificData(loot_type) {
+      this.data["data"][loot_type] = "";
+      this.componentKey += 1;
     },
     cleanup() {
       this.data = {};
