@@ -128,7 +128,7 @@ import axios from "axios";
 const basePath = "/api";
 
 export default {
-  props: ["xss_id", "xss_type", "client_id"],
+  props: ["xss_id", "client_id"],
   components: {
     VueJsonPretty
   },
@@ -153,14 +153,7 @@ export default {
       return timestampLocal;
     },
     getXSS() {
-      const path =
-        basePath +
-        "/client/" +
-        this.client_id +
-        "/" +
-        this.xss_type +
-        "/" +
-        this.xss_id;
+      const path = basePath + "/client/" + this.client_id + "/" + this.xss_id;
 
       axios
         .get(path)

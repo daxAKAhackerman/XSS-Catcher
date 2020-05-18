@@ -106,6 +106,16 @@
         </template>
         <template v-slot:cell(action)="row">
           <b-button
+            type="button"
+            v-b-tooltip.hover
+            title="View details"
+            variant="outline-info"
+            v-b-modal.view-details-modal
+            @click="xss_detail_id=String(Object.keys(row.item)[0])"
+          >
+            <b-icon-info style="width: 20px; height: 20px;"></b-icon-info>
+          </b-button>
+          <b-button
             v-if="owner_id === user_id || is_admin"
             v-b-tooltip.hover
             title="Delete data"
@@ -126,12 +136,15 @@
         <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </b-form>
     </b-modal>
+
+    <ViewDetails :xss_id="xss_detail_id" :client_id="client_id" />
   </b-modal>
 </template>
 
 <script>
 import axios from "axios";
 import VueJsonPretty from "vue-json-pretty";
+import ViewDetails from "./ViewDetails";
 
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
@@ -141,14 +154,15 @@ const basePath = "/api";
 export default {
   props: ["client_id", "is_admin", "owner_id", "user_id"],
   components: {
-    VueJsonPretty
+    VueJsonPretty,
+    ViewDetails
   },
   data() {
     return {
       fields: [
         {
           key: "data",
-          class: "text-left width90"
+          class: "text-left width88"
         },
         {
           key: "action",
@@ -159,7 +173,8 @@ export default {
       to_delete: 0,
       to_delete_type: "",
       search: "",
-      componentKey: 0
+      componentKey: 0,
+      xss_detail_id: 0
     };
   },
   methods: {
@@ -236,8 +251,8 @@ export default {
 </script>
 
 <style>
-.width90 {
-  width: 90%;
+.width88 {
+  width: 88%;
 }
 .invisible {
   display: none;

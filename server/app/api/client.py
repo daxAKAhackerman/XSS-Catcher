@@ -99,7 +99,7 @@ def get_client(id):
         return jsonify({'status': 'OK'}), 200
 
 
-@bp.route('/client/<id>/<flavor>', methods=['GET'])
+@bp.route('/client/<int:id>/<flavor>/all', methods=['GET'])
 @login_required
 def get_client_xss_list(id, flavor):
 
@@ -115,20 +115,16 @@ def get_client_xss_list(id, flavor):
     return jsonify(xss_list), 200
 
 
-@bp.route('/client/<id>/<flavor>/<xss_id>', methods=['GET'])
+@bp.route('/client/<int:id>/<int:xss_id>', methods=['GET'])
 @login_required
-def get_client_xss(id, flavor, xss_id):
+def get_client_xss(id, xss_id):
 
-    if flavor != 'reflected' and flavor != 'stored':
-        return jsonify({'status': 'error', 'detail': 'Unknown XSS type'}), 400
-
-    xss = XSS.query.filter_by(client_id=id).filter_by(
-        xss_type=flavor).filter_by(id=xss_id).first_or_404()
+    xss = XSS.query.filter_by(client_id=id).filter_by(id=xss_id).first_or_404()
 
     return jsonify(xss.to_dict()), 200
 
 
-@bp.route('/client/<id>/loot', methods=['GET'])
+@bp.route('/client/<int:id>/loot', methods=['GET'])
 @login_required
 def get_client_loot(id):
 
@@ -140,7 +136,7 @@ def get_client_loot(id):
         for element in json.loads(hit.data).items():
             if element[0] not in loot.keys():
                 loot[element[0]] = []
-            elif element[0] == 'fingerprint' or element[0] == 'dom' or element[0] == 'screenshot':
+            if element[0] == 'fingerprint' or element[0] == 'dom' or element[0] == 'screenshot':
                 loot[element[0]].append({hit.id: ''})
             else:
                 loot[element[0]].append({hit.id: element[1]})

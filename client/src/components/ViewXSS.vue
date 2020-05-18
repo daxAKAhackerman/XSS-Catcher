@@ -79,7 +79,7 @@
       </b-form>
     </b-modal>
 
-    <ViewDetails :xss_id="xss_id" :xss_type="xss_type" :client_id="client_id" />
+    <ViewDetails :xss_id="xss_id" :client_id="client_id" />
   </b-modal>
 </template>
 
@@ -136,7 +136,8 @@ export default {
   },
   methods: {
     getXSSList() {
-      const path = basePath + "/client/" + this.client_id + "/" + this.xss_type;
+      const path =
+        basePath + "/client/" + this.client_id + "/" + this.xss_type + "/all";
 
       axios
         .get(path)
