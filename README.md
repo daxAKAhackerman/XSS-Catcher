@@ -21,6 +21,8 @@ docker-compose up -d
 ## First login
 * Default credentials to connect to the Web interface are **admin:xss**
 * Default Web port is **8888**
+## *JavaScript mixed content error*
+*In order to avoid JavaScript mixed content errors when the XSS payload is triggered, it is highly recommended to put XSS Catcher behind a reverse proxy providing valid TLS certificates.*
 ## Pictures
 ### Dashboard
 ![Alt text](/pictures/dashboard.png?raw=true "Dashboard")
