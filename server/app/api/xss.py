@@ -22,6 +22,7 @@ def gen_xss(id):
     session_storage = False
     get_url = False
     i_want_it_all = False
+    code_type = 'html'
 
     for param, value in parameters.items():
 
