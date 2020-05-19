@@ -95,7 +95,7 @@
               >
                 <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
               </b-button>
-              <b-button v-else disabled type="button" variant="outline-danger">Delete</b-button>
+              <b-button v-else disabled type="button" variant="outline-danger"><b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash></b-button>
             </template>
           </b-table>
         </b-row>

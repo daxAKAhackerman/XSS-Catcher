@@ -9,33 +9,57 @@
   >
     <b-form @submit="getPayload" @reset="cleanup">
       <b-form-group class="text-left">
-        <b-form-group v-if="xss_payload !== ''">
-          <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
-          <br />
-          <b-link v-clipboard:copy="xss_payload">Copy to clipboard</b-link>
-        </b-form-group>
-        <b-form-checkbox v-model="options.stored" name="check-button" switch>Stored XSS</b-form-checkbox>
-        <b-form-checkbox v-model="options.cookies" name="check-button" switch>Steal cookies</b-form-checkbox>
-        <b-form-checkbox
-          v-model="options.local_storage"
-          name="check-button"
-          switch
-        >Steal local storage</b-form-checkbox>
-        <b-form-checkbox
-          v-model="options.session_storage"
-          name="check-button"
-          switch
-        >Steal session storage</b-form-checkbox>
-        <b-form-checkbox v-model="options.geturl" name="check-button" switch>Get origin URL</b-form-checkbox>
-        <b-form-checkbox
-          v-model="options.all"
-          name="check-button"
-          switch
-        >All of the above plus screenshot and host fingerprinting</b-form-checkbox>
-
-        <b-form-radio v-model="options.code_type" name="radio-button" value="js">JavaScript</b-form-radio>
-        <b-form-radio v-model="options.code_type" name="radio-button" value="html">HTML</b-form-radio>
+        <div v-if="xss_payload !== ''">
+          <b-form-group>
+            <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
+            <br />
+            <center>
+              <b-link v-clipboard:copy="xss_payload">Copy to clipboard</b-link>
+            </center>
+          </b-form-group>
+          <hr />
+        </div>
+        <center>
+          <b-form-group label="XSS type: ">
+            <b-form-radio-group
+              v-model="options.stored"
+              :options="options.typeList"
+              buttons
+              button-variant="outline-primary"
+            ></b-form-radio-group>
+          </b-form-group>
+          <hr />
+          <b-form-group label="Gather data: ">
+            <b-form-checkbox-group
+              @change="options.gatherAll=[]"
+              v-model="options.gatherData"
+              :options="options.gatherDataList"
+              buttons
+              button-variant="outline-primary"
+            ></b-form-checkbox-group>
+            <br />
+            <br />
+            <b-form-checkbox-group
+              @change="options.gatherData=[]"
+              v-model="options.gatherAll"
+              :options="options.gatherAllList"
+              buttons
+              button-variant="outline-primary"
+            ></b-form-checkbox-group>
+          </b-form-group>
+          <hr />
+          <b-form-group label="Code type: ">
+            <b-form-radio-group
+              v-model="options.code_type"
+              :options="options.codeTypeList"
+              buttons
+              button-variant="outline-primary"
+            ></b-form-radio-group>
+          </b-form-group>
+          <hr />
+        </center>
       </b-form-group>
+
       <b-form-group label="Other data: ">
         <b-form-input
           v-model="options.other"
@@ -65,14 +89,31 @@ export default {
   data() {
     return {
       options: {
-        cookies: false,
-        local_storage: false,
-        session_storage: false,
+        gatherData: [],
+        gatherAll: [],
+        gatherDataList: [
+          { text: "Local storage", value: "local_storage" },
+          { text: "Session storage", value: "session_storage" },
+          { text: "Cookies", value: "cookies" },
+          { text: "Origin URL", value: "geturl" }
+        ],
+        typeList: [
+          { text: "Reflected", value: false },
+          { text: "Stored", value: true }
+        ],
+        codeTypeList: [
+          { text: "HTML", value: "html" },
+          { text: "JavaScript", value: "js" }
+        ],
+        gatherAllList: [
+          {
+            text: "All of the above + screenshot/fingerprint/DOM",
+            value: "all"
+          }
+        ],
         stored: false,
-        geturl: false,
         code_type: "html",
-        other: "",
-        all: false
+        other: ""
       },
       xss_payload: ""
     };
@@ -89,19 +130,19 @@ export default {
         encodeURIComponent(location.origin) +
         "&";
 
-      if (this.options.all) {
+      if (this.options.gatherAll.includes("all")) {
         path += "i_want_it_all=1&";
       }
 
-      if (this.options.cookies) {
+      if (this.options.gatherData.includes("cookies")) {
         path += "cookies=1&";
       }
 
-      if (this.options.local_storage) {
+      if (this.options.gatherData.includes("local_storage")) {
         path += "local_storage=1&";
       }
 
-      if (this.options.session_storage) {
+      if (this.options.gatherData.includes("session_storage")) {
         path += "session_storage=1&";
       }
 
@@ -109,7 +150,7 @@ export default {
         path += "stored=1&";
       }
 
-      if (this.options.geturl) {
+      if (this.options.gatherData.includes("geturl")) {
         path += "geturl=1&";
       }
 
@@ -139,14 +180,11 @@ export default {
     },
     cleanup() {
       this.xss_payload = "";
-      this.options = {
-        cookies: false,
-        local_storage: false,
-        session_storage: false,
-        stored: false,
-        code_type: "html",
-        other: ""
-      };
+      this.options.gatherData = []
+      this.options.stored = false
+      this.options.code_type = "html"
+      this.options.other = ""
+      
       this.$refs.getPayloadModal.hide();
       this.$parent.getClients();
     }
