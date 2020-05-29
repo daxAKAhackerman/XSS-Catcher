@@ -45,7 +45,12 @@ def catch_xss(flavor, uid):
                     data['cookies'] = []
                 cookies_list = value.split('; ')
                 for cookie in cookies_list:
-                    cookie_name, cookie_value = cookie.split('=')
+                    cookie_array = cookie.split('=')
+                    cookie_name = cookie_array[0]
+                    cookie_value = ''.join(cookie_array[1:])
+                    #for element in cookie_array[1:]:
+                    #    cookie_value += element
+                    #cookie_name, cookie_value = cookie.split('=')
                     data['cookies'].append({cookie_name: cookie_value})
 
         elif param == 'local_storage':
