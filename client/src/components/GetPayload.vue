@@ -180,11 +180,11 @@ export default {
     },
     cleanup() {
       this.xss_payload = "";
-      this.options.gatherData = []
-      this.options.stored = false
-      this.options.code_type = "html"
-      this.options.other = ""
-      
+      this.options.gatherData = [];
+      this.options.stored = false;
+      this.options.code_type = "html";
+      this.options.other = "";
+
       this.$refs.getPayloadModal.hide();
       this.$parent.getClients();
     }
@@ -193,4 +193,9 @@ export default {
 </script>
 
 <style>
+.btn-outline-primary:not(:disabled):not(.disabled):active,
+.btn-outline-primary:not(:disabled):not(.disabled).active,
+.show > .btn-outline-primary.dropdown-toggle {
+  background-color: #5bc0de !important;
+}
 </style>
