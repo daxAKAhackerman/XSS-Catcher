@@ -220,7 +220,7 @@ export default {
   },
   methods: {
     getClients() {
-      const path = basePath + "/clients";
+      const path = basePath + "/client/all";
       axios
         .get(path)
         .then(response => {

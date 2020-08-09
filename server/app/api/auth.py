@@ -3,8 +3,10 @@ from app.api import bp
 from app.models import User
 from flask_login import current_user, login_user, logout_user, login_required
 
+
 @bp.route('/auth/login', methods=['POST'])
 def login():
+    """Logs a user in"""
     if current_user.is_authenticated:
         return jsonify({'status': 'error', 'detail': 'Already logged in'}), 400
     data = request.form
@@ -15,8 +17,9 @@ def login():
     return jsonify({'status': 'OK'}), 200
 
 
-@bp.route('/auth/logout')
+@bp.route('/auth/logout', methods=['GET'])
 @login_required
 def logout():
+    """Logs a user out"""
     logout_user()
-    return  jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK'}), 200

@@ -10,7 +10,7 @@ import json
 @bp.route('/x/<flavor>/<uid>', methods=['GET', 'POST'])
 @headers({'Access-Control-Allow-Origin':'*'})
 def catch_xss(flavor, uid):
-
+    """Catches an XSS"""
     client = Client.query.filter_by(uid=uid).first()
 
     if client == None:

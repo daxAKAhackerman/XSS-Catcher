@@ -3,13 +3,14 @@ from app.api import bp
 from app.models import User
 from flask_login import current_user, login_required
 from app.validators import is_password, not_empty, check_length
+from app.decorators import permissions
 from app import db
 
 
 @bp.route('/user/new', methods=['POST'])
 @login_required
 def register():
-
+    """Creates a new user"""
     data = request.form
 
     if 'username' not in data.keys():
@@ -38,7 +39,7 @@ def register():
 @bp.route('/user/change_password', methods=['POST'])
 @login_required
 def change_password():
-
+    """Change the current user's password"""
     data = request.form
 
     if ('password1' not in data.keys()) or \
@@ -64,11 +65,9 @@ def change_password():
 
 @bp.route('/user/<id>/reset_password', methods=['POST'])
 @login_required
+@permissions(all_of=['admin'])
 def reset_password(id):
-
-    if not current_user.is_admin:
-        return jsonify({'status': 'error', 'detail': 'Only an administrator can do that'}), 403
-
+    """Resets a user's password"""
     user = User.query.filter_by(id=id).first_or_404()
 
     password = user.generate_password()
@@ -83,60 +82,62 @@ def reset_password(id):
 
 @bp.route('/user', methods=['GET'])
 @login_required
-def get_user():
+def user_get():
+    """Get the current user"""
     return jsonify(current_user.to_dict()), 200
 
 
-@bp.route('/user/<id>', methods=['DELETE', 'POST'])
+@bp.route('/user/<user_id>', methods=['DELETE'])
 @login_required
-def edit_user(id):
+@permissions(all_of=['admin'])
+def user_delete(user_id):
+    """Deletes a user"""
+    if len(User.query.all()) <= 1:
+        return jsonify({'status': 'error', 'detail': 'Can\'t delete the only user'}), 400
 
-    if request.method == 'DELETE':
+    if current_user.id == int(user_id):
+        return jsonify({'status': 'error', 'detail': 'Can\'t delete yourself'}), 400
 
-        if len(User.query.all()) <= 1:
-            return jsonify({'status': 'error', 'detail': 'Can\'t delete the only user'}), 400
+    user = User.query.filter_by(id=user_id).first_or_404()
 
-        if current_user.id == int(id):
-            return jsonify({'status': 'error', 'detail': 'Can\'t delete yourself'}), 400
+    db.session.delete(user)
+    db.session.commit()
 
-        user = User.query.filter_by(id=id).first_or_404()
+    return jsonify({'status': 'OK'}), 200
 
-        db.session.delete(user)
-        db.session.commit()
 
-        return jsonify({'status': 'OK'}), 200
+@bp.route('/user/<user_id>', methods=['POST'])
+@login_required
+@permissions(all_of=['admin'])
+def user_post(user_id):
+    """Modifies a user"""
+    if current_user.id == int(user_id):
+        return jsonify({'status': 'error', 'detail': 'Can\'t demote yourself'}), 400
 
-    elif request.method == 'POST':
+    user = User.query.filter_by(id=user_id).first_or_404()
 
-        if not current_user.is_admin:
-            return jsonify({'status': 'error', 'detail': 'Only an administrator can do that'}), 403
+    data = request.form
 
-        if current_user.id == int(id):
-            return jsonify({'status': 'error', 'detail': 'Can\'t demote yourself'}), 400
+    if ('is_admin' not in data.keys()):
+        return jsonify({'status': 'error', 'detail': 'Missing data'}), 400
 
-        user = User.query.filter_by(id=id).first_or_404()
+    if (int(data['is_admin']) != 1) and (int(data['is_admin']) != 0):
+        return jsonify({'status': 'error', 'detail': 'Invalid data'}), 400
 
-        data = request.form
+    user.is_admin = (int(data['is_admin']) == 1)
 
-        if ('is_admin' not in data.keys()):
-            return jsonify({'status': 'error', 'detail': 'Missing data'}), 400
-
-        if (int(data['is_admin']) != 1) and (int(data['is_admin']) != 0):
-            return jsonify({'status': 'error', 'detail': 'Invalid data'}), 400
-
-        user.is_admin = (int(data['is_admin']) == 1)
-
-        db.session.commit()
-        return jsonify({'status': 'OK'}), 200
+    db.session.commit()
+    return jsonify({'status': 'OK'}), 200
 
 
 @bp.route('/user/all', methods=['GET'])
 @login_required
-def get_users():
+def user_all_get():
+    """Gets all users"""
     users = []
     data = User.query.all()
 
-    for user in data: 
+    for user in data:
         users.append(user.to_dict())
 
     return jsonify(users), 200

