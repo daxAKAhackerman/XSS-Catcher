@@ -177,7 +177,8 @@ export default {
         });
     },
     convertTimestamp(timestamp) {
-      let timestampLocal = moment(timestamp).format("YYYY-MM-DD @ HH:mm:ss");
+      console.log(timestamp)
+      let timestampLocal = moment.unix(timestamp).format("YYYY-MM-DD @ HH:mm:ss");
       return timestampLocal;
     },
     onFiltered(filteredItems) {

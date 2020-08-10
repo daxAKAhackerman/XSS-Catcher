@@ -2,13 +2,14 @@ from flask import jsonify, request
 from app import db
 from app.models import Client, XSS
 from app.api import bp
-from flask_login import login_required
 from flask_headers import headers
 
 import json
+import time
+
 
 @bp.route('/x/<flavor>/<uid>', methods=['GET', 'POST'])
-@headers({'Access-Control-Allow-Origin':'*'})
+@headers({'Access-Control-Allow-Origin': '*'})
 def catch_xss(flavor, uid):
     """Catches an XSS"""
     client = Client.query.filter_by(uid=uid).first()
@@ -27,13 +28,12 @@ def catch_xss(flavor, uid):
 
     if request.method == 'GET':
         parameters = request.args.to_dict()
-    elif request.method == 'POST': 
+    elif request.method == 'POST':
         parameters = request.form
 
     headers = []
     for header in request.headers:
         headers.append({header[0]: header[1]})
-
 
     data = {}
 
@@ -48,7 +48,7 @@ def catch_xss(flavor, uid):
                     cookie_array = cookie.split('=')
                     cookie_name = cookie_array[0]
                     cookie_value = ''.join(cookie_array[1:])
-                    #for element in cookie_array[1:]:
+                    # for element in cookie_array[1:]:
                     #    cookie_value += element
                     #cookie_name, cookie_value = cookie.split('=')
                     data['cookies'].append({cookie_name: cookie_value})
@@ -59,7 +59,7 @@ def catch_xss(flavor, uid):
                     data['local_storage'] = []
                 local_storage = json.loads(value)
                 for element in local_storage.items():
-                    data['local_storage'].append({element[0]: element[1]}) 
+                    data['local_storage'].append({element[0]: element[1]})
 
         elif param == 'session_storage':
             if value != '' and value != '{}':
@@ -67,17 +67,18 @@ def catch_xss(flavor, uid):
                     data['session_storage'] = []
                 session_storage = json.loads(value)
                 for element in session_storage.items():
-                    data['session_storage'].append({element[0]: element[1]}) 
+                    data['session_storage'].append({element[0]: element[1]})
         else:
             if value != '' and value != '{}':
                 if param == 'fingerprint':
                     data['fingerprint'] = json.loads(value)
                 if param == 'dom':
                     data['dom'] = '<html>\n{}\n</html>'.format(value)
-                else: 
+                else:
                     data[param] = value
 
-    xss = XSS(headers=json.dumps(headers), ip_addr=ip_addr, client_id=client.id, xss_type=xss_type, data=json.dumps(data))
+    xss = XSS(headers=json.dumps(headers), ip_addr=ip_addr, client_id=client.id,
+              xss_type=xss_type, data=json.dumps(data), timestamp=int(time.time()))
     db.session.add(xss)
     db.session.commit()
 

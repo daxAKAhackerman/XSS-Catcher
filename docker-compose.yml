@@ -1,15 +1,14 @@
 version: '3.3'
 services:
   db:
-    image: 'mariadb:latest'
+    image: 'postgres:latest'
     restart: 'unless-stopped'
     environment:
-      MYSQL_DATABASE: 'xss'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
-      MYSQL_ROOT_PASSWORD: 'CAcZeESTUDeK4JSBrxlq'
+      POSTGRES_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
+      POSTGRES_USER: 'user'
+      POSTGRES_DB: 'xss'
     volumes:
-      - 'xss-db:/var/lib/mysql'
+      - 'xss-db:/var/lib/postgresql/data'
 
   backend: 
     build:
@@ -19,8 +18,8 @@ services:
       - "db"
     restart: 'unless-stopped'
     environment:
-      DATABASE_URL: 'mysql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
-    command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "./startup.sh" ]
+      DATABASE_URL: 'postgresql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
+    command: [ "./wait-for-it.sh", "-t", "0", "db:5432", "--", "./startup.sh" ]
 
   frontend:
     build:

@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     convertTimestamp(timestamp) {
-      let timestampLocal = moment(timestamp).format(
+      let timestampLocal = moment.unix(timestamp).format(
         "dddd MMMM Do YYYY, h:mm:ss a"
       );
       return timestampLocal;

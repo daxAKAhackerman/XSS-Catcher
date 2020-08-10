@@ -1,4 +1,4 @@
-from flask import jsonify, request, Response
+from flask import jsonify, request
 from app import db
 from app.models import Client, XSS
 from app.api import bp
