@@ -162,13 +162,19 @@ def load_user(id):
 def init_app(app):
     """Creates the admin user and the settings"""
     with app.app_context():
-        if db.session.query(User).count() != 0 and db.session.query(Settings).count() != 0:
-            print('[-] Initialization not needed')
+        if db.session.query(User).count() != 0:
+            print('[-] User creation not needed')
         else:
             user = User(username='admin', is_admin=1)
-            settings = Settings()
             user.set_password('xss')
             db.session.add(user)
+            db.session.commit()
+            print('[+] Initial user created')
+
+        if db.session.query(Settings).count() != 0:
+            print('[-] Settings initialization not needed')
+        else:
+            settings = Settings()
             db.session.add(settings)
             db.session.commit()
-            print('[+] Initial setup successful')
+            print('[+] Settings initialization successful')
