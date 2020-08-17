@@ -7,7 +7,7 @@
       <b-col sm="3" class="text-right">
         <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">
           Current user:
-          <b>{{ user.username }}</b> [admin]<b-link v-b-modal.settings-modal> Settings</b-link>
+          <b>{{ user.username }}</b>&nbsp;<b-link v-b-modal.settings-modal><b-icon-gear></b-icon-gear></b-link>
         </p>
         <p v-else style="margin-bottom:0;margin-top:revert">
           Current user:

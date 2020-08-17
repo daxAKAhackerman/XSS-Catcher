@@ -173,10 +173,10 @@ export default {
         });
     },
     cleanup() {
-      this.settings = {};
+      this.$refs.settingsModal.hide();
       this.show_alert = false;
       this.alert_msg = "";
-      this.$refs.settingsModal.hide();
+      this.settings = {};
     },
   },
 };
