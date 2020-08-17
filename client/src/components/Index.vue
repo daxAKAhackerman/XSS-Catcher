@@ -7,7 +7,7 @@
       <b-col sm="3" class="text-right">
         <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">
           Current user:
-          <b>{{ user.username }}</b> [admin]
+          <b>{{ user.username }}</b> [admin]<b-link v-b-modal.settings-modal> Settings</b-link>
         </p>
         <p v-else style="margin-bottom:0;margin-top:revert">
           Current user:
@@ -146,6 +146,7 @@
     />
     <ChangePassword />
     <ManageUsers />
+    <Settings />
   </b-container>
 </template>
 
@@ -160,6 +161,7 @@ import ViewXSS from "./ViewXSS";
 import ViewClient from "./ViewClient";
 import ChangePassword from "./ChangePassword";
 import ManageUsers from "./ManageUsers";
+import Settings from "./Settings";
 
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
@@ -174,7 +176,8 @@ export default {
     ViewXSS,
     ViewClient,
     ChangePassword,
-    ManageUsers
+    ManageUsers,
+    Settings
   },
   mixins: [Vue2Filters.mixin],
   data() {

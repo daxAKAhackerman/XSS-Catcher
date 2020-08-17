@@ -3,7 +3,7 @@ from app import db
 from app.models import Client, XSS, User
 from app.api import bp
 from flask_login import login_required, current_user
-from app.validators import not_empty, check_length
+from app.validators import not_empty, check_length, is_email
 from app.decorators import permissions
 
 import json
@@ -74,11 +74,21 @@ def client_post(client_id):
             return jsonify({'status': 'error', 'detail': 'Invalid description (too long)'}), 400
 
     if 'owner' in data.keys():
-        
+
         user = User.query.filter_by(id=data['owner']).first()
         if user == None:
             return jsonify({'status': 'error', 'detail': 'This user does not exist'}), 400
         client.owner_id = data['owner']
+
+    if 'mail_to' in data.keys():
+
+        if data['mail_to'] == '':
+            client.mail_to = None
+        else:
+            if is_email(data['mail_to']) and check_length(data['mail_to'], 256):
+                client.mail_to = data['mail_to']
+            else:
+                return jsonify({'status': 'error', 'detail': 'Invalid mail recipient'}), 400
 
     db.session.commit()
 

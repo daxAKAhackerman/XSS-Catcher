@@ -37,6 +37,20 @@
       </b-form-group>
 
       <b-form-group
+        id="input-group-mail"
+        label="Send alerts to:"
+        label-cols="3"
+        label-for="input-field-mail"
+      >
+        <b-form-input
+          v-if="owner_id === user_id || is_admin"
+          id="input-field-mail"
+          v-model="client.mail_to"
+        ></b-form-input>
+        <b-form-input v-else readonly id="input-field-mail" v-model="client.mail_to"></b-form-input>
+      </b-form-group>
+
+      <b-form-group
         id="input-group-owner"
         label="Owner:"
         label-cols="3"
@@ -76,7 +90,7 @@ export default {
       client: {},
       show_alert: false,
       alert_msg: "",
-      users: {}
+      users: {},
     };
   },
   computed: {
@@ -87,8 +101,8 @@ export default {
           list.push(value.username);
         }
         return list;
-      }
-    }
+      },
+    },
   },
   methods: {
     getClient() {
@@ -96,11 +110,11 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.client = response.data;
           this.getUsers();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
@@ -124,14 +138,15 @@ export default {
       payload.append("name", this.client.name);
       payload.append("description", this.client.description);
       payload.append("owner", owner);
+      payload.append("mail_to", this.client.mail_to);
 
       axios
         .post(path, payload)
-        .then(response => {
+        .then((response) => {
           void response;
           this.cleanup();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
@@ -145,10 +160,10 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.users = response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
@@ -162,8 +177,8 @@ export default {
       this.client = {};
       this.$refs.viewClientModal.hide();
       this.$parent.getClients();
-    }
-  }
+    },
+  },
 };
 </script>
 

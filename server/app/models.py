@@ -12,6 +12,7 @@ class Client(db.Model):
     uid = db.Column(db.String(6), unique=True, nullable=False)
     name = db.Column(db.String(32), unique=True, nullable=False)
     description = db.Column(db.String(128))
+    mail_to = db.Column(db.String(256), nullable=True)
     xss = db.relationship('XSS', backref='client', lazy='dynamic')
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -42,7 +43,8 @@ class Client(db.Model):
             'owner': owner,
             'id': self.id,
             'name': self.name,
-            'description': self.description
+            'description': self.description,
+            'mail_to': self.mail_to
         }
         return data
 
@@ -127,20 +129,46 @@ class User(UserMixin, db.Model):
         return data
 
 
+class Settings(db.Model):
+    """Holds app settings"""
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    smtp_host = db.Column(db.String(256), nullable=True)
+    smtp_port = db.Column(db.Integer, nullable=True)
+    starttls = db.Column(db.Boolean, default=False, nullable=True)
+    ssl_tls = db.Column(db.Boolean, default=False, nullable=True)
+    mail_from = db.Column(db.String(256), nullable=True)
+    smtp_user = db.Column(db.String(128), nullable=True)
+    smtp_pass = db.Column(db.String(128), nullable=True)
+
+    def to_dict(self):
+        """Returns the settings"""
+        data = {
+            'smtp_host': self.smtp_host,
+            'smtp_port': self.smtp_port,
+            'starttls': self.starttls,
+            'ssl_tls': self.ssl_tls,
+            'mail_from': self.mail_from,
+            'smtp_user': self.smtp_user
+        }
+        return data
+
+
 @login.user_loader
 def load_user(id):
     """Returns the user identifier for the session mechanism"""
     return User.query.get(id)
 
 
-def create_first_user(app):
-    """Creates the admin user on application first launch"""
+def init_app(app):
+    """Creates the admin user and the settings"""
     with app.app_context():
-        if db.session.query(User).count() != 0:
-            print('[-] User creation not needed')
+        if db.session.query(User).count() != 0 and db.session.query(Settings).count() != 0:
+            print('[-] Initialization not needed')
         else:
             user = User(username='admin', is_admin=1)
+            settings = Settings()
             user.set_password('xss')
             db.session.add(user)
+            db.session.add(settings)
             db.session.commit()
-            print('[+] Initial user created')
+            print('[+] Initial setup successful')
