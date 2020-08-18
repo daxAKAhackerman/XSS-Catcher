@@ -83,6 +83,10 @@ def catch_xss(flavor, uid):
     settings = Settings.query.first()
 
     if xss.client.mail_to != None and settings.smtp_host != None:
-        send_mail(xss)
+        try: 
+            send_mail(xss)
+        except:
+            # Find a way to handle this pls
+            pass
 
     return jsonify({'status': 'OK'}), 200

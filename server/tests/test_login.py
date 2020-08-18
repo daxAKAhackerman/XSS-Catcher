@@ -2,11 +2,11 @@ from fixtures import client
 
 
 def login(client, username, password, remember):
-    return client.post('/api/auth/login', data=dict(username=username, password=password, remember=remember), follow_redirects=True)
+    return client.post('/api/auth/login', data=dict(username=username, password=password, remember=remember))
 
 
 def logout(client):
-    return client.get('/api/auth/logout', follow_redirects=True)
+    return client.get('/api/auth/logout')
 
 
 def test_normal_flow(client):
@@ -32,15 +32,15 @@ def test_bad_flow(client):
 
 def test_missing_data(client):
     rv = client.post('/api/auth/login', data=dict(username='admin',
-                                                  remember=True), follow_redirects=True)
+                                                  remember=True))
     assert b'Missing username or password' in rv.data
 
     rv = client.post('/api/auth/login', data=dict(password='xss',
-                                                  remember=True), follow_redirects=True)
+                                                  remember=True))
     assert b'Missing username or password' in rv.data
 
     rv = client.post('/api/auth/login', data=dict(username='admin',
-                                                  password='xss'), follow_redirects=True)
+                                                  password='xss'))
     assert b'OK' in rv.data
 
 
