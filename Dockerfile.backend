@@ -4,6 +4,3 @@ COPY ./server /var/www/html/server
 WORKDIR /var/www/html/server
 RUN python3 -m pip install -r /var/www/html/server/requirements.txt
 RUN chmod +x *.sh
-
-EXPOSE 8080
-

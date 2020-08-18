@@ -20,5 +20,3 @@ RUN a2enmod proxy
 RUN a2enmod proxy_http
 RUN a2enmod proxy_http2
 RUN a2enmod setenvif
-
-EXPOSE 80

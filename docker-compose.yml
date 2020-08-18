@@ -17,6 +17,8 @@ services:
     depends_on:
       - "db"
     restart: 'unless-stopped'
+    expose:
+      - "8080"
     environment:
       DATABASE_URL: 'postgresql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
     command: [ "./wait-for-it.sh", "-t", "0", "db:5432", "--", "./startup.sh" ]
@@ -27,6 +29,8 @@ services:
       dockerfile: 'Dockerfile.frontend'
     depends_on: 
       - 'backend'
+    expose:
+        - "80"
     ports:
      - '8888:80'
     restart: 'unless-stopped'
