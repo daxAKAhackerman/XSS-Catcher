@@ -84,9 +84,11 @@ def catch_xss(flavor, uid):
 
     if xss.client.mail_to != None and settings.smtp_host != None:
         try: 
-            send_mail(xss)
+            send_mail(xss=xss)
+            settings.smtp_status = True
+            db.session.commit()
         except:
-            # Find a way to handle this pls
-            pass
+            settings.smtp_status = False
+            db.session.commit()
 
     return jsonify({'status': 'OK'}), 200

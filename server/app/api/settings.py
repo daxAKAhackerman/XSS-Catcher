@@ -5,6 +5,7 @@ from app.api import bp
 from flask_login import login_required
 from app.validators import check_length, is_email
 from app.decorators import permissions
+from app.utils import send_mail
 
 
 @bp.route('/settings', methods=['GET'])
@@ -97,6 +98,7 @@ def settings_post():
             settings.mail_from = None
             settings.smtp_user = None
             settings.smtp_pass = None
+            settings.smtp_status = None
 
     else:
         settings.smtp_host = None
@@ -106,7 +108,34 @@ def settings_post():
         settings.mail_from = None
         settings.smtp_user = None
         settings.smtp_pass = None
+        settings.smtp_status = None
 
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'details': 'Configuration saved successfuly'}), 200
+
+
+@bp.route('/settings/smtp_test', methods=['POST'])
+@login_required
+@permissions(all_of=['admin'])
+def smtp_test_post():
+    data = request.form
+
+    settings = Settings.query.first()
+
+    if 'mail_to' not in data.keys():
+        return jsonify({'status': 'error', 'detail': 'Missing recipient'}), 400
+
+    if is_email(data['mail_to']) and check_length(data['mail_to'], 256):
+
+        try:
+            send_mail(receiver=data['mail_to'])
+            settings.smtp_status = True
+            db.session.commit()
+            return jsonify({'status': 'OK', 'details': 'SMTP configuration test successful'}), 200
+        except:
+            settings.smtp_status = False
+            db.session.commit()
+            return jsonify({'status': 'error', 'detail': 'Could not send test email. Please review your SMTP configuration and don\'t forget to save it before testing it. '}), 400
+    else:
+        return jsonify({'status': 'error', 'detail': 'Invalid recipient'}), 400

@@ -4,19 +4,48 @@ from email.mime.text import MIMEText
 from app.models import Settings
 
 
-def send_mail(xss):
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+class MissingDataError(Error):
+    """Exception raised when data is missing."""
+
+    def __init__(self, message):
+        self.message = message
+
+
+def send_mail(xss=None, receiver=None):
 
     settings = Settings.query.first()
 
     sender = settings.mail_from
-    receiver = xss.client.mail_to
+    
 
-    msg = MIMEText('XSS Catcher just caught a new {} XSS for client {}! Go check it out!'.format(
-        xss.xss_type, xss.client.name))
+    if xss:
+        receiver = xss.client.mail_to
 
-    msg['Subject'] = 'Captured XSS for client {}'.format(xss.client.name)
-    msg['From'] = 'XSS Catcher <{}>'.format(settings.mail_from)
-    msg['To'] = xss.client.mail_to
+        msg = MIMEText('XSS Catcher just caught a new {} XSS for client {}! Go check it out!'.format(
+            xss.xss_type, xss.client.name))
+
+        msg['Subject'] = 'Captured XSS for client {}'.format(xss.client.name)
+
+        msg['To'] = xss.client.mail_to
+
+        msg['From'] = 'XSS Catcher <{}>'.format(settings.mail_from)
+
+    elif receiver:
+        msg = MIMEText(
+            'This is a test email from XSS catcher. If you are getting this, it\'s because your SMTP configuration works. ')
+
+        msg['Subject'] = 'XSS Catcher mail test'
+
+        msg['To'] = receiver
+
+        msg['From'] = 'XSS Catcher <{}>'.format(settings.mail_from)
+
+    else:
+        raise MissingDataError('send_mail did not receive an XSS or a receiver')
 
     user = settings.smtp_user
     password = settings.smtp_pass

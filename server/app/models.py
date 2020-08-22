@@ -139,6 +139,7 @@ class Settings(db.Model):
     mail_from = db.Column(db.String(256), nullable=True)
     smtp_user = db.Column(db.String(128), nullable=True)
     smtp_pass = db.Column(db.String(128), nullable=True)
+    smtp_status = db.Column(db.Boolean, nullable=True)
 
     def to_dict(self):
         """Returns the settings"""
@@ -148,7 +149,8 @@ class Settings(db.Model):
             'starttls': self.starttls,
             'ssl_tls': self.ssl_tls,
             'mail_from': self.mail_from,
-            'smtp_user': self.smtp_user
+            'smtp_user': self.smtp_user,
+            'smtp_status': self.smtp_status
         }
         return data
 
