@@ -1,6 +1,6 @@
 """added smtp status
 
-Revision ID: 2495cd56504b
+Revision ID: 83f0d8cf732e
 Revises: 
 Create Date: 2020-08-22 16:37:40.881765
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2495cd56504b'
+revision = '83f0d8cf732e'
 down_revision = None
 branch_labels = None
 depends_on = None

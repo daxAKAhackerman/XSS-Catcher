@@ -17,7 +17,6 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 cd XSS-Catcher
 docker-compose up -d
-# Even if the containers are up, allow for a little bit of time before the first login. The MySQL container takes like 1 or 2 minutes to be ready
 ```
 ## First login
 * Default credentials to connect to the Web interface are **admin:xss**
