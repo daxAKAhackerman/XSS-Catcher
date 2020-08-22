@@ -158,7 +158,9 @@ export default {
           }
         });
     },
-    deleteXSS() {
+    deleteXSS(evt) {
+      evt.preventDefault();
+      
       const path = basePath + "/xss/" + this.to_delete;
 
       axios

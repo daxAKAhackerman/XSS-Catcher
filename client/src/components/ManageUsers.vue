@@ -128,7 +128,9 @@ export default {
           }
         });
     },
-    deleteUser() {
+    deleteUser(evt) {
+      evt.preventDefault();
+
       const path = basePath + "/user/" + this.to_delete;
 
       axios

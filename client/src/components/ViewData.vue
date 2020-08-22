@@ -194,7 +194,9 @@ export default {
           }
         });
     },
-    deleteData() {
+    deleteData(evt) {
+      evt.preventDefault();
+      
       const path =
         basePath + "/xss/" + this.to_delete + "/" + this.to_delete_type;
 

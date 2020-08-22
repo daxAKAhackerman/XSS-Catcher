@@ -122,7 +122,9 @@ export default {
           }
         });
     },
-    postClient() {
+    postClient(evt) {
+      evt.preventDefault();
+      
       const path = basePath + "/client/" + this.client_id;
 
       var payload = new URLSearchParams();
@@ -138,7 +140,9 @@ export default {
       payload.append("name", this.client.name);
       payload.append("description", this.client.description);
       payload.append("owner", owner);
-      payload.append("mail_to", this.client.mail_to);
+      if (this.client.mail_to !== "" && this.client.mail_to !== null) {
+        payload.append("mail_to", this.client.mail_to);
+      }
 
       axios
         .post(path, payload)

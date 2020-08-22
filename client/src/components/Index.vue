@@ -238,7 +238,9 @@ export default {
           }
         });
     },
-    deleteClient() {
+    deleteClient(evt) {
+      evt.preventDefault();
+      
       const path = basePath + "/client/" + this.to_delete;
       axios
         .delete(path)

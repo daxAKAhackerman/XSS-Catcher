@@ -60,7 +60,7 @@ def change_password():
     current_user.first_login = False
 
     db.session.commit()
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'details': 'Password changed successfuly'}), 200
 
 
 @bp.route('/user/<id>/reset_password', methods=['POST'])

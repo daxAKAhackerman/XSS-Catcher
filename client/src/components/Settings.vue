@@ -178,7 +178,9 @@ export default {
           }
         });
     },
-    postSettings() {
+    postSettings(evt) {
+      evt.preventDefault();
+
       const path = basePath + "/settings";
 
       var payload = new URLSearchParams();

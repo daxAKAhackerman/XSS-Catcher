@@ -63,7 +63,9 @@ export default {
     };
   },
   methods: {
-    changePassword() {
+    changePassword(evt) {
+      evt.preventDefault();
+
       const path = basePath + "/user/change_password";
 
       var payload = new URLSearchParams();

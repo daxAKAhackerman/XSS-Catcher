@@ -66,7 +66,9 @@ export default {
     }
   },
   methods: {
-    createUser () {
+    createUser (evt) {
+      evt.preventDefault();
+
       const path = basePath + '/user/new'
 
       var payload = new URLSearchParams()

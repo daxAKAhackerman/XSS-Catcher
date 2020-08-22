@@ -35,6 +35,9 @@ import axios from "axios";
 axios.defaults.headers.post["Content-Type"] =
   "application/x-www-form-urlencoded";
 
+axios.defaults.headers.put["Content-Type"] =
+  "application/x-www-form-urlencoded";
+
 const basePath = "/api";
 
 export default {
@@ -42,13 +45,15 @@ export default {
     return {
       client: {},
       show_alert: false,
-      alert_msg: ""
+      alert_msg: "",
     };
   },
   methods: {
-    putClient() {
-      const path = basePath + "/client";
+    putClient(evt) {
+      evt.preventDefault();
 
+      const path = basePath + "/client";
+      
       var payload = new URLSearchParams();
 
       payload.append("name", this.client.name);
@@ -56,11 +61,11 @@ export default {
 
       axios
         .put(path, payload)
-        .then(response => {
+        .then((response) => {
           void response;
           this.cleanup();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
@@ -75,8 +80,8 @@ export default {
       this.alert_msg = "";
       this.$refs.addClientModal.hide();
       this.$parent.getClients();
-    }
-  }
+    },
+  },
 };
 </script>
 
