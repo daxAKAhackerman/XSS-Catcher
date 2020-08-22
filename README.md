@@ -3,6 +3,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 ## Features
 * Generates simple customizable XSS payloads
 * Sends email alerts when a new XSS is caught
+* The destination email is configured per client to better fit an environment where different pentesters don't necessarily work on the same tests
 * Separates the gathered data by clients
 * Multi-user with administrative and low privilege users
 * Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
@@ -34,5 +35,6 @@ docker-compose up -d
 ![Alt text](/pictures/details.png?raw=true "XSS details")
 ### Captured data
 ![Alt text](/pictures/data.png?raw=true "Captured data")
-
+## Disclaimer
+Usage of this tool for attacking targets without prior mutual consent is illegal. It is the end user’s responsibility to obey all applicable local, state and federal laws. We assume no liability and are not responsible for any misuse or damage caused by this tool.
 > The bootstrap theme used can be found [here](https://bootswatch.com/slate/)
