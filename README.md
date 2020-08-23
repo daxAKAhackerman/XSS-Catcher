@@ -19,6 +19,12 @@ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 cd XSS-Catcher
 docker-compose up -d
 ```
+## Update
+```bash
+git pull
+docker-compose build
+docker-compose up -d
+```
 ## First login
 * Default credentials to connect to the Web interface are **admin:xss**
 * Default Web port is **8888**
