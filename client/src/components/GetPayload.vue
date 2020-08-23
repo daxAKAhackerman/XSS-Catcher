@@ -14,7 +14,10 @@
             <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
             <br />
             <center>
-              <b-link v-clipboard:copy="xss_payload">Copy to clipboard</b-link>
+              <b-link
+                v-clipboard:copy="xss_payload"
+                @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
+              >Copy to clipboard</b-link>
             </center>
           </b-form-group>
           <hr />
