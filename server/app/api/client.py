@@ -32,7 +32,7 @@ def client_put():
         db.session.add(new_client)
 
         db.session.commit()
-        return jsonify({'status': 'OK'}), 201
+        return jsonify({'status': 'OK', 'detail': 'New client {} created successfuly'.format(new_client.name)}), 201
     else:
         return jsonify({'status': 'error', 'detail': 'Invalid data (name empty or too long or description too long)'}), 400
 
@@ -92,7 +92,7 @@ def client_post(client_id):
 
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Client {} edited successfuly'.format(client.name)}), 200
 
 
 @bp.route('/client/<int:client_id>', methods=['DELETE'])
@@ -107,7 +107,7 @@ def client_delete(client_id):
     db.session.delete(client)
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Client {} deleted successfuly'.format(client.name)}), 200
 
 
 @bp.route('/client/<int:client_id>/<flavor>/all', methods=['GET'])

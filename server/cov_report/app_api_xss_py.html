@@ -189,7 +189,7 @@
     <p id="t136" class="mis show_mis"><span class="n"><a href="#t136">136</a></span><span class="t">    <span class="nam">db</span><span class="op">.</span><span class="nam">session</span><span class="op">.</span><span class="nam">delete</span><span class="op">(</span><span class="nam">xss</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t137" class="mis show_mis"><span class="n"><a href="#t137">137</a></span><span class="t">    <span class="nam">db</span><span class="op">.</span><span class="nam">session</span><span class="op">.</span><span class="nam">commit</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t138" class="pln"><span class="n"><a href="#t138">138</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t139" class="mis show_mis"><span class="n"><a href="#t139">139</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t139" class="mis show_mis"><span class="n"><a href="#t139">139</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'XSS deleted successfuly'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
     <p id="t140" class="pln"><span class="n"><a href="#t140">140</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t141" class="pln"><span class="n"><a href="#t141">141</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t142" class="run"><span class="n"><a href="#t142">142</a></span><span class="t"><span class="op">@</span><span class="nam">bp</span><span class="op">.</span><span class="nam">route</span><span class="op">(</span><span class="str">'/xss/&lt;xss_id>/&lt;loot_type>'</span><span class="op">,</span> <span class="nam">methods</span><span class="op">=</span><span class="op">[</span><span class="str">'GET'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -218,13 +218,13 @@
     <p id="t165" class="pln"><span class="n"><a href="#t165">165</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t166" class="mis show_mis"><span class="n"><a href="#t166">166</a></span><span class="t">    <span class="nam">db</span><span class="op">.</span><span class="nam">session</span><span class="op">.</span><span class="nam">commit</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t167" class="pln"><span class="n"><a href="#t167">167</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t168" class="mis show_mis"><span class="n"><a href="#t168">168</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t168" class="mis show_mis"><span class="n"><a href="#t168">168</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'Data deleted successfuly'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
 </div>
 <div id="footer">
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.2.1</a>,
-            created at 2020-08-17 20:17 -0400
+            created at 2020-08-23 11:42 -0400
         </p>
     </div>
 </div>

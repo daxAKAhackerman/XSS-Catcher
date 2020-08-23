@@ -24,7 +24,7 @@ def login():
         remember = data['remember']
 
     login_user(user, remember=remember)
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Logged in successfuly'}), 200
 
 
 @bp.route('/auth/logout', methods=['GET'])
@@ -32,4 +32,4 @@ def login():
 def logout():
     """Logs a user out"""
     logout_user()
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Logged out successfuly'}), 200

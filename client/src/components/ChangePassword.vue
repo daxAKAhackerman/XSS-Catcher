@@ -14,7 +14,13 @@
         label-cols="3"
         label-for="input-field-op"
       >
-        <b-form-input @keyup.enter="changePassword" v-model="old_password" id="input-field-op" type="password" required></b-form-input>
+        <b-form-input
+          @keyup.enter="changePassword"
+          v-model="old_password"
+          id="input-field-op"
+          type="password"
+          required
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -23,7 +29,13 @@
         label-cols="3"
         label-for="input-field-np"
       >
-        <b-form-input @keyup.enter="changePassword" v-model="new_password1" id="input-field-np" type="password" required></b-form-input>
+        <b-form-input
+          @keyup.enter="changePassword"
+          v-model="new_password1"
+          id="input-field-np"
+          type="password"
+          required
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -32,15 +44,19 @@
         label-cols="3"
         label-for="input-field-np2"
       >
-        <b-form-input @keyup.enter="changePassword" v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
+        <b-form-input
+          @keyup.enter="changePassword"
+          v-model="new_password2"
+          id="input-field-np2"
+          type="password"
+          required
+        ></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button type="submit" variant="outline-info">Save</b-button>
         <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
-    <br v-if="show_alert" />
-    <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>
   </b-modal>
 </template>
 
@@ -58,8 +74,6 @@ export default {
       old_password: "",
       new_password1: "",
       new_password2: "",
-      show_alert: false,
-      alert_msg: ""
     };
   },
   methods: {
@@ -76,33 +90,42 @@ export default {
 
       axios
         .post(path, payload)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.cleanup();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            this.show_alert = true;
-            this.alert_msg = error.response.data.detail;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
+    },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
     },
     cleanup() {
       this.old_password = "";
       this.new_password1 = "";
       this.new_password2 = "";
-      this.show_alert = false;
-      this.alert_msg = "";
       this.$refs.changePasswordModal.hide();
       if (this.$route.name !== "Index") {
         this.$router.push({
-          name: "Index"
+          name: "Index",
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

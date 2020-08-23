@@ -3,25 +3,24 @@ import json
 from fixtures import client
 from app.models import Client, XSS
 
-from tests.test_login import login, logout
+from tests.functions import *
 
 
-from tests.test_client import create_client, get_xss, get_xss_all
+# Tests
 
+def test_new_xss(client):
 
-def test_normal_flow(client):
+    login(client, username='admin', password='xss', remember=True)
 
-    login(client, 'admin', 'xss', True)
-
-    create_client(client, 'TEST_NAME', 'Test description')
+    create_client(client, name='TEST_NAME', description='Test description')
 
     client_obj = Client.query.filter_by(id=1).first()
 
-    client.post('/api/x/r/{}'.format(client_obj.uid), data=dict(cookies='cookie=good', local_storage='{"local":"good"}',
-                                                                session_storage='{"session":"good"}', param='good', fingerprint='["good"]', dom='<br />'))
+    post_x(client, 'r', client_obj.uid, cookies='cookie=good',
+           local_storage='{"local":"good"}', session_storage='{"session":"good"}', param='good', fingerprint='["good"]', dom='<br />')
 
-    client.get('/api/x/s/{}'.format(client_obj.uid),
-               headers={'X-Forwarded-For': '127.0.0.2'})
+    get_x(client, 's', client_obj.uid, headers={
+          'X-Forwarded-For': '127.0.0.2'})
 
     xss1 = XSS.query.filter_by(id=1).first()
     xss2 = XSS.query.filter_by(id=2).first()
@@ -45,11 +44,7 @@ def test_normal_flow(client):
     assert xss2.xss_type == 'stored'
     assert xss2.ip_addr == '127.0.0.2'
 
-
-def test_non_existent_client(client):
-
-    rv = client.get('/api/x/r/AAAAA')
+    rv = get_x(client, 'r', 'AAAAA')
 
     assert rv._status_code == 200
-
-    assert XSS.query.count() == 0
+    assert XSS.query.count() == 2

@@ -97,7 +97,7 @@ const basePath = "/api";
 
 export default {
   components: {
-    ViewDetails
+    ViewDetails,
   },
   props: ["xss_type", "client_id", "is_admin", "owner_id", "user_id"],
   mixins: [Vue2Filters.mixin],
@@ -107,19 +107,19 @@ export default {
         {
           key: "formattedTimestamp",
           sortable: true,
-          label: "Timestamp"
+          label: "Timestamp",
         },
         {
           key: "ip_addr",
           sortable: true,
-          label: "IP address"
+          label: "IP address",
         },
         {
           key: "action",
           sortable: false,
           label: "Action",
-          class: "text-right"
-        }
+          class: "text-right",
+        },
       ],
       sortBy: "formattedTimestamp",
       sortDesc: true,
@@ -131,7 +131,7 @@ export default {
       currentPage: 1,
       totalRows: 0,
       search: "",
-      filterOn: ["formattedTimestamp", "ip_addr"]
+      filterOn: ["formattedTimestamp", "ip_addr"],
     };
   },
   methods: {
@@ -141,7 +141,7 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.dataXSS = response.data;
           for (const index in this.dataXSS) {
             this.dataXSS[index].formattedTimestamp = this.convertTimestamp(
@@ -150,49 +150,67 @@ export default {
           }
           this.totalRows = this.dataXSS.length;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     deleteXSS(evt) {
       evt.preventDefault();
-      
+
       const path = basePath + "/xss/" + this.to_delete;
 
       axios
         .delete(path)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getXSSList();
           this.$refs.deleteXSSModal.hide();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     convertTimestamp(timestamp) {
-      console.log(timestamp)
-      let timestampLocal = moment.unix(timestamp).format("YYYY-MM-DD @ HH:mm:ss");
+      console.log(timestamp);
+      let timestampLocal = moment
+        .unix(timestamp)
+        .format("YYYY-MM-DD @ HH:mm:ss");
       return timestampLocal;
     },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
+    },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
     },
     cleanup() {
       this.dataXSS = [];
       this.xss_id = 0;
       this.to_delete = 0;
       this.$parent.getClients();
-    }
-  }
+    },
+  },
 };
 </script>
 

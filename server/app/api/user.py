@@ -60,7 +60,7 @@ def change_password():
     current_user.first_login = False
 
     db.session.commit()
-    return jsonify({'status': 'OK', 'details': 'Password changed successfuly'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Password changed successfuly'}), 200
 
 
 @bp.route('/user/<id>/reset_password', methods=['POST'])
@@ -103,7 +103,7 @@ def user_delete(user_id):
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'User {} deleted successfuly'.format(user.username)}), 200
 
 
 @bp.route('/user/<user_id>', methods=['POST'])
@@ -127,7 +127,7 @@ def user_post(user_id):
     user.is_admin = (int(data['is_admin']) == 1)
 
     db.session.commit()
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'User {} modified successfuly'.format(user.username)}), 200
 
 
 @bp.route('/user/all', methods=['GET'])

@@ -77,7 +77,7 @@
     <p id="t24" class="run"><span class="n"><a href="#t24">24</a></span><span class="t">        <span class="nam">remember</span> <span class="op">=</span> <span class="nam">data</span><span class="op">[</span><span class="str">'remember'</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p id="t25" class="pln"><span class="n"><a href="#t25">25</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t26" class="run"><span class="n"><a href="#t26">26</a></span><span class="t">    <span class="nam">login_user</span><span class="op">(</span><span class="nam">user</span><span class="op">,</span> <span class="nam">remember</span><span class="op">=</span><span class="nam">remember</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t27" class="run"><span class="n"><a href="#t27">27</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t27" class="run"><span class="n"><a href="#t27">27</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'Logged in successfuly'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
     <p id="t28" class="pln"><span class="n"><a href="#t28">28</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t29" class="pln"><span class="n"><a href="#t29">29</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t30" class="run"><span class="n"><a href="#t30">30</a></span><span class="t"><span class="op">@</span><span class="nam">bp</span><span class="op">.</span><span class="nam">route</span><span class="op">(</span><span class="str">'/auth/logout'</span><span class="op">,</span> <span class="nam">methods</span><span class="op">=</span><span class="op">[</span><span class="str">'GET'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -85,13 +85,13 @@
     <p id="t32" class="run"><span class="n"><a href="#t32">32</a></span><span class="t"><span class="key">def</span> <span class="nam">logout</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t33" class="pln"><span class="n"><a href="#t33">33</a></span><span class="t">    <span class="str">"""Logs a user out"""</span>&nbsp;</span><span class="r"></span></p>
     <p id="t34" class="run"><span class="n"><a href="#t34">34</a></span><span class="t">    <span class="nam">logout_user</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t35" class="run"><span class="n"><a href="#t35">35</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t35" class="run"><span class="n"><a href="#t35">35</a></span><span class="t">    <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'OK'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'Logged out successfuly'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">200</span>&nbsp;</span><span class="r"></span></p>
 </div>
 <div id="footer">
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.2.1</a>,
-            created at 2020-08-17 22:57 -0400
+            created at 2020-08-23 13:21 -0400
         </p>
     </div>
 </div>

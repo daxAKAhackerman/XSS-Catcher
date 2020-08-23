@@ -2,12 +2,16 @@
   <b-container>
     <b-row>
       <b-col sm="9" class="text-left">
-        <b-img height="75px" src="/logo.png" /><b-img height="40px" src="/title.png"/>
+        <b-img height="75px" src="/logo.png" />
+        <b-img height="40px" src="/title.png" />
       </b-col>
       <b-col sm="3" class="text-right">
         <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">
           Current user:
-          <b>{{ user.username }}</b>&nbsp;<b-link v-b-modal.settings-modal><b-icon-gear></b-icon-gear></b-link>
+          <b>{{ user.username }}</b>&nbsp;
+          <b-link v-b-modal.settings-modal>
+            <b-icon-gear></b-icon-gear>
+          </b-link>
         </p>
         <p v-else style="margin-bottom:0;margin-top:revert">
           Current user:
@@ -26,10 +30,19 @@
             </b-button>
           </b-col>
           <b-col offset-sm="1" sm="8" class="text-right">
-            <b-button variant="outline-secondary" v-b-tooltip.hover title="Refresh data" @click="getClients">
+            <b-button
+              variant="outline-secondary"
+              v-b-tooltip.hover
+              title="Refresh data"
+              @click="getClients(); makeToast('Data refreshed', 'success', 'OK')"
+            >
               <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
             </b-button>
-            <b-button v-if="user.is_admin" variant="outline-info" v-b-modal.manage-users-modal>Manage users</b-button>
+            <b-button
+              v-if="user.is_admin"
+              variant="outline-info"
+              v-b-modal.manage-users-modal
+            >Manage users</b-button>
             <b-button variant="outline-warning" v-b-modal.change-password-modal>Change password</b-button>
             <b-button type="button" variant="outline-warning" @click="getLogout">Log out</b-button>
           </b-col>
@@ -40,7 +53,12 @@
             <b-input-group>
               <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
               <b-input-group-append>
-                <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
+                <b-button
+                  variant="outline-secondary"
+                  size="sm"
+                  :disabled="!search"
+                  @click="search = ''"
+                >Clear</b-button>
               </b-input-group-append>
             </b-input-group>
           </b-col>
@@ -95,7 +113,9 @@
               >
                 <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
               </b-button>
-              <b-button v-else disabled type="button" variant="outline-danger"><b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash></b-button>
+              <b-button v-else disabled type="button" variant="outline-danger">
+                <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+              </b-button>
             </template>
           </b-table>
         </b-row>
@@ -177,7 +197,7 @@ export default {
     ViewClient,
     ChangePassword,
     ManageUsers,
-    Settings
+    Settings,
   },
   mixins: [Vue2Filters.mixin],
   data() {
@@ -186,28 +206,28 @@ export default {
         {
           key: "name",
           sortable: true,
-          label: "Client name"
+          label: "Client name",
         },
         {
           key: "stored",
           sortable: true,
-          label: "Stored XSS"
+          label: "Stored XSS",
         },
         {
           key: "reflected",
           sortable: true,
-          label: "Reflected XSS"
+          label: "Reflected XSS",
         },
         {
           key: "data",
           sortable: true,
-          label: "Data collected"
+          label: "Data collected",
         },
         {
           key: "action",
           sortable: false,
-          label: "Action"
-        }
+          label: "Action",
+        },
       ],
       clients: [],
       viewed_client: "",
@@ -218,7 +238,7 @@ export default {
       perPage: 5,
       currentPage: 1,
       totalRows: 0,
-      search: ""
+      search: "",
     };
   },
   methods: {
@@ -226,34 +246,42 @@ export default {
       const path = basePath + "/client/all";
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.clients = response.data;
           this.totalRows = this.clients.length;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     deleteClient(evt) {
       evt.preventDefault();
-      
+
       const path = basePath + "/client/" + this.to_delete;
       axios
         .delete(path)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getClients();
           this.$refs.deleteClientModal.hide();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -261,15 +289,19 @@ export default {
       const path = basePath + "/auth/logout";
       axios
         .get(path)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.$router.push({ name: "Login" });
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -277,25 +309,37 @@ export default {
       const path = basePath + "/user";
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.user = response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
+    },
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
-    }
+    },
   },
   created() {
     this.getClients();
     this.getUser();
-  }
+  },
 };
 </script>
 

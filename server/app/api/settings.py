@@ -112,7 +112,7 @@ def settings_post():
 
     db.session.commit()
 
-    return jsonify({'status': 'OK', 'details': 'Configuration saved successfuly'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Configuration saved successfuly'}), 200
 
 
 @bp.route('/settings/smtp_test', methods=['POST'])
@@ -132,7 +132,7 @@ def smtp_test_post():
             send_mail(receiver=data['mail_to'])
             settings.smtp_status = True
             db.session.commit()
-            return jsonify({'status': 'OK', 'details': 'SMTP configuration test successful'}), 200
+            return jsonify({'status': 'OK', 'detail': 'SMTP configuration test successful'}), 200
         except:
             settings.smtp_status = False
             db.session.commit()

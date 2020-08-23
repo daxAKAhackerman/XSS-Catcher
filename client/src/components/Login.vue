@@ -47,8 +47,6 @@
             </b-form-group>
             <b-button type="submit" variant="outline-info">Login</b-button>
           </b-form>
-          <br />
-          <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>
         </b-card>
       </b-col>
     </b-row>
@@ -68,19 +66,17 @@ const basePath = "/api";
 
 export default {
   components: {
-    ChangePassword
+    ChangePassword,
   },
   data() {
     return {
       form: {
         username: "",
         password: "",
-        remember: []
+        remember: [],
       },
-      show_alert: false,
-      alert_msg: "",
       user: {},
-      show_password_modal: false
+      show_password_modal: false,
     };
   },
   methods: {
@@ -88,17 +84,17 @@ export default {
       const path = basePath + "/user";
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.user = response.data;
           if (this.user.first_login) {
             this.show_password_modal = true;
           } else {
             this.$router.push({
-              name: "Index"
+              name: "Index",
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           }
@@ -115,34 +111,45 @@ export default {
 
       axios
         .post(path, payload)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.loginProcess();
         })
-        .catch(error => {
+        .catch((error) => {
           this.form.password = "";
-          this.show_alert = true;
-          this.alert_msg = error.response.data.detail;
+          this.makeToast(
+            error.response.data.detail,
+            "danger",
+            error.response.data.status
+          );
         });
     },
     isAuth() {
       const path = basePath + "/user";
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           void response;
           this.$router.push({
-            name: "Index"
+            name: "Index",
           });
         })
-        .catch(error => {
+        .catch((error) => {
           void error;
         });
-    }
+    },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
+    },
   },
   created() {
     this.isAuth();
-  }
+  },
 };
 </script>
 

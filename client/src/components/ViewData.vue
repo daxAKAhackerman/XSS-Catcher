@@ -155,26 +155,26 @@ export default {
   props: ["client_id", "is_admin", "owner_id", "user_id"],
   components: {
     VueJsonPretty,
-    ViewDetails
+    ViewDetails,
   },
   data() {
     return {
       fields: [
         {
           key: "data",
-          class: "text-left width88"
+          class: "text-left width88",
         },
         {
           key: "action",
-          class: "text-right"
-        }
+          class: "text-right",
+        },
       ],
       data: {},
       to_delete: 0,
       to_delete_type: "",
       search: "",
       componentKey: 0,
-      xss_detail_id: 0
+      xss_detail_id: 0,
     };
   },
   methods: {
@@ -183,35 +183,43 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.data = response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     deleteData(evt) {
       evt.preventDefault();
-      
+
       const path =
         basePath + "/xss/" + this.to_delete + "/" + this.to_delete_type;
 
       axios
         .delete(path)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getData();
           this.$refs.deleteDataModal.hide();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -220,7 +228,7 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           if (loot_type === "fingerprint") {
             this.data[loot_type][row_index][element_id] = JSON.parse(
               response.data.data
@@ -230,11 +238,15 @@ export default {
           }
           this.componentKey += 1;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -242,13 +254,21 @@ export default {
       this.data[loot_type][row_index][element_id] = "";
       this.componentKey += 1;
     },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
+    },
     cleanup() {
       this.data = {};
       this.to_delete = 0;
       this.to_delete_type = "";
       this.$parent.getClients();
-    }
-  }
+    },
+  },
 };
 </script>
 

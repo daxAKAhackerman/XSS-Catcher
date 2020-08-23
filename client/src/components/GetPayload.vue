@@ -95,27 +95,27 @@ export default {
           { text: "Local storage", value: "local_storage" },
           { text: "Session storage", value: "session_storage" },
           { text: "Cookies", value: "cookies" },
-          { text: "Origin URL", value: "geturl" }
+          { text: "Origin URL", value: "geturl" },
         ],
         typeList: [
           { text: "Reflected", value: false },
-          { text: "Stored", value: true }
+          { text: "Stored", value: true },
         ],
         codeTypeList: [
           { text: "HTML", value: "html" },
-          { text: "JavaScript", value: "js" }
+          { text: "JavaScript", value: "js" },
         ],
         gatherAllList: [
           {
             text: "All of the above + screenshot/fingerprint/DOM",
-            value: "all"
-          }
+            value: "all",
+          },
         ],
         stored: false,
         code_type: "html",
-        other: ""
+        other: "",
       },
-      xss_payload: ""
+      xss_payload: "",
     };
   },
   methods: {
@@ -166,17 +166,29 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.xss_payload = response.data;
           this.$forceUpdate();
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
+    },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
     },
     cleanup() {
       this.xss_payload = "";
@@ -187,8 +199,8 @@ export default {
 
       this.$refs.getPayloadModal.hide();
       this.$parent.getClients();
-    }
-  }
+    },
+  },
 };
 </script>
 

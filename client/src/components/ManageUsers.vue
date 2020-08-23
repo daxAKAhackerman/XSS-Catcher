@@ -99,7 +99,7 @@ const basePath = "/api";
 
 export default {
   components: {
-    CreateUser
+    CreateUser,
   },
   mixins: [Vue2Filters.mixin],
   data() {
@@ -108,7 +108,7 @@ export default {
       to_delete: 0,
       show_alert: false,
       alert_msg: "",
-      alert_type: "danger"
+      alert_type: "danger",
     };
   },
   methods: {
@@ -117,14 +117,18 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.users = response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -135,20 +139,22 @@ export default {
 
       axios
         .delete(path)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.$refs.deleteUserModal.hide();
           this.getUsers();
           this.promote = 0;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
             this.$refs.deleteUserModal.hide();
-            this.alert_msg = error.response.data.detail;
-            this.show_alert = true;
-            this.alert_type = "danger";
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -161,31 +167,38 @@ export default {
 
       axios
         .post(path, payload)
-        .then(response => {
-          void response;
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getUsers();
-          this.alert_msg = "";
-          this.alert_type = "success";
-          this.show_alert = false;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            this.show_alert = true;
-            this.alert_msg = error.response.data.detail;
-            this.alert_type = "danger";
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     resetPassword(userId, username) {
       const path = basePath + "/user/" + userId + "/reset_password";
 
-      axios.post(path).then(response => {
+      axios.post(path).then((response) => {
         this.alert_msg =
           "New password for user " + username + " is: " + response.data.detail;
         this.show_alert = true;
         this.alert_type = "success";
+      });
+    },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
       });
     },
     cleanup() {
@@ -194,8 +207,8 @@ export default {
       this.show_alert = false;
       this.alert_msg = "";
       this.$refs.manageUsersModal.hide();
-    }
-  }
+    },
+  },
 };
 </script>
 

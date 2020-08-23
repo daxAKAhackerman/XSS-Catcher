@@ -130,26 +130,26 @@ const basePath = "/api";
 export default {
   props: ["xss_id", "client_id"],
   components: {
-    VueJsonPretty
+    VueJsonPretty,
   },
   computed: {
     converted_timestamp: {
       get() {
         return this.convertTimestamp(this.data.timestamp);
-      }
-    }
+      },
+    },
   },
   data() {
     return {
       data: {},
-      componentKey: 0
+      componentKey: 0,
     };
   },
   methods: {
     convertTimestamp(timestamp) {
-      let timestampLocal = moment.unix(timestamp).format(
-        "dddd MMMM Do YYYY, h:mm:ss a"
-      );
+      let timestampLocal = moment
+        .unix(timestamp)
+        .format("dddd MMMM Do YYYY, h:mm:ss a");
       return timestampLocal;
     },
     getXSS() {
@@ -157,14 +157,18 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           this.data = response.data;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -173,7 +177,7 @@ export default {
 
       axios
         .get(path)
-        .then(response => {
+        .then((response) => {
           if (loot_type === "fingerprint") {
             this.data["data"][loot_type] = JSON.parse(response.data.data);
           } else {
@@ -181,11 +185,15 @@ export default {
           }
           this.componentKey += 1;
         })
-        .catch(error => {
+        .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -195,8 +203,8 @@ export default {
     },
     cleanup() {
       this.data = {};
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -138,8 +138,6 @@
         <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
-    <br v-if="show_alert" />
-    <b-alert show :variant="alert_type" v-if="show_alert">{{ alert_msg }}</b-alert>
   </b-modal>
 </template>
 
@@ -155,9 +153,6 @@ export default {
   data() {
     return {
       settings: {},
-      show_alert: false,
-      alert_msg: "",
-      alert_type: "danger",
       smtp_test_mail_to: "",
     };
   },
@@ -174,7 +169,11 @@ export default {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -213,18 +212,18 @@ export default {
       axios
         .post(path, payload)
         .then((response) => {
-          this.alert_type = "success";
-          this.alert_msg = response.data.details;
-          this.show_alert = true;
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getSettings();
         })
         .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            this.alert_msg = error.response.data.detail;
-            this.alert_type = "danger";
-            this.show_alert = true;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
             this.getSettings();
           }
         });
@@ -239,27 +238,32 @@ export default {
       axios
         .post(path, payload)
         .then((response) => {
-          this.alert_type = "success";
-          this.alert_msg = response.data.details;
-          this.show_alert = true;
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.getSettings();
         })
         .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            this.alert_msg = error.response.data.detail;
-            this.alert_type = "danger";
-            this.show_alert = true;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
             this.getSettings();
           }
         });
     },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
+    },
     cleanup() {
       this.$refs.settingsModal.hide();
-      this.show_alert = false;
-      this.alert_type = "danger";
-      this.alert_msg = "";
       this.settings = {};
     },
   },

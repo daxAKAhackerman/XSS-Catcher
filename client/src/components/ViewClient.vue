@@ -70,8 +70,6 @@
         <b-button type="reset" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
-    <br v-if="show_alert" />
-    <b-alert show variant="danger" v-if="show_alert">{{ alert_msg }}</b-alert>
   </b-modal>
 </template>
 
@@ -88,8 +86,6 @@ export default {
   data() {
     return {
       client: {},
-      show_alert: false,
-      alert_msg: "",
       users: {},
     };
   },
@@ -118,13 +114,17 @@ export default {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
     postClient(evt) {
       evt.preventDefault();
-      
+
       const path = basePath + "/client/" + this.client_id;
 
       var payload = new URLSearchParams();
@@ -147,15 +147,18 @@ export default {
       axios
         .post(path, payload)
         .then((response) => {
-          void response;
+          this.makeToast(response.data.detail, "success", response.data.status);
           this.cleanup();
         })
         .catch((error) => {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            this.alert_msg = error.response.data.detail;
-            this.show_alert = true;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
@@ -171,13 +174,23 @@ export default {
           if (error.response.status === 401) {
             this.$router.push({ name: "Login" });
           } else {
-            void error;
+            this.makeToast(
+              error.response.data.detail,
+              "danger",
+              error.response.data.status
+            );
           }
         });
     },
+    makeToast(message, variant, title) {
+      this.$root.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: variant,
+      });
+    },
     cleanup() {
-      this.show_alert = false;
-      this.alert_msg = "";
       this.client = {};
       this.$refs.viewClientModal.hide();
       this.$parent.getClients();

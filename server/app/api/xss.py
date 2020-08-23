@@ -136,7 +136,7 @@ def xss_delete(xss_id):
     db.session.delete(xss)
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'XSS deleted successfuly'}), 200
 
 
 @bp.route('/xss/<xss_id>/<loot_type>', methods=['GET'])
@@ -165,4 +165,4 @@ def xss_loot_delete(xss_id, loot_type):
 
     db.session.commit()
 
-    return jsonify({'status': 'OK'}), 200
+    return jsonify({'status': 'OK', 'detail': 'Data deleted successfuly'}), 200

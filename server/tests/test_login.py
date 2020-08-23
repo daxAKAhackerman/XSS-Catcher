@@ -1,52 +1,44 @@
 from fixtures import client
+from tests.functions import *
+
+import json
 
 
-def login(client, username, password, remember):
-    return client.post('/api/auth/login', data=dict(username=username, password=password, remember=remember))
+# Tests
 
+def test_login(client):
 
-def logout(client):
-    return client.get('/api/auth/logout')
-
-
-def test_normal_flow(client):
-
-    rv = login(client, 'admin', 'xss', True)
+    rv = login(client, username='admin', password='xss', remember=True)
     assert b'OK' in rv.data
 
-    rv = logout(client)
-    assert b'OK' in rv.data
+    login(client, username='admin', password='xss', remember=True)
 
-
-def test_login_required(client):
-    rv = logout(client)
-    assert rv._status_code == 401
-
-
-def test_bad_flow(client):
-    login(client, 'admin', 'xss', True)
-
-    rv = login(client, 'admin', 'xss', True)
+    rv = login(client, username='admin', password='xss', remember=True)
     assert b'Already logged in' in rv.data
 
+    logout(client)
 
-def test_missing_data(client):
-    rv = client.post('/api/auth/login', data=dict(username='admin',
-                                                  remember=True))
+    rv = login(client, username='admin', remember=True)
     assert b'Missing username or password' in rv.data
 
-    rv = client.post('/api/auth/login', data=dict(password='xss',
-                                                  remember=True))
-    assert b'Missing username or password' in rv.data
-
-    rv = client.post('/api/auth/login', data=dict(username='admin',
-                                                  password='xss'))
+    rv = login(client, username='admin', password='xss')
     assert b'OK' in rv.data
 
+    logout(client)
 
-def test_bad_creds(client):
-    rv = login(client, 'bad_username', 'bad_password', True)
+    rv = login(client, username='bad_username',
+               password='bad_password', remember=True)
     assert b'Bad username or password' in rv.data
 
-    rv = login(client, 'admin', 'bad_password', True)
-    assert b'Bad username or password' in rv.data
+
+def test_logout(client):
+
+    login(client, username='admin', password='xss', remember=True)
+    rv = logout(client)
+    raise_logout = False
+
+    for k, v in rv.headers:
+        if (k == 'Set-Cookie') and ('session=;' in v):
+            raise_logout = True
+
+    assert raise_logout
