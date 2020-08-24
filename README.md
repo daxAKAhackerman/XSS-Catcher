@@ -20,6 +20,7 @@ cd XSS-Catcher
 docker-compose up -d
 ```
 ## Update
+**Important:** The early versions of XSS Catcher got a lot of DB models modifications and Flask-Migrate was badly used. As such, if you were using versions before commit 44431224885a5c62d182177123f79b1a8f7f0342 (Aug 9, 2020 which is pretty much before anybody used the tool at all), updating XSS Catcher will require deletion of the docker volume associated with the database (basically reverting to factory defaults) resulting in the loss of the data stored in the software. 
 ```bash
 git pull
 docker-compose build
@@ -41,6 +42,7 @@ docker-compose up -d
 ![Alt text](/pictures/details.png?raw=true "XSS details")
 ### Captured data
 ![Alt text](/pictures/data.png?raw=true "Captured data")
+> The bootstrap theme used can be found [here](https://bootswatch.com/slate/)
 ## Disclaimer
 Usage of this tool for attacking targets without prior mutual consent is illegal. It is the end user’s responsibility to obey all applicable local, state and federal laws. We assume no liability and are not responsible for any misuse or damage caused by this tool.
-> The bootstrap theme used can be found [here](https://bootswatch.com/slate/)
+
