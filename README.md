@@ -69,7 +69,7 @@ $ docker-compose up -d
 
 ## Demo
 
-![demo](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/design/animation.gif)
+![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/design/animation.gif)
 
 ## Troubleshooting
 
