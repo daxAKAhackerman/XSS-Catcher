@@ -12,6 +12,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
   <a href="#installation">Installation</a> •
   <a href="#updating">Updating</a> •
   <a href="#first-login">First login</a> •
+  <a href="#demo">Demo</a> •
   <a href="#troubleshooting">Troubleshooting</a> •
   <a href="#credits">Credits</a> 
 </p>
@@ -65,6 +66,10 @@ $ docker-compose up -d
 
 * Default credentials to connect to the Web interface are **admin:xss**
 * Default Web port is **8888**
+
+## Demo
+
+![demo](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/design/animation.gif)
 
 ## Troubleshooting
 
