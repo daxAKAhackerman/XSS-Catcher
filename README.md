@@ -85,6 +85,8 @@ In order to avoid JavaScript mixed content errors when the XSS payload is trigge
 * [Fingerprint.js](https://github.com/Valve/fingerprintjs2)
 * [html2canvas](https://github.com/niklasvh/html2canvas)
 * [Bootswatch Slate theme](https://bootswatch.com/slate/)
+* [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
+* [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
 
 ## Disclaimer
 
@@ -96,4 +98,4 @@ Usage of this tool for attacking targets without prior mutual consent is illegal
 
 ---
 
-> GitHub [@daxAKAhackerman](https://github.com/daxAKAhackerman/) &nbsp; &middot; &nbsp; 
+> GitHub [@daxAKAhackerman](https://github.com/daxAKAhackerman/)
