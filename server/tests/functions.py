@@ -63,3 +63,17 @@ def get_x(client, xss_type, uid, headers={}, **kwargs):
     query_string = query_string.rstrip('&')
 
     return client.get('/api/x/{}/{}{}'.format(xss_type, uid, query_string), headers=headers)
+
+
+# settings
+
+def post_settings(client, **kwargs):
+    return client.post('/api/settings', data=kwargs)
+
+
+def get_settings(client):
+    return client.get('/api/settings')
+
+
+def send_test_mail(client, **kwargs):
+    return client.post('/api/settings/smtp_test', data=kwargs)

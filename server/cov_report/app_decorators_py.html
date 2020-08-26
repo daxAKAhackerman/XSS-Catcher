@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for app\decorators.py: 38%</title>
+    <title>Coverage for app\decorators.py: 49%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
@@ -17,13 +17,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>app\decorators.py</b> :
-            <span class="pc_cov">38%</span>
+            <span class="pc_cov">49%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             39 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">15 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">24 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">19 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">20 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
         </h2>
     </div>
@@ -63,11 +63,11 @@
     <p id="t10" class="run"><span class="n"><a href="#t10">10</a></span><span class="t">        <span class="op">@</span><span class="nam">wraps</span><span class="op">(</span><span class="nam">orig_func</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t11" class="run"><span class="n"><a href="#t11">11</a></span><span class="t">        <span class="key">def</span> <span class="nam">new_func</span><span class="op">(</span><span class="op">*</span><span class="nam">args</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t12" class="run"><span class="n"><a href="#t12">12</a></span><span class="t">            <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">all_of</span><span class="op">)</span> <span class="op">!=</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t13" class="mis show_mis"><span class="n"><a href="#t13">13</a></span><span class="t">                <span class="key">if</span> <span class="str">'admin'</span> <span class="key">in</span> <span class="nam">all_of</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t14" class="mis show_mis"><span class="n"><a href="#t14">14</a></span><span class="t">                    <span class="key">if</span> <span class="key">not</span> <span class="nam">current_user</span><span class="op">.</span><span class="nam">is_admin</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t13" class="run"><span class="n"><a href="#t13">13</a></span><span class="t">                <span class="key">if</span> <span class="str">'admin'</span> <span class="key">in</span> <span class="nam">all_of</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t14" class="run"><span class="n"><a href="#t14">14</a></span><span class="t">                    <span class="key">if</span> <span class="key">not</span> <span class="nam">current_user</span><span class="op">.</span><span class="nam">is_admin</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t15" class="mis show_mis"><span class="n"><a href="#t15">15</a></span><span class="t">                        <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'error'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'Only an administrator can do that'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">403</span>&nbsp;</span><span class="r"></span></p>
     <p id="t16" class="pln"><span class="n"><a href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t17" class="mis show_mis"><span class="n"><a href="#t17">17</a></span><span class="t">                <span class="key">if</span> <span class="str">'owner'</span> <span class="key">in</span> <span class="nam">all_of</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t17" class="run"><span class="n"><a href="#t17">17</a></span><span class="t">                <span class="key">if</span> <span class="str">'owner'</span> <span class="key">in</span> <span class="nam">all_of</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t18" class="mis show_mis"><span class="n"><a href="#t18">18</a></span><span class="t">                    <span class="key">if</span> <span class="str">'client_id'</span> <span class="key">in</span> <span class="nam">kwargs</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t19" class="mis show_mis"><span class="n"><a href="#t19">19</a></span><span class="t">                        <span class="nam">client</span> <span class="op">=</span> <span class="nam">Client</span><span class="op">.</span><span class="nam">query</span><span class="op">.</span><span class="nam">filter_by</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p id="t20" class="pln"><span class="n"><a href="#t20">20</a></span><span class="t">                            <span class="nam">id</span><span class="op">=</span><span class="nam">kwargs</span><span class="op">[</span><span class="str">'client_id'</span><span class="op">]</span><span class="op">)</span><span class="op">.</span><span class="nam">first_or_404</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -80,7 +80,7 @@
     <p id="t27" class="mis show_mis"><span class="n"><a href="#t27">27</a></span><span class="t">                        <span class="key">if</span> <span class="nam">current_user</span><span class="op">.</span><span class="nam">id</span> <span class="op">!=</span> <span class="nam">xss</span><span class="op">.</span><span class="nam">client</span><span class="op">.</span><span class="nam">owner_id</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t28" class="mis show_mis"><span class="n"><a href="#t28">28</a></span><span class="t">                            <span class="key">return</span> <span class="nam">jsonify</span><span class="op">(</span><span class="op">{</span><span class="str">'status'</span><span class="op">:</span> <span class="str">'error'</span><span class="op">,</span> <span class="str">'detail'</span><span class="op">:</span> <span class="str">'You are not the client\'s owner'</span><span class="op">}</span><span class="op">)</span><span class="op">,</span> <span class="num">403</span>&nbsp;</span><span class="r"></span></p>
     <p id="t29" class="pln"><span class="n"><a href="#t29">29</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p id="t30" class="mis show_mis"><span class="n"><a href="#t30">30</a></span><span class="t">                <span class="key">return</span> <span class="nam">orig_func</span><span class="op">(</span><span class="op">*</span><span class="nam">args</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t30" class="run"><span class="n"><a href="#t30">30</a></span><span class="t">                <span class="key">return</span> <span class="nam">orig_func</span><span class="op">(</span><span class="op">*</span><span class="nam">args</span><span class="op">,</span> <span class="op">**</span><span class="nam">kwargs</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t31" class="pln"><span class="n"><a href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t32" class="run"><span class="n"><a href="#t32">32</a></span><span class="t">            <span class="key">elif</span> <span class="nam">len</span><span class="op">(</span><span class="nam">one_of</span><span class="op">)</span> <span class="op">!=</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t33" class="run"><span class="n"><a href="#t33">33</a></span><span class="t">                <span class="key">if</span> <span class="str">'admin'</span> <span class="key">in</span> <span class="nam">one_of</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -111,7 +111,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.2.1</a>,
-            created at 2020-08-23 13:21 -0400
+            created at 2020-08-25 21:29 -0400
         </p>
     </div>
 </div>
