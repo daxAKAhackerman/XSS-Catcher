@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for app\models.py: 76%</title>
+    <title>Coverage for app\models.py: 81%</title>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="jquery.hotkeys.js"></script>
@@ -17,13 +17,13 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>app\models.py</b> :
-            <span class="pc_cov">76%</span>
+            <span class="pc_cov">81%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             103 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">78 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">25 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">83 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">20 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
         </h2>
     </div>
@@ -160,7 +160,7 @@
     <p id="t107" class="pln"><span class="n"><a href="#t107">107</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t108" class="run"><span class="n"><a href="#t108">108</a></span><span class="t">    <span class="key">def</span> <span class="nam">set_password</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">password</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t109" class="pln"><span class="n"><a href="#t109">109</a></span><span class="t">        <span class="str">"""Sets user's password"""</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t110" class="mis show_mis"><span class="n"><a href="#t110">110</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">password_hash</span> <span class="op">=</span> <span class="nam">generate_password_hash</span><span class="op">(</span><span class="nam">password</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t110" class="run"><span class="n"><a href="#t110">110</a></span><span class="t">        <span class="nam">self</span><span class="op">.</span><span class="nam">password_hash</span> <span class="op">=</span> <span class="nam">generate_password_hash</span><span class="op">(</span><span class="nam">password</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t111" class="pln"><span class="n"><a href="#t111">111</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t112" class="run"><span class="n"><a href="#t112">112</a></span><span class="t">    <span class="key">def</span> <span class="nam">check_password</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">password</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t113" class="pln"><span class="n"><a href="#t113">113</a></span><span class="t">        <span class="str">"""Validates user's password"""</span>&nbsp;</span><span class="r"></span></p>
@@ -168,18 +168,18 @@
     <p id="t115" class="pln"><span class="n"><a href="#t115">115</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t116" class="run"><span class="n"><a href="#t116">116</a></span><span class="t">    <span class="key">def</span> <span class="nam">generate_password</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t117" class="pln"><span class="n"><a href="#t117">117</a></span><span class="t">        <span class="str">"""Generates a new password"""</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t118" class="mis show_mis"><span class="n"><a href="#t118">118</a></span><span class="t">        <span class="nam">characters</span> <span class="op">=</span> <span class="nam">string</span><span class="op">.</span><span class="nam">ascii_letters</span> <span class="op">+</span> <span class="nam">string</span><span class="op">.</span><span class="nam">digits</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t119" class="mis show_mis"><span class="n"><a href="#t119">119</a></span><span class="t">        <span class="key">return</span> <span class="str">''</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">random</span><span class="op">.</span><span class="nam">choice</span><span class="op">(</span><span class="nam">characters</span><span class="op">)</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="num">12</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t118" class="run"><span class="n"><a href="#t118">118</a></span><span class="t">        <span class="nam">characters</span> <span class="op">=</span> <span class="nam">string</span><span class="op">.</span><span class="nam">ascii_letters</span> <span class="op">+</span> <span class="nam">string</span><span class="op">.</span><span class="nam">digits</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t119" class="run"><span class="n"><a href="#t119">119</a></span><span class="t">        <span class="key">return</span> <span class="str">''</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">random</span><span class="op">.</span><span class="nam">choice</span><span class="op">(</span><span class="nam">characters</span><span class="op">)</span> <span class="key">for</span> <span class="nam">i</span> <span class="key">in</span> <span class="nam">range</span><span class="op">(</span><span class="num">12</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t120" class="pln"><span class="n"><a href="#t120">120</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t121" class="run"><span class="n"><a href="#t121">121</a></span><span class="t">    <span class="key">def</span> <span class="nam">to_dict</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t122" class="pln"><span class="n"><a href="#t122">122</a></span><span class="t">        <span class="str">"""Returns a representation of the user"""</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t123" class="mis show_mis"><span class="n"><a href="#t123">123</a></span><span class="t">        <span class="nam">data</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t123" class="run"><span class="n"><a href="#t123">123</a></span><span class="t">        <span class="nam">data</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p id="t124" class="pln"><span class="n"><a href="#t124">124</a></span><span class="t">            <span class="str">'id'</span><span class="op">:</span> <span class="nam">self</span><span class="op">.</span><span class="nam">id</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t125" class="pln"><span class="n"><a href="#t125">125</a></span><span class="t">            <span class="str">'username'</span><span class="op">:</span> <span class="nam">self</span><span class="op">.</span><span class="nam">username</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t126" class="pln"><span class="n"><a href="#t126">126</a></span><span class="t">            <span class="str">'first_login'</span><span class="op">:</span> <span class="nam">self</span><span class="op">.</span><span class="nam">first_login</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t127" class="pln"><span class="n"><a href="#t127">127</a></span><span class="t">            <span class="str">'is_admin'</span><span class="op">:</span> <span class="nam">self</span><span class="op">.</span><span class="nam">is_admin</span>&nbsp;</span><span class="r"></span></p>
     <p id="t128" class="pln"><span class="n"><a href="#t128">128</a></span><span class="t">        <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t129" class="mis show_mis"><span class="n"><a href="#t129">129</a></span><span class="t">        <span class="key">return</span> <span class="nam">data</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t129" class="run"><span class="n"><a href="#t129">129</a></span><span class="t">        <span class="key">return</span> <span class="nam">data</span>&nbsp;</span><span class="r"></span></p>
     <p id="t130" class="pln"><span class="n"><a href="#t130">130</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t131" class="pln"><span class="n"><a href="#t131">131</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t132" class="run"><span class="n"><a href="#t132">132</a></span><span class="t"><span class="key">class</span> <span class="nam">Settings</span><span class="op">(</span><span class="nam">db</span><span class="op">.</span><span class="nam">Model</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -238,7 +238,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.2.1</a>,
-            created at 2020-08-25 21:47 -0400
+            created at 2020-08-26 21:15 -0400
         </p>
     </div>
 </div>
