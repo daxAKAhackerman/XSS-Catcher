@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/client/public/icon.png" alt="Markdownify" width="150">
+  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/client/public/icon.png" alt="XSS-Catcher" width="150">
   <br>
   XSS-Catcher
   <br>
