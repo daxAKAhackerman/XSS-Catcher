@@ -17,7 +17,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
   <a href="#credits">Credits</a> 
 </p>
 
-![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/pictures/dashboard.png)
+![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/media/dashboard.png)
 
 ## Features
 
@@ -69,7 +69,7 @@ $ docker-compose up -d
 
 ## Demo
 
-![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/design/animation.gif)
+![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/media/animation.gif)
 
 ## Troubleshooting
 

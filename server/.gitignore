@@ -114,3 +114,6 @@ dmypy.json
 
 # Custom ignores
 *.db
+.coverage
+cov_report/
+.vscode/
