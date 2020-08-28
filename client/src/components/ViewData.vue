@@ -131,9 +131,9 @@
     </div>
 
     <b-modal ref="deleteDataModal" id="delete-data-modal" title="Are you sure?" hide-footer>
-      <b-form @submit="deleteData" @reset="$refs.deleteDataModal.hide()">
-        <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+      <b-form>
+        <b-button @click="deleteData" variant="outline-danger">Yes, delete this entry</b-button>
+        <b-button @click="$refs.deleteDataModal.hide()" variant="outline-secondary">Cancel</b-button>
       </b-form>
     </b-modal>
 
@@ -198,9 +198,7 @@ export default {
           }
         });
     },
-    deleteData(evt) {
-      evt.preventDefault();
-
+    deleteData() {
       const path =
         basePath + "/xss/" + this.to_delete + "/" + this.to_delete_type;
 

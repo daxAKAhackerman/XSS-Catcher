@@ -6,7 +6,7 @@
     hide-footer
     @hidden="cleanup"
   >
-    <b-form @submit="putClient" @reset="cleanup">
+    <b-form @keyup.enter="putClient">
       <b-form-group id="input-group-name" label="Name:" label-cols="3" label-for="input-field-name">
         <b-form-input v-model="client.name" id="input-field-name" required></b-form-input>
       </b-form-group>
@@ -20,8 +20,8 @@
         <b-form-input v-model="client.description" id="input-field-description" required></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="outline-info">Save</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="putClient" variant="outline-info">Save</b-button>
+        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>
@@ -45,9 +45,7 @@ export default {
     };
   },
   methods: {
-    putClient(evt) {
-      evt.preventDefault();
-
+    putClient() {
       const path = basePath + "/client";
 
       var payload = new URLSearchParams();

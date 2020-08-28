@@ -7,20 +7,14 @@
     @hidden="cleanup"
     :visible="$parent.show_password_modal"
   >
-    <b-form @submit="changePassword" @reset="cleanup">
+    <b-form @keyup.enter="changePassword">
       <b-form-group
         id="input-group-op"
         label="Old password:"
         label-cols="3"
         label-for="input-field-op"
       >
-        <b-form-input
-          @keyup.enter="changePassword"
-          v-model="old_password"
-          id="input-field-op"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="old_password" id="input-field-op" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -29,13 +23,7 @@
         label-cols="3"
         label-for="input-field-np"
       >
-        <b-form-input
-          @keyup.enter="changePassword"
-          v-model="new_password1"
-          id="input-field-np"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="new_password1" id="input-field-np" type="password" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -44,17 +32,11 @@
         label-cols="3"
         label-for="input-field-np2"
       >
-        <b-form-input
-          @keyup.enter="changePassword"
-          v-model="new_password2"
-          id="input-field-np2"
-          type="password"
-          required
-        ></b-form-input>
+        <b-form-input v-model="new_password2" id="input-field-np2" type="password" required></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="outline-info">Save</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="changePassword" variant="outline-info">Save</b-button>
+        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>
@@ -77,9 +59,7 @@ export default {
     };
   },
   methods: {
-    changePassword(evt) {
-      evt.preventDefault();
-
+    changePassword() {
       const path = basePath + "/user/change_password";
 
       var payload = new URLSearchParams();

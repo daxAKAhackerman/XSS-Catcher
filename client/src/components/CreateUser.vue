@@ -6,7 +6,7 @@
     hide-footer
     @hide="cleanup"
   >
-    <b-form @submit="createUser" @reset="cleanup">
+    <b-form @keyup.enter="createUser">
       <b-form-group
         id="input-group-username"
         label="Username:"
@@ -16,8 +16,8 @@
         <b-form-input v-model="username" id="input-field-username"></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="outline-info">Create user</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="createUser" variant="outline-info">Create user</b-button>
+        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
     <b-modal
@@ -30,11 +30,7 @@
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
       <div class="text-right">
-        <b-button
-          @click="$refs.createUserModal.hide()"
-          type="reset"
-          variant="outline-secondary"
-        >Close</b-button>
+        <b-button @click="$refs.createUserModal.hide()" variant="outline-secondary">Close</b-button>
       </div>
     </b-modal>
   </b-modal>
@@ -56,9 +52,7 @@ export default {
     };
   },
   methods: {
-    createUser(evt) {
-      evt.preventDefault();
-
+    createUser() {
       const path = basePath + "/user/new";
 
       var payload = new URLSearchParams();

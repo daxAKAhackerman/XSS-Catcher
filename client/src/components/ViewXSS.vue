@@ -73,9 +73,9 @@
     </b-row>
 
     <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
-      <b-form @submit="deleteXSS" @reset="$refs.deleteXSSModal.hide()">
-        <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+      <b-form>
+        <b-button @click="deleteXSS" variant="outline-danger">Yes, delete this entry</b-button>
+        <b-button @click="$refs.deleteXSSModal.hide()" variant="outline-secondary">Cancel</b-button>
       </b-form>
     </b-modal>
 
@@ -162,9 +162,7 @@ export default {
           }
         });
     },
-    deleteXSS(evt) {
-      evt.preventDefault();
-
+    deleteXSS() {
       const path = basePath + "/xss/" + this.to_delete;
 
       axios

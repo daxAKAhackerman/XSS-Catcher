@@ -14,7 +14,7 @@
     <b-row align-v="center">
       <b-col md="4" offset-sm="4">
         <b-card>
-          <b-form @submit="postLogin">
+          <b-form @keyup.enter="postLogin">
             <b-form-group
               id="input-group-username"
               label="Username:"
@@ -45,7 +45,7 @@
                 <b-form-checkbox v-model="form.remember">Remember me:</b-form-checkbox>
               </b-form-checkbox-group>
             </b-form-group>
-            <b-button type="submit" variant="outline-info">Login</b-button>
+            <b-button @click="postLogin" variant="outline-info">Login</b-button>
           </b-form>
         </b-card>
       </b-col>
@@ -100,8 +100,7 @@ export default {
           }
         });
     },
-    postLogin(evt) {
-      evt.preventDefault();
+    postLogin() {
       const path = basePath + "/auth/login";
       var payload = new URLSearchParams();
 

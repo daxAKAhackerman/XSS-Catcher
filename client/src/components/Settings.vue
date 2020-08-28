@@ -10,7 +10,7 @@
   >
     <h3>SMTP settings</h3>
     <hr />
-    <b-form @submit="postSettings" @reset="cleanup">
+    <b-form @keyup.enter="postSettings">
       <b-form-group
         id="input-group-host"
         label="SMTP server: "
@@ -116,6 +116,8 @@
           <b>BAD CONFIGURATION</b>
         </p>
       </b-form-group>
+    </b-form>
+    <b-form @keyup.enter="testSettings">
       <b-form-group
         id="input-group-smtp_test"
         label="SMTP test"
@@ -129,15 +131,15 @@
             placeholder="Recipient"
           ></b-form-input>
           <b-input-group-append>
-            <b-button @click="testSettings()" variant="outline-warning">Test</b-button>
+            <b-button @click="testSettings" variant="outline-warning">Test</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
-      <div class="text-right">
-        <b-button type="submit" variant="outline-info">Save</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
-      </div>
     </b-form>
+    <div class="text-right">
+      <b-button @click="postSettings" variant="outline-info">Save</b-button>
+      <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+    </div>
   </b-modal>
 </template>
 
@@ -177,9 +179,7 @@ export default {
           }
         });
     },
-    postSettings(evt) {
-      evt.preventDefault();
-
+    postSettings() {
       const path = basePath + "/settings";
 
       var payload = new URLSearchParams();

@@ -135,10 +135,10 @@
     </b-row>
 
     <b-modal ref="deleteClientModal" id="delete-client-modal" title="Are you sure?" hide-footer>
-      <b-form @submit="deleteClient" @reset="$refs.deleteClientModal.hide()">
+      <b-form>
         <div class="text-right">
-          <b-button type="submit" variant="outline-danger">Yes, delete this entry</b-button>
-          <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+          <b-button @click="deleteClient" variant="outline-danger">Yes, delete this entry</b-button>
+          <b-button @click="$refs.deleteClientModal.hide()" variant="outline-secondary">Cancel</b-button>
         </div>
       </b-form>
     </b-modal>
@@ -262,9 +262,7 @@ export default {
           }
         });
     },
-    deleteClient(evt) {
-      evt.preventDefault();
-
+    deleteClient() {
       const path = basePath + "/client/" + this.to_delete;
       axios
         .delete(path)

@@ -7,60 +7,56 @@
     hide-footer
     @hidden="cleanup"
   >
-    <b-form @submit="getPayload" @reset="cleanup">
+    <b-form>
       <b-form-group class="text-left">
         <div v-if="xss_payload !== ''">
           <b-form-group>
             <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
             <br />
-            <center>
-              <b-link
-                v-clipboard:copy="xss_payload"
-                @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
-              >Copy to clipboard</b-link>
-            </center>
+            <b-link
+              v-clipboard:copy="xss_payload"
+              @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
+            >Copy to clipboard</b-link>
           </b-form-group>
           <hr />
         </div>
-        <center>
-          <b-form-group label="XSS type: ">
-            <b-form-radio-group
-              v-model="options.stored"
-              :options="options.typeList"
-              buttons
-              button-variant="outline-primary"
-            ></b-form-radio-group>
-          </b-form-group>
-          <hr />
-          <b-form-group label="Gather data: ">
-            <b-form-checkbox-group
-              @change="options.gatherAll=[]"
-              v-model="options.gatherData"
-              :options="options.gatherDataList"
-              buttons
-              button-variant="outline-primary"
-            ></b-form-checkbox-group>
-            <br />
-            <br />
-            <b-form-checkbox-group
-              @change="options.gatherData=[]"
-              v-model="options.gatherAll"
-              :options="options.gatherAllList"
-              buttons
-              button-variant="outline-primary"
-            ></b-form-checkbox-group>
-          </b-form-group>
-          <hr />
-          <b-form-group label="Code type: ">
-            <b-form-radio-group
-              v-model="options.code_type"
-              :options="options.codeTypeList"
-              buttons
-              button-variant="outline-primary"
-            ></b-form-radio-group>
-          </b-form-group>
-          <hr />
-        </center>
+        <b-form-group label="XSS type: ">
+          <b-form-radio-group
+            v-model="options.stored"
+            :options="options.typeList"
+            buttons
+            button-variant="outline-primary"
+          ></b-form-radio-group>
+        </b-form-group>
+        <hr />
+        <b-form-group label="Gather data: ">
+          <b-form-checkbox-group
+            @change="options.gatherAll=[]"
+            v-model="options.gatherData"
+            :options="options.gatherDataList"
+            buttons
+            button-variant="outline-primary"
+          ></b-form-checkbox-group>
+          <br />
+          <br />
+          <b-form-checkbox-group
+            @change="options.gatherData=[]"
+            v-model="options.gatherAll"
+            :options="options.gatherAllList"
+            buttons
+            button-variant="outline-primary"
+          ></b-form-checkbox-group>
+        </b-form-group>
+        <hr />
+        <b-form-group label="Code type: ">
+          <b-form-radio-group
+            v-model="options.code_type"
+            :options="options.codeTypeList"
+            buttons
+            button-variant="outline-primary"
+          ></b-form-radio-group>
+        </b-form-group>
+        <hr />
       </b-form-group>
 
       <b-form-group label="Other data: ">
@@ -72,8 +68,8 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button type="submit" variant="outline-info">Generate</b-button>
-        <b-button type="reset" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="getPayload" variant="outline-info">Generate</b-button>
+        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>
@@ -122,9 +118,7 @@ export default {
     };
   },
   methods: {
-    getPayload(evt) {
-      evt.preventDefault();
-
+    getPayload() {
       let path =
         basePath +
         "/xss/generate/" +
@@ -171,7 +165,6 @@ export default {
         .get(path)
         .then((response) => {
           this.xss_payload = response.data;
-          this.$forceUpdate();
         })
         .catch((error) => {
           if (error.response.status === 401) {
