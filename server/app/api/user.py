@@ -9,6 +9,7 @@ from app import db
 
 @bp.route('/user/new', methods=['POST'])
 @login_required
+@permissions(all_of=['admin'])
 def register():
     """Creates a new user"""
     data = request.form

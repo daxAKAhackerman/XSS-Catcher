@@ -26,6 +26,9 @@ def xss_generate(id):
     i_want_it_all = False
     code_type = 'html'
 
+    if 'url' not in parameters.keys():
+        return jsonify({'status': 'error', 'detail': 'Missing url parameter'}), 400
+
     for param, value in parameters.items():
 
         if param == 'url':
