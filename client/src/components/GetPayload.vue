@@ -7,7 +7,7 @@
     hide-footer
     @hidden="cleanup"
   >
-    <b-form>
+    <b-form v-on:submit.prevent @keyup.enter="getPayload">
       <b-form-group class="text-left">
         <div v-if="xss_payload !== ''">
           <b-form-group>
