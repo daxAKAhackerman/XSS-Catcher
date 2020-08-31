@@ -1,6 +1,7 @@
 from fixtures import client
 from tests.functions import *
 from app.models import Settings
+from app.utils import send_mail, MissingDataError
 
 import json
 
@@ -71,3 +72,13 @@ def test_send_mail(client):
     assert b'Invalid recipient' in rv.data
     rv = send_test_mail(client, mail_to='dax@hackerman.ca')
     assert b'Could not send test email' in rv.data
+    post_settings(client, smtp_host='127.0.0.1', smtp_port=587, ssl_tls=True,
+                  mail_from='xsscatcher@hackerman.ca')
+    rv = send_test_mail(client, mail_to='dax@hackerman.ca')
+    assert b'Could not send test email' in rv.data
+    try:
+        send_mail()
+    except MissingDataError:
+        assert True
+    except:
+        assert False
