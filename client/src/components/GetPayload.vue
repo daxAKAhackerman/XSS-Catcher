@@ -7,7 +7,7 @@
     hide-footer
     @hidden="cleanup"
   >
-    <b-form v-on:submit.prevent @keyup.enter="getPayload">
+    <b-form v-on:submit.prevent>
       <b-form-group class="text-left">
         <div v-if="xss_payload !== ''">
           <b-form-group>
@@ -61,6 +61,7 @@
 
       <b-form-group label="Other data: ">
         <b-form-input
+          @keyup.enter="getPayload"
           v-model="options.other"
           name="input"
           label="Other data: "

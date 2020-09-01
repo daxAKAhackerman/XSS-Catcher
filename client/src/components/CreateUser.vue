@@ -6,14 +6,14 @@
     hide-footer
     @hide="cleanup"
   >
-    <b-form @keyup.enter="createUser">
+    <b-form>
       <b-form-group
         id="input-group-username"
         label="Username:"
         label-cols="3"
         label-for="input-field-username"
       >
-        <b-form-input v-model="username" id="input-field-username"></b-form-input>
+        <b-form-input @keyup.enter="createUser" v-model="username" id="input-field-username"></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button @click="createUser" variant="outline-info">Create user</b-button>

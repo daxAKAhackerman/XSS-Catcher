@@ -6,9 +6,9 @@
     hide-footer
     @hidden="cleanup"
   >
-    <b-form @keyup.enter="putClient">
+    <b-form>
       <b-form-group id="input-group-name" label="Name:" label-cols="3" label-for="input-field-name">
-        <b-form-input v-model="client.name" id="input-field-name" required></b-form-input>
+        <b-form-input @keyup.enter="putClient" v-model="client.name" id="input-field-name" required></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -17,7 +17,12 @@
         label-cols="3"
         label-for="input-field-description"
       >
-        <b-form-input v-model="client.description" id="input-field-description" required></b-form-input>
+        <b-form-input
+          @keyup.enter="putClient"
+          v-model="client.description"
+          id="input-field-description"
+          required
+        ></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button @click="putClient" variant="outline-info">Save</b-button>

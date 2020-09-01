@@ -10,14 +10,18 @@
   >
     <h3>SMTP settings</h3>
     <hr />
-    <b-form @keyup.enter="postSettings">
+    <b-form>
       <b-form-group
         id="input-group-host"
         label="SMTP server: "
         label-cols="3"
         label-for="input-field-host"
       >
-        <b-form-input id="input-field-host" v-model="settings.smtp_host"></b-form-input>
+        <b-form-input
+          @keyup.enter="postSettings"
+          id="input-field-host"
+          v-model="settings.smtp_host"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -26,7 +30,12 @@
         label-cols="3"
         label-for="input-field-port"
       >
-        <b-form-input type="number" id="input-field-port" v-model="settings.smtp_port"></b-form-input>
+        <b-form-input
+          @keyup.enter="postSettings"
+          type="number"
+          id="input-field-port"
+          v-model="settings.smtp_port"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -35,7 +44,11 @@
         label-cols="3"
         label-for="input-field-mail_from"
       >
-        <b-form-input id="input-field-mail_from" v-model="settings.mail_from"></b-form-input>
+        <b-form-input
+          @keyup.enter="postSettings"
+          id="input-field-mail_from"
+          v-model="settings.mail_from"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -44,7 +57,11 @@
         label-cols="3"
         label-for="input-field-user"
       >
-        <b-form-input id="input-field-user" v-model="settings.smtp_user"></b-form-input>
+        <b-form-input
+          @keyup.enter="postSettings"
+          id="input-field-user"
+          v-model="settings.smtp_user"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -54,6 +71,7 @@
         label-for="input-field-pass"
       >
         <b-form-input
+          @keyup.enter="postSettings"
           type="password"
           id="input-field-pass"
           v-model="settings.smtp_pass"
@@ -117,7 +135,7 @@
         </p>
       </b-form-group>
     </b-form>
-    <b-form @keyup.enter="testSettings">
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-smtp_test"
         label="SMTP test"
@@ -126,6 +144,7 @@
       >
         <b-input-group>
           <b-form-input
+            @keyup.enter="testSettings"
             v-model="smtp_test_mail_to"
             id="input-field-smtp_test"
             placeholder="Recipient"

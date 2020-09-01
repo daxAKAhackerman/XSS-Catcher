@@ -7,7 +7,7 @@
     @show="getClient"
     @hide="cleanup"
   >
-    <b-form @keyup.enter="postClient">
+    <b-form>
       <b-form-group
         id="input-group-name"
         label="Short name:"
@@ -15,6 +15,7 @@
         label-for="input-field-name"
       >
         <b-form-input
+          @keyup.enter="postClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-name"
           v-model="client.name"
@@ -29,6 +30,7 @@
         label-for="input-field-description"
       >
         <b-form-input
+          @keyup.enter="postClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-description"
           v-model="client.description"
@@ -43,6 +45,7 @@
         label-for="input-field-mail"
       >
         <b-form-input
+          @keyup.enter="postClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-mail"
           v-model="client.mail_to"
@@ -71,7 +74,7 @@
           @click="postClient"
           variant="outline-info"
         >Save</b-button>
-        <b-button  @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>

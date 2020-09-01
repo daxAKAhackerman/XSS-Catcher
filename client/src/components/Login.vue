@@ -14,13 +14,14 @@
     <b-row align-v="center">
       <b-col md="4" offset-sm="4">
         <b-card>
-          <b-form @keyup.enter="postLogin">
+          <b-form>
             <b-form-group
               id="input-group-username"
               label="Username:"
               label-for="input-field-username"
             >
               <b-form-input
+                @keyup.enter="postLogin"
                 id="input-field-username"
                 v-model="form.username"
                 required
@@ -33,6 +34,7 @@
               label-for="input-field-password"
             >
               <b-form-input
+                @keyup.enter="postLogin"
                 type="password"
                 id="input-field-password"
                 v-model="form.password"
