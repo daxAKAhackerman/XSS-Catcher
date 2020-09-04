@@ -2,7 +2,7 @@
   <br>
   <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/client/public/icon.png" alt="XSS-Catcher" width="150">
   <br>
-  XSS-Catcher
+  XSS Catcher
   <br>
 </h1>
 <h4 align="center">A blind XSS detection framework that runs on <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a> and <a href="https://vuejs.org/" target="_blank">VueJS</a>.</h4>
