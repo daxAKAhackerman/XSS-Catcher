@@ -18,7 +18,7 @@ services:
       - "db"
     restart: 'unless-stopped'
     environment:
-      DATABASE_URL: 'postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-python/${POSTGRES_DB}'
+      DATABASE_URL: 'postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}'
     command: [ "./wait-for-it.sh", "-t", "0", "db:5432", "--", "./startup.sh" ]
 
   frontend:
