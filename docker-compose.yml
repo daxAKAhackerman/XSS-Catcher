@@ -4,9 +4,9 @@ services:
     image: 'postgres:latest'
     restart: 'unless-stopped'
     environment:
-      POSTGRES_PASSWORD: 'FvzZ0a1mxfWWRp9gAeml'
-      POSTGRES_USER: 'user'
-      POSTGRES_DB: 'xss'
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - 'xss-db:/var/lib/postgresql/data'
 
@@ -17,10 +17,8 @@ services:
     depends_on:
       - "db"
     restart: 'unless-stopped'
-    expose:
-      - "8080"
     environment:
-      DATABASE_URL: 'postgresql://user:FvzZ0a1mxfWWRp9gAeml@db/xss'
+      DATABASE_URL: 'postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db-python/${POSTGRES_DB}'
     command: [ "./wait-for-it.sh", "-t", "0", "db:5432", "--", "./startup.sh" ]
 
   frontend:
@@ -29,8 +27,6 @@ services:
       dockerfile: 'Dockerfile.frontend'
     depends_on: 
       - 'backend'
-    expose:
-        - "80"
     ports:
      - '8888:80'
     restart: 'unless-stopped'
@@ -38,4 +34,3 @@ services:
 
 volumes: 
   xss-db:
-
