@@ -2,6 +2,11 @@
 
 OLD_PASSWORD=FvzZ0a1mxfWWRp9gAeml
 
+if [ -z "$POSTGRES_PASSWORD" ]; then
+    echo "[!] POSTGRES password is not set. Did you run 'make deploy'?"
+    exit
+fi
+
 if [ "$POSTGRES_PASSWORD" != "$OLD_PASSWORD" ]; then
     psql -d "postgresql://$POSTGRES_USER:$OLD_PASSWORD@$POSTGRES_HOSTNAME/$POSTGRES_DB" -c "\q"
 
