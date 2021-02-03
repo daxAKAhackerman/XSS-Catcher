@@ -1,16 +1,14 @@
-from dotenv import load_dotenv
-
 import os
 import string
 import random
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '.env'))
 
 if os.environ.get('POSTGRES_DB') and \
    os.environ.get('POSTGRES_USER') and \
-   os.environ.get('POSTGRES_PASSWORD'):
-    DATABASE_URL = f'postgres://${os.environ.get("POSTGRES_USER")}:${os.environ.get("POSTGRES_PASSWORD")}@db/${os.environ.get("POSTGRES_DB")}'
+   os.environ.get('POSTGRES_PASSWORD') and\
+   os.environ.get('POSTGRES_HOSTNAME'):
+    DATABASE_URL = f'postgres://${os.environ.get("POSTGRES_USER")}:${os.environ.get("POSTGRES_PASSWORD")}@${os.environ.get("POSTGRES_HOSTNAME")}/${os.environ.get("POSTGRES_DB")}'
 else:
     DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db')
 
