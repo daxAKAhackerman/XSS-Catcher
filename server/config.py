@@ -8,7 +8,7 @@ if os.environ.get('POSTGRES_DB') and \
    os.environ.get('POSTGRES_USER') and \
    os.environ.get('POSTGRES_PASSWORD') and\
    os.environ.get('POSTGRES_HOSTNAME'):
-    DATABASE_URL = f'postgres://${os.environ.get("POSTGRES_USER")}:${os.environ.get("POSTGRES_PASSWORD")}@${os.environ.get("POSTGRES_HOSTNAME")}/${os.environ.get("POSTGRES_DB")}'
+    DATABASE_URL = f'postgres://{os.environ.get("POSTGRES_USER")}:{os.environ.get("POSTGRES_PASSWORD")}@{os.environ.get("POSTGRES_HOSTNAME")}/{os.environ.get("POSTGRES_DB")}'
 else:
     DATABASE_URL = 'sqlite:///' + os.path.join(basedir, 'app.db')
 
