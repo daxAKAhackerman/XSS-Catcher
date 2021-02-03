@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/client/public/icon.png" alt="XSS-Catcher" width="150">
+  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/icon.png" alt="XSS-Catcher" width="150">
   <br>
   XSS Catcher
   <br>
@@ -17,7 +17,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
   <a href="#credits">Credits</a> 
 </p>
 
-![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/media/dashboard.png)
+![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/dashboard.png)
 
 ## Features
 
@@ -45,8 +45,11 @@ $ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 # Go into the repository
 $ cd XSS-Catcher
 
-# Start the containers
-$ docker-compose up -d
+# If it is not already installed, install make
+$ apt install make
+
+# Deploy the application
+$ make deploy
 ```
 
 ## Update
@@ -55,11 +58,8 @@ $ docker-compose up -d
 # Pull the repository
 $ git pull
 
-# Build the new version of the containers
-$ docker-compose build
-
-# Start the containers
-$ docker-compose up -d
+# Update the application
+$ make update
 ```
 
 ## First login
@@ -69,13 +69,19 @@ $ docker-compose up -d
 
 ## Demo
 
-![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/media/animation.gif)
+![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/animation.gif)
 
 ## Troubleshooting
 
 ### JavaScript mixed content error
 
 In order to avoid JavaScript mixed content errors when the XSS payload is triggered, it is highly recommended to put XSS Catcher behind a reverse proxy providing valid TLS certificates.
+
+### Database looks empty after migrating from v1.0.0 to v1.1.0 and up
+
+Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default. 
+
+### 
 
 ## Credits
 
