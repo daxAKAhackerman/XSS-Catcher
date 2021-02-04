@@ -20,11 +20,11 @@ test-coverage-report:
 
 generate-secrets:
 ifeq ($(wildcard ./.env),)
-	@echo "[-] Docker environment variables are already set"
-else
 	@echo POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) >> .env
 	@echo POSTGRES_USER=$(POSTGRES_USER) >> .env
 	@echo POSTGRES_DB=$(POSTGRES_DB) >> .env
+else
+	@echo "[-] Docker environment variables are already set"
 endif
 
 deploy: generate-secrets
