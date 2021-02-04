@@ -19,9 +19,13 @@ test-coverage-report:
 	@pipenv run pytest -v --cov=app --cov-report html:cov_html server/tests
 
 generate-secrets:
+ifeq ($(wildcard ./.env),)
+	@echo "[-] Docker environment variables are already set"
+else
 	@echo POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) >> .env
 	@echo POSTGRES_USER=$(POSTGRES_USER) >> .env
 	@echo POSTGRES_DB=$(POSTGRES_DB) >> .env
+endif
 
 deploy: generate-secrets
 	@docker-compose build
