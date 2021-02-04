@@ -21,24 +21,24 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 
 ## Features
 
-* Generates simple customizable XSS payloads
-* Sends email alerts when a new XSS is caught
-* The destination email is configured per client to better fit an environment where different pentesters don't necessarily work on the same tests
-* Separates the gathered data by clients
-* Multi-user with administrative and low privilege users
-* Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
-* Allows capture of cookies, local storage, session storage and any other specified parameters
-* Payload can be customized by the users as he pleases. Simply pass your data in the query string or POST body and the application will catch it!
-* Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs2](https://github.com/Valve/fingerprintjs2)
-* Captures the full DOM so you can easily know where the payload triggered
-* Granular deletion of captured data
-* Uses db initialisation scripts with Flask-Migrate, so using an alternative database only requires minor modifications of the docker-compose.yml file
+-   Generates simple customizable XSS payloads
+-   Sends email alerts when a new XSS is caught
+-   The destination email is configured per client to better fit an environment where different pentesters don't necessarily work on the same tests
+-   Separates the gathered data by clients
+-   Multi-user with administrative and low privilege users
+-   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
+-   Allows capture of cookies, local storage, session storage and any other specified parameters
+-   Payload can be customized by the users as he pleases. Simply pass your data in the query string or POST body and the application will catch it!
+-   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs2](https://github.com/Valve/fingerprintjs2)
+-   Captures the full DOM so you can easily know where the payload triggered
+-   Granular deletion of captured data
+-   Uses db initialisation scripts with Flask-Migrate, so using an alternative database only requires minor modifications of the docker-compose.yml file
 
 ## Installation
 
 To clone and run this application, you'll need [Git](https://git-scm.com), [Docker](https://docs.docker.com/engine/) and [Docker Compose](https://docs.docker.com/compose/). From your command line:
 
-``` bash
+```bash
 # Clone this repository
 $ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 
@@ -54,7 +54,7 @@ $ make deploy
 
 ## Update
 
-``` bash
+```bash
 # Pull the repository
 $ git pull
 
@@ -62,10 +62,20 @@ $ git pull
 $ make update
 ```
 
+## Start/Stop containers
+
+```bash
+# Start the containers
+$ make start
+
+# Stop the containers
+$ make stop
+```
+
 ## First login
 
-* Default credentials to connect to the Web interface are **admin:xss**
-* Default Web port is **8888**
+-   Default credentials to connect to the Web interface are **admin:xss**
+-   Default Web port is **8888**
 
 ## Demo
 
@@ -85,14 +95,14 @@ Since v1.1.0 introduced the usage of randomized database passwords, be sure to r
 
 ## Credits
 
-* [Flask](https://flask.palletsprojects.com/)
-* [VueJS](https://vuejs.org/)
-* [BootstrapVue](https://bootstrap-vue.org/)
-* [Fingerprint.js](https://github.com/Valve/fingerprintjs2)
-* [html2canvas](https://github.com/niklasvh/html2canvas)
-* [Bootswatch Slate theme](https://bootswatch.com/slate/)
-* [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
-* [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
+-   [Flask](https://flask.palletsprojects.com/)
+-   [VueJS](https://vuejs.org/)
+-   [BootstrapVue](https://bootstrap-vue.org/)
+-   [Fingerprint.js](https://github.com/Valve/fingerprintjs2)
+-   [html2canvas](https://github.com/niklasvh/html2canvas)
+-   [Bootswatch Slate theme](https://bootswatch.com/slate/)
+-   [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
+-   [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
 
 ## Disclaimer
 
@@ -100,7 +110,7 @@ Usage of this tool for attacking targets without prior mutual consent is illegal
 
 ## You may also like...
 
-* [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
+-   [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
 
 ---
 
