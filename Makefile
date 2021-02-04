@@ -2,6 +2,7 @@ SHELL := /usr/bin/env bash
 POSTGRES_USER = user
 POSTGRES_DB = xss
 POSTGRES_PASSWORD := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)\n
+CLIENT_DIR=client
 
 install:
 	@python3 -m pip install pipenv -U
@@ -9,6 +10,7 @@ install:
 	@pipenv run pre-commit install
 
 lint:
+	@npm run --prefix $(CLIENT_DIR) lint
 	@pipenv run black --line-length=160 server/app server/tests server/config.py server/xss.py
 	@pipenv run isort --profile black server/app server/tests server/config.py server/xss.py
 
