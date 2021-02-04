@@ -11,7 +11,8 @@ if [ "$POSTGRES_PASSWORD" != "$OLD_PASSWORD" ]; then
     psql -d "postgresql://$POSTGRES_USER:$OLD_PASSWORD@$POSTGRES_HOSTNAME/$POSTGRES_DB" -c "\q" > /dev/null 2>&1
 
     if [ $? -eq 0 ]; then
-        psql -d "postgresql://$POSTGRES_USER:$OLD_PASSWORD@$POSTGRES_HOSTNAME/$POSTGRES_DB" -c "ALTER USER \"$POSTGRES_USER\" WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';"
+        psql -d "postgresql://$POSTGRES_USER:$OLD_PASSWORD@$POSTGRES_HOSTNAME/$POSTGRES_DB" -c "ALTER USER \"$POSTGRES_USER\" WITH ENCRYPTED PASSWORD '$POSTGRES_PASSWORD';" > /dev/null 2>&1
+        echo "[+] New database password was set successfully"
     else
         echo "[-] Password migration not needed"
     fi
