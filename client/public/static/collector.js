@@ -6466,7 +6466,7 @@
                 var _i, _a, child, _b, _c, child, _d, _e, child, _f, _g, child, _h, _j, child, _k, _l, child, _m, _o, child;
                 return __generator(this, function (_p) {
                     switch (_p.label) {
-                        case 0: 
+                        case 0:
                         // https://www.w3.org/TR/css-position-3/#painting-order
                         // 1. the background and borders of the element forming the stacking context.
                         return [4 /*yield*/, this.renderNodeBackgroundAndBorders(stack.element)];
@@ -6486,7 +6486,7 @@
                         case 4:
                             _i++;
                             return [3 /*break*/, 2];
-                        case 5: 
+                        case 5:
                         // 3. For all its in-flow, non-positioned, block-level descendants in tree order:
                         return [4 /*yield*/, this.renderNodeContent(stack.element)];
                         case 6:
@@ -7094,7 +7094,7 @@
     if (typeof window !== 'undefined' && typeof define === 'function' && define.amd) { define(definition) } else if (typeof module !== 'undefined' && module.exports) { module.exports = definition() } else if (context.exports) { context.exports = definition() } else { context[name] = definition() }
   })('Fingerprint2', this, function () {
     'use strict'
-  
+
     // detect if object is array
     // only implement if no native implementation is available
     if (typeof Array.isArray === 'undefined') {
@@ -7102,9 +7102,9 @@
         return Object.prototype.toString.call(obj) === '[object Array]'
       }
     };
-  
+
     /// MurmurHash3 related functions
-  
+
     //
     // Given two 64bit ints (as an array of two 32bit ints) returns the two
     // added together as a 64bit int (as an array of two 32bit ints).
@@ -7126,7 +7126,7 @@
       o[0] &= 0xffff
       return [(o[0] << 16) | o[1], (o[2] << 16) | o[3]]
     }
-  
+
     //
     // Given two 64bit ints (as an array of two 32bit ints) returns the two
     // multiplied together as a 64bit int (as an array of two 32bit ints).
@@ -7208,7 +7208,7 @@
       h = x64Xor(h, [0, h[0] >>> 1])
       return h
     }
-  
+
     //
     // Given a string and an optional seed as an int, returns a 128 bit
     // hash using the x64 flavor of MurmurHash3, as an unsigned hex.
@@ -7309,7 +7309,7 @@
       h2 = x64Add(h2, h1)
       return ('00000000' + (h1[0] >>> 0).toString(16)).slice(-8) + ('00000000' + (h1[1] >>> 0).toString(16)).slice(-8) + ('00000000' + (h2[0] >>> 0).toString(16)).slice(-8) + ('00000000' + (h2[1] >>> 0).toString(16)).slice(-8)
     }
-  
+
     var defaultOptions = {
       preprocessor: null,
       audio: {
@@ -7348,7 +7348,7 @@
       ERROR: 'error',
       EXCLUDED: 'excluded'
     }
-  
+
     var each = function (obj, iterator) {
       if (Array.prototype.forEach && obj.forEach === Array.prototype.forEach) {
         obj.forEach(iterator)
@@ -7364,7 +7364,7 @@
         }
       }
     }
-  
+
     var map = function (obj, iterator) {
       var results = []
       // Not using strict equality so that this acts as a
@@ -7378,7 +7378,7 @@
       })
       return results
     }
-  
+
     var extendSoft = function (target, source) {
       if (source == null) { return target }
       var value
@@ -7391,7 +7391,7 @@
       }
       return target
     }
-  
+
     // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
     var enumerateDevicesKey = function (done, options) {
       if (!isEnumerateDevicesSupported()) {
@@ -7405,7 +7405,7 @@
         done(error)
       })
     }
-  
+
     var isEnumerateDevicesSupported = function () {
       return (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices)
     }
@@ -7416,19 +7416,19 @@
         // See comment for excludeUserAgent and https://stackoverflow.com/questions/46363048/onaudioprocess-not-called-on-ios11#46534088
         return done(options.EXCLUDED)
       }
-  
+
       var AudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
-  
+
       if (AudioContext == null) {
         return done(options.NOT_AVAILABLE)
       }
-  
+
       var context = new AudioContext(1, 44100, 44100)
-  
+
       var oscillator = context.createOscillator()
       oscillator.type = 'triangle'
       oscillator.frequency.setValueAtTime(10000, context.currentTime)
-  
+
       var compressor = context.createDynamicsCompressor()
       each([
         ['threshold', -50],
@@ -7442,19 +7442,19 @@
           compressor[item[0]].setValueAtTime(item[1], context.currentTime)
         }
       })
-  
+
       oscillator.connect(compressor)
       compressor.connect(context.destination)
       oscillator.start(0)
       context.startRendering()
-  
+
       var audioTimeoutId = setTimeout(function () {
         console.warn('Audio fingerprint timed out. Please report bug at https://github.com/Valve/fingerprintjs2 with your user agent: "' + navigator.userAgent + '".')
         context.oncomplete = function () { }
         context = null
         return done('audioTimeout')
       }, audioOptions.timeout)
-  
+
       context.oncomplete = function (event) {
         var fingerprint
         try {
@@ -7606,7 +7606,7 @@
       // a font will be compared against all the three default fonts.
       // and if it doesn't match all 3 then that font is not available.
       var baseFonts = ['monospace', 'sans-serif', 'serif']
-  
+
       var fontList = [
         'Andale Mono', 'Arial', 'Arial Black', 'Arial Hebrew', 'Arial MT', 'Arial Narrow', 'Arial Rounded MT Bold', 'Arial Unicode MS',
         'Bitstream Vera Sans Mono', 'Book Antiqua', 'Bookman Old Style',
@@ -7621,7 +7621,7 @@
         'Tahoma', 'Times', 'Times New Roman', 'Times New Roman PS', 'Trebuchet MS',
         'Verdana', 'Wingdings', 'Wingdings 2', 'Wingdings 3'
       ]
-  
+
       if (options.fonts.extendedJsFonts) {
         var extendedFontList = [
           'Abadi MT Condensed Light', 'Academy Engraved LET', 'ADOBE CASLON PRO', 'Adobe Garamond', 'ADOBE GARAMOND PRO', 'Agency FB', 'Aharoni', 'Albertus Extra Bold', 'Albertus Medium', 'Algerian', 'Amazone BT', 'American Typewriter',
@@ -7657,32 +7657,32 @@
           'ZapfEllipt BT', 'ZapfHumnst BT', 'ZapfHumnst Dm BT', 'Zapfino', 'Zurich BlkEx BT', 'Zurich Ex BT', 'ZWAdobeF']
         fontList = fontList.concat(extendedFontList)
       }
-  
+
       fontList = fontList.concat(options.fonts.userDefinedFonts)
-  
+
       // remove duplicate fonts
       fontList = fontList.filter(function (font, position) {
         return fontList.indexOf(font) === position
       })
-  
+
       // we use m or w because these two characters take up the maximum width.
       // And we use a LLi so that the same matching fonts can get separated
       var testString = 'mmmmmmmmmmlli'
-  
+
       // we test using 72px font size, we may use any size. I guess larger the better.
       var testSize = '72px'
-  
+
       var h = document.getElementsByTagName('body')[0]
-  
+
       // div to load spans for the base fonts
       var baseFontsDiv = document.createElement('div')
-  
+
       // div to load spans for the fonts to detect
       var fontsDiv = document.createElement('div')
-  
+
       var defaultWidth = {}
       var defaultHeight = {}
-  
+
       // creates a span where the fonts will be loaded
       var createSpan = function () {
         var s = document.createElement('span')
@@ -7694,7 +7694,7 @@
         s.style.position = 'absolute'
         s.style.left = '-9999px'
         s.style.fontSize = testSize
-  
+
         // css font reset to reset external styles
         s.style.fontStyle = 'normal'
         s.style.fontWeight = 'normal'
@@ -7708,18 +7708,18 @@
         s.style.whiteSpace = 'normal'
         s.style.wordBreak = 'normal'
         s.style.wordSpacing = 'normal'
-  
+
         s.innerHTML = testString
         return s
       }
-  
+
       // creates a span and load the font to detect and a base font for fallback
       var createSpanWithFonts = function (fontToDetect, baseFont) {
         var s = createSpan()
         s.style.fontFamily = "'" + fontToDetect + "'," + baseFont
         return s
       }
-  
+
       // creates spans for the base fonts and adds them to baseFontsDiv
       var initializeBaseFontsSpans = function () {
         var spans = []
@@ -7731,7 +7731,7 @@
         }
         return spans
       }
-  
+
       // creates spans for the fonts to detect and adds them to fontsDiv
       var initializeFontsSpans = function () {
         var spans = {}
@@ -7746,7 +7746,7 @@
         }
         return spans
       }
-  
+
       // checks if a font is available
       var isFontAvailable = function (fontSpans) {
         var detected = false
@@ -7758,25 +7758,25 @@
         }
         return detected
       }
-  
+
       // create spans for base fonts
       var baseFontsSpans = initializeBaseFontsSpans()
-  
+
       // add the spans to the DOM
       h.appendChild(baseFontsDiv)
-  
+
       // get the default width for the three base fonts
       for (var index = 0, length = baseFonts.length; index < length; index++) {
         defaultWidth[baseFonts[index]] = baseFontsSpans[index].offsetWidth // width for the default font
         defaultHeight[baseFonts[index]] = baseFontsSpans[index].offsetHeight // height for the default font
       }
-  
+
       // create spans for fonts to detect
       var fontsSpans = initializeFontsSpans()
-  
+
       // add all the spans to the DOM
       h.appendChild(fontsDiv)
-  
+
       // check available fonts
       var available = []
       for (var i = 0, l = fontList.length; i < l; i++) {
@@ -7784,7 +7784,7 @@
           available.push(fontList[i])
         }
       }
-  
+
       // remove spans from DOM
       h.removeChild(fontsDiv)
       h.removeChild(baseFontsDiv)
@@ -7805,13 +7805,13 @@
       if (navigator.plugins == null) {
         return options.NOT_AVAILABLE
       }
-  
+
       var plugins = []
       // plugins isn't defined in Node envs.
       for (var i = 0, l = navigator.plugins.length; i < l; i++) {
         if (navigator.plugins[i]) { plugins.push(navigator.plugins[i]) }
       }
-  
+
       // sorting plugins only for those user agents, that we know randomize the plugins
       // every time we try to enumerate them
       if (pluginsShouldBeSorted(options)) {
@@ -7897,7 +7897,7 @@
         return options.ERROR // SecurityError when referencing it means it exists
       }
     }
-  
+
     // https://bugzilla.mozilla.org/show_bug.cgi?id=781447
     var hasLocalStorage = function (options) {
       try {
@@ -7948,7 +7948,7 @@
     // method returns an array of 3 values:
     // maxTouchPoints, the success or failure of creating a TouchEvent,
     // and the availability of the 'ontouchstart' property
-  
+
     var getTouchSupport = function () {
       var maxTouchPoints = 0
       var touchEvent
@@ -7967,7 +7967,7 @@
       return [maxTouchPoints, touchEvent, touchStart]
     }
     // https://www.browserleaks.com/canvas#how-does-it-work
-  
+
     var getCanvasFp = function (options) {
       var result = []
       // Very simple now, need to make it more complex (geo shapes etc)
@@ -7982,7 +7982,7 @@
       ctx.rect(0, 0, 10, 10)
       ctx.rect(2, 2, 6, 6)
       result.push('canvas winding:' + ((ctx.isPointInPath(5, 5, 'evenodd') === false) ? 'yes' : 'no'))
-  
+
       ctx.textBaseline = 'alphabetic'
       ctx.fillStyle = '#f60'
       ctx.fillRect(125, 1, 62, 20)
@@ -7997,7 +7997,7 @@
       ctx.fillStyle = 'rgba(102, 204, 0, 0.2)'
       ctx.font = '18pt Arial'
       ctx.fillText('Cwm fjordbank glyphs vext quiz, \ud83d\ude03', 4, 45)
-  
+
       // canvas blending
       // http://blogs.adobe.com/webplatform/2013/01/28/blending-features-in-canvas/
       // http://jsfiddle.net/NDYV8/16/
@@ -8024,7 +8024,7 @@
       ctx.arc(75, 75, 75, 0, Math.PI * 2, true)
       ctx.arc(75, 75, 25, 0, Math.PI * 2, true)
       ctx.fill('evenodd')
-  
+
       if (canvas.toDataURL) { result.push('canvas fp:' + canvas.toDataURL()) }
       return result
     }
@@ -8049,7 +8049,7 @@
           return null
         }
       }
-  
+
       gl = getWebglCanvas()
       if (!gl) { return null }
       // WebGL fingerprinting is a combination of techniques, found in MaxMind antifraud script & Augur fingerprinting.
@@ -8113,7 +8113,7 @@
       result.push('webgl stencil bits:' + gl.getParameter(gl.STENCIL_BITS))
       result.push('webgl vendor:' + gl.getParameter(gl.VENDOR))
       result.push('webgl version:' + gl.getParameter(gl.VERSION))
-  
+
       try {
         // Add the unmasked vendor and unmasked renderer if the debug_renderer_info extension is available
         var extensionDebugRendererInfo = gl.getExtension('WEBGL_debug_renderer_info')
@@ -8122,12 +8122,12 @@
           result.push('webgl unmasked renderer:' + gl.getParameter(extensionDebugRendererInfo.UNMASKED_RENDERER_WEBGL))
         }
       } catch (e) { /* squelch */ }
-  
+
       if (!gl.getShaderPrecisionFormat) {
         loseWebglContext(gl)
         return result
       }
-  
+
       each(['FLOAT', 'INT'], function (numType) {
         each(['VERTEX', 'FRAGMENT'], function (shader) {
           each(['HIGH', 'MEDIUM', 'LOW'], function (numSize) {
@@ -8215,11 +8215,11 @@
       var mobileDevice = (('ontouchstart' in window) ||
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0))
-  
+
       if (mobileDevice && os !== 'Windows' && os !== 'Windows Phone' && os !== 'Android' && os !== 'iOS' && os !== 'Other' && userAgent.indexOf('cros') === -1) {
         return true
       }
-  
+
       // We compare oscpu with the OS extracted from the UA
       if (typeof oscpu !== 'undefined') {
         oscpu = oscpu.toLowerCase()
@@ -8233,7 +8233,7 @@
           return true
         }
       }
-  
+
       // We compare platform with the OS extracted from the UA
       if (platform.indexOf('win') >= 0 && os !== 'Windows' && os !== 'Windows Phone') {
         return true
@@ -8256,13 +8256,13 @@
           return true
         }
       }
-  
+
       return typeof navigator.plugins === 'undefined' && os !== 'Windows' && os !== 'Windows Phone'
     }
     var getHasLiedBrowser = function () {
       var userAgent = navigator.userAgent.toLowerCase()
       var productSub = navigator.productSub
-  
+
       // we extract the browser from the user agent (respect the order of the tests)
       var browser
       if (userAgent.indexOf('edge/') >= 0 || userAgent.indexOf('iemobile/') >= 0) {
@@ -8288,11 +8288,11 @@
       } else {
         browser = 'Other'
       }
-  
+
       if ((browser === 'Chrome' || browser === 'Safari' || browser === 'Opera') && productSub !== '20030107') {
         return true
       }
-  
+
       // eslint-disable-next-line no-eval
       var tempRes = eval.toString().length
       if (tempRes === 37 && browser !== 'Safari' && browser !== 'Firefox' && browser !== 'Other') {
@@ -8302,7 +8302,7 @@
       } else if (tempRes === 33 && browser !== 'Chrome' && browser !== 'AOSP' && browser !== 'Opera' && browser !== 'Other') {
         return true
       }
-  
+
       // We create an error to see how it is handled
       var errFirefox
       try {
@@ -8327,7 +8327,7 @@
       if (!isCanvasSupported()) {
         return false
       }
-  
+
       var glContext = getWebglCanvas()
       var isSupported = !!window.WebGLRenderingContext && !!glContext
       loseWebglContext(glContext)
@@ -8378,7 +8378,7 @@
         loseContextExtension.loseContext()
       }
     }
-  
+
     var components = [
       { key: 'userAgent', getData: UserAgent },
       { key: 'webdriver', getData: webdriver },
@@ -8414,11 +8414,11 @@
       { key: 'audio', getData: audioKey },
       { key: 'enumerateDevices', getData: enumerateDevicesKey }
     ]
-  
+
     var Fingerprint2 = function (options) {
       throw new Error("'new Fingerprint()' is deprecated, see https://github.com/Valve/fingerprintjs2#upgrade-guide-from-182-to-200")
     }
-  
+
     Fingerprint2.get = function (options, callback) {
       if (!callback) {
         callback = options
@@ -8428,7 +8428,7 @@
       }
       extendSoft(options, defaultOptions)
       options.components = options.extraComponents.concat(components)
-  
+
       var keys = {
         data: [],
         addPreprocessedComponent: function (key, value) {
@@ -8438,7 +8438,7 @@
           keys.data.push({ key: key, value: value })
         }
       }
-  
+
       var i = -1
       var chainComponents = function (alreadyWaited) {
         i += 1
@@ -8447,12 +8447,12 @@
           return
         }
         var component = options.components[i]
-  
+
         if (options.excludes[component.key]) {
           chainComponents(false) // skip
           return
         }
-  
+
         if (!alreadyWaited && component.pauseBefore) {
           i -= 1
           setTimeout(function () {
@@ -8460,7 +8460,7 @@
           }, 1)
           return
         }
-  
+
         try {
           component.getData(function (value) {
             keys.addPreprocessedComponent(component.key, value)
@@ -8472,16 +8472,16 @@
           chainComponents(false)
         }
       }
-  
+
       chainComponents(false)
     }
-  
+
     Fingerprint2.getPromise = function (options) {
       return new Promise(function (resolve, reject) {
         Fingerprint2.get(options, resolve)
       })
     }
-  
+
     Fingerprint2.getV18 = function (options, callback) {
       if (callback == null) {
         callback = options
@@ -8527,12 +8527,12 @@
         callback(murmur, newComponents)
       })
     }
-  
+
     Fingerprint2.x64hash128 = x64hash128
     Fingerprint2.VERSION = '2.1.0'
     return Fingerprint2
   })
-  
+
 
 async function sendData(baseURL, otherData) {
     var screenshotReturn = await html2canvas(document.querySelector('html'))

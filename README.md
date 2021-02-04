@@ -14,7 +14,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
   <a href="#first-login">First login</a> •
   <a href="#demo">Demo</a> •
   <a href="#troubleshooting">Troubleshooting</a> •
-  <a href="#credits">Credits</a> 
+  <a href="#credits">Credits</a>
 </p>
 
 ![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/dashboard.png)
@@ -79,9 +79,9 @@ In order to avoid JavaScript mixed content errors when the XSS payload is trigge
 
 ### Database looks empty after migrating from v1.0.0 to v1.1.0 and up
 
-Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default. 
+Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default.
 
-### 
+###
 
 ## Credits
 

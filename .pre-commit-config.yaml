@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0 # bump to latest version when needed
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-merge-conflict
+      - id: detect-aws-credentials
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: no-commit-to-branch
+        args: [--branch, master, --branch, main]
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+  - repo: https://github.com/psf/black
+    rev: 20.8b1 # bump to latest version when needed
+    hooks:
+      - id: black
+        files: server/(app|tests|config|xss).+\.py$
+        types: ["file"]
+        args: [--line-length=160]
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.7.0 # bump to latest version when needed
+    hooks:
+      - id: isort
+        files: server/(app|tests|config|xss).+\.py$
+        types: ["file"]
+        args: ["--profile", "black"]
