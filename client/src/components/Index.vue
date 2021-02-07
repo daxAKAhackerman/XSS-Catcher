@@ -6,14 +6,15 @@
         <b-img height="40px" src="/title.png" />
       </b-col>
       <b-col sm="3" class="text-right">
-        <p v-if="user.is_admin" style="margin-bottom:0;margin-top:revert">
+        <p v-if="user.is_admin" style="margin-bottom: 0; margin-top: revert">
           Current user:
-          <b>{{ user.username }}</b>&nbsp;
+          <b>{{ user.username }}</b
+          >&nbsp;
           <b-link v-b-modal.settings-modal>
             <b-icon-gear></b-icon-gear>
           </b-link>
         </p>
-        <p v-else style="margin-bottom:0;margin-top:revert">
+        <p v-else style="margin-bottom: 0; margin-top: revert">
           Current user:
           <b>{{ user.username }}</b>
         </p>
@@ -24,9 +25,12 @@
       <b-col offset-sm="1" sm="10">
         <b-row>
           <b-col sm="3" class="text-left">
-            <b-button v-b-modal.add-client-modal type="button" variant="outline-success">
-              Add
-              new client
+            <b-button
+              v-b-modal.add-client-modal
+              type="button"
+              variant="outline-success"
+            >
+              Add new client
             </b-button>
           </b-col>
           <b-col offset-sm="1" sm="8" class="text-right">
@@ -34,31 +38,47 @@
               variant="outline-secondary"
               v-b-tooltip.hover
               title="Refresh data"
-              @click="getClients(); makeToast('Data refreshed', 'success', 'OK')"
+              @click="
+                getClients();
+                makeToast('Data refreshed', 'success', 'OK');
+              "
             >
-              <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
+              <b-icon-arrow-repeat
+                style="width: 20px; height: 20px"
+              ></b-icon-arrow-repeat>
             </b-button>
             <b-button
               v-if="user.is_admin"
               variant="outline-info"
               v-b-modal.manage-users-modal
-            >Manage users</b-button>
-            <b-button variant="outline-warning" v-b-modal.change-password-modal>Change password</b-button>
-            <b-button type="button" variant="outline-warning" @click="getLogout">Log out</b-button>
+              >Manage users</b-button
+            >
+            <b-button variant="outline-warning" v-b-modal.change-password-modal
+              >Change password</b-button
+            >
+            <b-button type="button" variant="outline-warning" @click="getLogout"
+              >Log out</b-button
+            >
           </b-col>
         </b-row>
         <br />
         <b-row>
           <b-col offset-sm="8" sm="4">
             <b-input-group>
-              <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
+              <b-form-input
+                size="sm"
+                v-model="search"
+                type="search"
+                placeholder="Search"
+              ></b-form-input>
               <b-input-group-append>
                 <b-button
                   variant="outline-secondary"
                   size="sm"
                   :disabled="!search"
                   @click="search = ''"
-                >Clear</b-button>
+                  >Clear</b-button
+                >
               </b-input-group-append>
             </b-input-group>
           </b-col>
@@ -76,32 +96,46 @@
           >
             <template v-slot:cell(name)="row">
               <b-link
-                @click="viewed_client=row.item"
+                @click="viewed_client = row.item"
                 v-b-modal.view-client-modal
-              >{{ row.item.name }}</b-link>
+                >{{ row.item.name }}</b-link
+              >
             </template>
             <template v-slot:cell(stored)="row">
               <b-link
-                @click="xss_type='stored'; viewed_client=row.item"
+                @click="
+                  xss_type = 'stored';
+                  viewed_client = row.item;
+                "
                 v-b-modal.view-XSS-modal
-              >{{ row.item.stored }}</b-link>
+                >{{ row.item.stored }}</b-link
+              >
             </template>
             <template v-slot:cell(reflected)="row">
               <b-link
-                @click="xss_type='reflected'; viewed_client=row.item"
+                @click="
+                  xss_type = 'reflected';
+                  viewed_client = row.item;
+                "
                 v-b-modal.view-XSS-modal
-              >{{ row.item.reflected }}</b-link>
+                >{{ row.item.reflected }}</b-link
+              >
             </template>
             <template v-slot:cell(data)="row">
-              <b-link @click="viewed_client=row.item" v-b-modal.view-data-modal>{{ row.item.data }}</b-link>
+              <b-link
+                @click="viewed_client = row.item"
+                v-b-modal.view-data-modal
+                >{{ row.item.data }}</b-link
+              >
             </template>
             <template v-slot:cell(action)="row">
               <b-button
-                @click="viewed_client=row.item"
+                @click="viewed_client = row.item"
                 v-b-modal.get-payload-modal
                 type="button"
                 variant="outline-info"
-              >Generate payload</b-button>
+                >Generate payload</b-button
+              >
               <b-button
                 v-if="row.item.owner_id === user.id || user.is_admin"
                 v-b-tooltip.hover
@@ -111,34 +145,55 @@
                 type="button"
                 variant="outline-danger"
               >
-                <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+                <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
               </b-button>
               <b-button v-else disabled type="button" variant="outline-danger">
-                <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+                <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
               </b-button>
             </template>
           </b-table>
         </b-row>
         <b-row>
           <b-col sm="3">
-            <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"></b-pagination>
+            <b-pagination
+              v-model="currentPage"
+              :total-rows="totalRows"
+              :per-page="perPage"
+            ></b-pagination>
           </b-col>
           <b-col offset-sm="7" sm="2">
             <b-form-select
               size="sm"
               v-model="perPage"
-              :options="[{ value: 5, text: '-- Per page --' },{ value: 5, text: '5' },{ value: 10, text: '10' },{ value: 25, text: '25' }]"
-            >-- Per page --</b-form-select>
+              :options="[
+                { value: 5, text: '-- Per page --' },
+                { value: 5, text: '5' },
+                { value: 10, text: '10' },
+                { value: 25, text: '25' },
+              ]"
+              >-- Per page --</b-form-select
+            >
           </b-col>
         </b-row>
       </b-col>
     </b-row>
 
-    <b-modal ref="deleteClientModal" id="delete-client-modal" title="Are you sure?" hide-footer>
+    <b-modal
+      ref="deleteClientModal"
+      id="delete-client-modal"
+      title="Are you sure?"
+      hide-footer
+    >
       <b-form>
         <div class="text-right">
-          <b-button @click="deleteClient" variant="outline-danger">Yes, delete this entry</b-button>
-          <b-button @click="$refs.deleteClientModal.hide()" variant="outline-secondary">Cancel</b-button>
+          <b-button @click="deleteClient" variant="outline-danger"
+            >Yes, delete this entry</b-button
+          >
+          <b-button
+            @click="$refs.deleteClientModal.hide()"
+            variant="outline-secondary"
+            >Cancel</b-button
+          >
         </div>
       </b-form>
     </b-modal>
@@ -182,9 +237,6 @@ import ViewClient from "./ViewClient";
 import ChangePassword from "./ChangePassword";
 import ManageUsers from "./ManageUsers";
 import Settings from "./Settings";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -243,7 +295,7 @@ export default {
   },
   methods: {
     getClients() {
-      const path = basePath + "/client/all";
+      const path = basePath + "/client";
       axios
         .get(path)
         .then((response) => {
@@ -304,7 +356,7 @@ export default {
         });
     },
     getUser() {
-      const path = basePath + "/user";
+      const path = basePath + "/user/current";
       axios
         .get(path)
         .then((response) => {

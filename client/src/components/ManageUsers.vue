@@ -32,7 +32,9 @@
               type="button"
               variant="outline-danger"
             >
-              <b-icon-chevron-double-down style="width: 20px; height: 20px;"></b-icon-chevron-double-down>
+              <b-icon-chevron-double-down
+                style="width: 20px; height: 20px"
+              ></b-icon-chevron-double-down>
             </b-button>
             <b-button
               v-else
@@ -42,7 +44,9 @@
               type="button"
               variant="outline-success"
             >
-              <b-icon-chevron-double-up style="width: 20px; height: 20px;"></b-icon-chevron-double-up>
+              <b-icon-chevron-double-up
+                style="width: 20px; height: 20px"
+              ></b-icon-chevron-double-up>
             </b-button>
             <b-button
               v-b-tooltip.hover
@@ -51,7 +55,9 @@
               type="button"
               variant="outline-warning"
             >
-              <b-icon-arrow-repeat style="width: 20px; height: 20px;"></b-icon-arrow-repeat>
+              <b-icon-arrow-repeat
+                style="width: 20px; height: 20px"
+              ></b-icon-arrow-repeat>
             </b-button>
             <b-button
               v-b-tooltip.hover
@@ -61,23 +67,40 @@
               type="button"
               variant="outline-danger"
             >
-              <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+              <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
             </b-button>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="text-right">
-      <b-button variant="outline-success" v-b-modal.create-user-modal>Create user</b-button>
-      <b-button variant="outline-secondary" type="reset" @click="cleanup">Cancel</b-button>
+      <b-button variant="outline-success" v-b-modal.create-user-modal
+        >Create user</b-button
+      >
+      <b-button variant="outline-secondary" type="reset" @click="cleanup"
+        >Cancel</b-button
+      >
     </div>
     <br v-if="show_alert" />
-    <b-alert show :variant="alert_type" v-if="show_alert">{{ alert_msg }}</b-alert>
-    <b-modal ref="deleteUserModal" id="delete-user-modal" title="Are you sure?" hide-footer>
+    <b-alert show :variant="alert_type" v-if="show_alert">{{
+      alert_msg
+    }}</b-alert>
+    <b-modal
+      ref="deleteUserModal"
+      id="delete-user-modal"
+      title="Are you sure?"
+      hide-footer
+    >
       <b-form>
         <div class="text-right">
-          <b-button @click="deleteUser" variant="outline-danger">Yes, delete this user</b-button>
-          <b-button @click="$refs.deleteUserModal.hide()" variant="outline-secondary">Cancel</b-button>
+          <b-button @click="deleteUser" variant="outline-danger"
+            >Yes, delete this user</b-button
+          >
+          <b-button
+            @click="$refs.deleteUserModal.hide()"
+            variant="outline-secondary"
+            >Cancel</b-button
+          >
         </div>
       </b-form>
     </b-modal>
@@ -91,9 +114,6 @@ import axios from "axios";
 import Vue2Filters from "vue2-filters";
 
 import CreateUser from "./CreateUser";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -113,7 +133,7 @@ export default {
   },
   methods: {
     getUsers() {
-      const path = basePath + "/user/all";
+      const path = basePath + "/user";
 
       axios
         .get(path)
@@ -159,12 +179,12 @@ export default {
     promoteUser(promotion, userId) {
       const path = basePath + "/user/" + userId;
 
-      var payload = new URLSearchParams();
-
-      payload.append("is_admin", promotion);
+      const payload = {
+        is_admin: promotion,
+      };
 
       axios
-        .post(path, payload)
+        .patch(path, payload)
         .then((response) => {
           this.makeToast(response.data.detail, "success", response.data.status);
           this.getUsers();
@@ -182,7 +202,7 @@ export default {
         });
     },
     resetPassword(userId, username) {
-      const path = basePath + "/user/" + userId + "/reset_password";
+      const path = basePath + "/user/" + userId + "/password";
 
       axios.post(path).then((response) => {
         this.alert_msg =

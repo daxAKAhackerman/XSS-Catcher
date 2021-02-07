@@ -18,12 +18,12 @@ def settings_get():
     return jsonify(settings.to_dict()), 200
 
 
-@bp.route("/settings", methods=["POST"])
+@bp.route("/settings", methods=["PATCH"])
 @login_required
 @permissions(all_of=["admin"])
 def settings_post():
 
-    data = request.form
+    data = request.get_json()
 
     settings = Settings.query.first()
 
@@ -119,7 +119,7 @@ def settings_post():
 @login_required
 @permissions(all_of=["admin"])
 def smtp_test_post():
-    data = request.form
+    data = request.get_json()
 
     settings = Settings.query.first()
 

@@ -6,14 +6,15 @@ from app.api import bp
 from app.models import XSS, Client, Settings
 from app.utils import send_mail
 from flask import jsonify, request
-from flask_headers import headers
+from flask_cors import cross_origin
 
 
 @bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
-@headers({"Access-Control-Allow-Origin": "*"})
+@cross_origin()
 def catch_xss(flavor, uid):
     """Catches an XSS"""
     client = Client.query.filter_by(uid=uid).first()
+    parameters = None
 
     if client == None:
         return jsonify({"status": "OK"}), 200
@@ -30,7 +31,7 @@ def catch_xss(flavor, uid):
     if request.method == "GET":
         parameters = request.args.to_dict()
     elif request.method == "POST":
-        parameters = request.form
+        parameters = request.get_json()
 
     headers = []
     for header in request.headers:

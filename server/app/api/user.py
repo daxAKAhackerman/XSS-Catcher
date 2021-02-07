@@ -7,12 +7,12 @@ from flask import jsonify, request
 from flask_login import current_user, login_required
 
 
-@bp.route("/user/new", methods=["POST"])
+@bp.route("/user", methods=["POST"])
 @login_required
 @permissions(all_of=["admin"])
 def register():
     """Creates a new user"""
-    data = request.form
+    data = request.get_json()
 
     if "username" not in data.keys():
 
@@ -37,11 +37,11 @@ def register():
     return jsonify({"status": "OK", "detail": password}), 200
 
 
-@bp.route("/user/change_password", methods=["POST"])
+@bp.route("/user/password", methods=["POST"])
 @login_required
 def change_password():
     """Change the current user's password"""
-    data = request.form
+    data = request.get_json()
 
     if ("password1" not in data.keys()) or ("password2" not in data.keys()) or ("old_password" not in data.keys()):
         return jsonify({"status": "error", "detail": "Missing data (password1, password2 or old_password)"}), 400
@@ -65,7 +65,7 @@ def change_password():
     return jsonify({"status": "OK", "detail": "Password changed successfuly"}), 200
 
 
-@bp.route("/user/<id>/reset_password", methods=["POST"])
+@bp.route("/user/<id>/password", methods=["POST"])
 @login_required
 @permissions(all_of=["admin"])
 def reset_password(id):
@@ -82,7 +82,7 @@ def reset_password(id):
     return jsonify({"status": "OK", "detail": password}), 200
 
 
-@bp.route("/user", methods=["GET"])
+@bp.route("/user/current", methods=["GET"])
 @login_required
 def user_get():
     """Get the current user"""
@@ -108,7 +108,7 @@ def user_delete(user_id):
     return jsonify({"status": "OK", "detail": "User {} deleted successfuly".format(user.username)}), 200
 
 
-@bp.route("/user/<user_id>", methods=["POST"])
+@bp.route("/user/<user_id>", methods=["PATCH"])
 @login_required
 @permissions(all_of=["admin"])
 def user_post(user_id):
@@ -118,7 +118,7 @@ def user_post(user_id):
 
     user = User.query.filter_by(id=user_id).first_or_404()
 
-    data = request.form
+    data = request.get_json()
 
     if "is_admin" not in data.keys():
         return jsonify({"status": "error", "detail": "Missing data"}), 400
@@ -132,7 +132,7 @@ def user_post(user_id):
     return jsonify({"status": "OK", "detail": "User {} modified successfuly".format(user.username)}), 200
 
 
-@bp.route("/user/all", methods=["GET"])
+@bp.route("/user", methods=["GET"])
 @login_required
 def user_all_get():
     """Gets all users"""

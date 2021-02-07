@@ -27,7 +27,9 @@
         </b-td>
         <b-td>
           <div v-highlight>
-            <pre class="language-http"><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name"><div
+            <pre
+              class="language-http"
+            ><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name"><div
   v-for="(header_value_deep, header_name_deep) in header_value"
   v-bind:key="header_name_deep"
 >{{ header_name_deep }}: {{ header_value_deep }}
@@ -48,13 +50,19 @@
             <div v-if="data_name == 'screenshot'">
               <h4>{{ data_name }}</h4>
               <p>
-                <a href="#" v-b-toggle="'collapse-screenshot'">[Click to view screenshot...]</a>
+                <a href="#" v-b-toggle="'collapse-screenshot'"
+                  >[Click to view screenshot...]</a
+                >
                 <b-collapse
                   id="collapse-screenshot"
                   @hidden="cleanSpecificData(data_name)"
                   @show="getSpecificData(data_name)"
                 >
-                  <img :key="componentKey" style="max-width:100%" :src="data_value" />
+                  <img
+                    :key="componentKey"
+                    style="max-width: 100%"
+                    :src="data_value"
+                  />
                 </b-collapse>
               </p>
               <p></p>
@@ -62,7 +70,9 @@
             <div v-else-if="data_name == 'fingerprint'">
               <h4>{{ data_name }}</h4>
               <p>
-                <a href="#" v-b-toggle="'collapse-fingerprint'">[Click to view fingerprint...]</a>
+                <a href="#" v-b-toggle="'collapse-fingerprint'"
+                  >[Click to view fingerprint...]</a
+                >
                 <b-collapse
                   id="collapse-fingerprint"
                   @hidden="cleanSpecificData(data_name)"
@@ -81,25 +91,36 @@
             <div v-else-if="data_name == 'dom'">
               <h4>{{ data_name }}</h4>
               <p>
-                <a href="#" v-b-toggle="'collapse-dom'">[Click to view DOM...]</a>
+                <a href="#" v-b-toggle="'collapse-dom'"
+                  >[Click to view DOM...]</a
+                >
                 <b-collapse
                   @hidden="cleanSpecificData(data_name)"
                   @show="getSpecificData(data_name)"
                   id="collapse-dom"
                 >
                   <div :key="componentKey" v-highlight>
-                    <pre class="language-html"><code>{{ data_value }}</code></pre>
+                    <pre
+                      class="language-html"
+                    ><code>{{ data_value }}</code></pre>
                   </div>
                 </b-collapse>
               </p>
               <p></p>
             </div>
             <div
-              v-else-if="data_name == 'cookies' || data_name == 'local_storage' || data_name == 'session_storage'"
+              v-else-if="
+                data_name == 'cookies' ||
+                data_name == 'local_storage' ||
+                data_name == 'session_storage'
+              "
             >
               <h4>{{ data_name }}</h4>
               <div v-for="(value, param) in data_value" v-bind:key="param">
-                <div v-for="(value_deep, param_deep) in value" v-bind:key="param_deep">
+                <div
+                  v-for="(value_deep, param_deep) in value"
+                  v-bind:key="param_deep"
+                >
                   <code>{{ param_deep }} => {{ value_deep }}</code>
                 </div>
               </div>
@@ -122,7 +143,7 @@
 <script>
 import moment from "moment";
 import VueJsonPretty from "vue-json-pretty";
-import 'vue-json-pretty/lib/styles.css';
+import "vue-json-pretty/lib/styles.css";
 
 import axios from "axios";
 
@@ -154,7 +175,7 @@ export default {
       return timestampLocal;
     },
     getXSS() {
-      const path = basePath + "/client/" + this.client_id + "/" + this.xss_id;
+      const path = basePath + "/xss/" + this.xss_id;
 
       axios
         .get(path)
@@ -174,7 +195,7 @@ export default {
         });
     },
     getSpecificData(loot_type) {
-      const path = basePath + "/xss/" + this.xss_id + "/" + loot_type;
+      const path = basePath + "/xss/" + this.xss_id + "/data/" + loot_type;
 
       axios
         .get(path)

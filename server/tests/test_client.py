@@ -59,36 +59,6 @@ def test_delete_client(client):
     assert Client.query.count() == 0
 
 
-def test_get_xss_all(client):
-    login(client, username="admin", password="xss", remember=False)
-    create_client(client, name="name1", description="desc1")
-    client1 = Client.query.filter_by(id=1).first()
-    get_x(client, "r", client1.uid)
-    rv = get_xss_all(client, 1, "reflected")
-    assert len(json.loads(rv.data)) == 1
-    rv = get_xss_all(client, 1, "badtype")
-    assert b"Unknown XSS type" in rv.data
-
-
-def test_get_single_xss(client):
-    login(client, username="admin", password="xss", remember=False)
-    create_client(client, name="name1", description="desc1")
-    client1 = Client.query.filter_by(id=1).first()
-    get_x(client, "r", client1.uid)
-    rv = get_single_xss(client, 1, 1)
-    assert "ip_addr" in json.loads(rv.data).keys()
-
-
-def test_get_loot(client):
-    login(client, username="admin", password="xss", remember=False)
-    create_client(client, name="name1", description="desc1")
-    client1 = Client.query.filter_by(id=1).first()
-    get_x(client, "r", client1.uid, test_data="test", dom="<h1>test</h1>")
-    rv = get_loot(client, 1)
-    assert json.loads(rv.data)["test_data"][0]["1"] == "test"
-    assert json.loads(rv.data)["dom"][0]["1"] == ""
-
-
 def test_get_clients(client):
     login(client, username="admin", password="xss", remember=False)
     create_client(client, name="name1", description="desc1")

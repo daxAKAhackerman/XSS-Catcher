@@ -8,13 +8,21 @@ from flask import jsonify, request
 from flask_login import current_user, login_required
 
 
-@bp.route("/xss/generate/<id>", methods=["GET"])
+@bp.route("/xss/generate", methods=["GET"])
 @login_required
-def xss_generate(id):
+def xss_generate():
     """Generates an XSS payload"""
-    client = Client.query.filter_by(id=id).first_or_404()
-    uid = client.uid
+
     parameters = request.args.to_dict()
+
+    if "client_id" not in parameters:
+        return jsonify({"status": "error", "detail": "Missing client_id parameter"}), 400
+    if not parameters["client_id"].isnumeric():
+        return jsonify({"status": "error", "detail": "Bad client ID"}), 400
+
+    client = Client.query.filter_by(id=parameters["client_id"]).first_or_404()
+    parameters.pop("client_id", None)
+    uid = client.uid
     other_data = ""
     xss_type = "r"
     require_js = False
@@ -25,6 +33,7 @@ def xss_generate(id):
     get_url = False
     i_want_it_all = False
     code_type = "html"
+    url = ""
 
     if "url" not in parameters.keys():
         return jsonify({"status": "error", "detail": "Missing url parameter"}), 400
@@ -131,7 +140,16 @@ def xss_generate(id):
     return (payload), 200
 
 
-@bp.route("/xss/<xss_id>", methods=["DELETE"])
+@bp.route("/xss/<int:xss_id>", methods=["GET"])
+@login_required
+def client_xss_get(xss_id):
+    """Gets a single XSS instance for a client"""
+    xss = XSS.query.filter_by(id=xss_id).first_or_404()
+
+    return jsonify(xss.to_dict()), 200
+
+
+@bp.route("/xss/<int:xss_id>", methods=["DELETE"])
 @login_required
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id):
@@ -144,7 +162,7 @@ def xss_delete(xss_id):
     return jsonify({"status": "OK", "detail": "XSS deleted successfuly"}), 200
 
 
-@bp.route("/xss/<xss_id>/<loot_type>", methods=["GET"])
+@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @login_required
 def xss_loot_get(xss_id, loot_type):
     """Gets a specific type of data for an XSS"""
@@ -155,7 +173,7 @@ def xss_loot_get(xss_id, loot_type):
     return jsonify({"data": data[loot_type]}), 200
 
 
-@bp.route("/xss/<xss_id>/<loot_type>", methods=["DELETE"])
+@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @login_required
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id, loot_type):
@@ -171,3 +189,57 @@ def xss_loot_delete(xss_id, loot_type):
     db.session.commit()
 
     return jsonify({"status": "OK", "detail": "Data deleted successfuly"}), 200
+
+
+@bp.route("/xss", methods=["GET"])
+@login_required
+def client_xss_all_get():
+    """Gets all XSS of a particular type (reflected of stored) for a specific client"""
+
+    filter_expression = {}
+    parameters = request.args.to_dict()
+
+    if "client_id" in parameters:
+        if not parameters["client_id"].isnumeric():
+            return jsonify({"status": "error", "detail": "Bad client ID"}), 400
+        filter_expression["client_id"] = parameters["client_id"]
+    if "type" in parameters:
+        if parameters["type"] != "reflected" and parameters["type"] != "stored":
+            return jsonify({"status": "error", "detail": "Unknown XSS type"}), 400
+        filter_expression["xss_type"] = parameters["type"]
+
+    xss_list = []
+    xss = XSS.query.filter_by(**filter_expression).all()
+
+    for hit in xss:
+        xss_list.append(hit.to_dict_short())
+
+    return jsonify(xss_list), 200
+
+
+@bp.route("/xss/data", methods=["GET"])
+@login_required
+def client_loot_get():
+    """Get all captured data for a client"""
+    loot = {}
+
+    filter_expression = {}
+    parameters = request.args.to_dict()
+
+    if "client_id" in parameters:
+        if not parameters["client_id"].isnumeric():
+            return jsonify({"status": "error", "detail": "Bad client ID"}), 400
+        filter_expression["client_id"] = parameters["client_id"]
+
+    xss = XSS.query.filter_by(**filter_expression).all()
+
+    for hit in xss:
+        for element in json.loads(hit.data).items():
+            if element[0] not in loot.keys():
+                loot[element[0]] = []
+            if element[0] == "fingerprint" or element[0] == "dom" or element[0] == "screenshot":
+                loot[element[0]].append({hit.id: ""})
+            else:
+                loot[element[0]].append({hit.id: element[1]})
+
+    return jsonify(loot), 200
