@@ -149,7 +149,7 @@ def client_xss_get(xss_id):
     return jsonify(xss.to_dict()), 200
 
 
-@bp.route("/xss/<xss_id>", methods=["DELETE"])
+@bp.route("/xss/<int:xss_id>", methods=["DELETE"])
 @login_required
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id):
@@ -162,7 +162,7 @@ def xss_delete(xss_id):
     return jsonify({"status": "OK", "detail": "XSS deleted successfuly"}), 200
 
 
-@bp.route("/xss/<xss_id>/<loot_type>", methods=["GET"])
+@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @login_required
 def xss_loot_get(xss_id, loot_type):
     """Gets a specific type of data for an XSS"""
@@ -173,7 +173,7 @@ def xss_loot_get(xss_id, loot_type):
     return jsonify({"data": data[loot_type]}), 200
 
 
-@bp.route("/xss/<xss_id>/<loot_type>", methods=["DELETE"])
+@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @login_required
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id, loot_type):

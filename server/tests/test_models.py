@@ -43,8 +43,9 @@ def test_xss_to_dict(client):
         dom="<br />",
         screenshot="O==",
     )
-    rv = get_xss(client, 1, 1)
+    rv = get_xss(client, 1)
     json_data = json.loads(rv.data)
+    print(json_data)
     assert json_data["data"]["fingerprint"] == ""
     assert json_data["data"]["dom"] == ""
     assert json_data["data"]["screenshot"] == ""

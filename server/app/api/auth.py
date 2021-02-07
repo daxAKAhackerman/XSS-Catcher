@@ -21,7 +21,7 @@ def login():
     if "remember" not in data.keys():
         remember = False
     else:
-        remember = data["remember"]
+        remember = True
 
     login_user(user, remember=remember)
     return jsonify({"status": "OK", "detail": "Logged in successfuly"}), 200

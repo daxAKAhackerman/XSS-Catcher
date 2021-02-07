@@ -45,7 +45,7 @@ def test_new_xss(client):
     rv = get_x(client, "r", "AAAAA")
     assert rv._status_code == 200
     assert XSS.query.count() == 2
-    post_settings(client, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca")
+    patch_settings(client, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca")
     edit_client(client, 1, mail_to="dax@hackerman.ca")
     get_x(client, "s", client_obj.uid)
     settings = Settings.query.first()
