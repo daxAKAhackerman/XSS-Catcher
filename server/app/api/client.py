@@ -9,11 +9,11 @@ from flask import jsonify, request
 from flask_login import current_user, login_required
 
 
-@bp.route("/client", methods=["PUT"])
+@bp.route("/client", methods=["POST"])
 @login_required
 def client_put():
     """Creates a new client"""
-    data = request.form
+    data = request.get_json()
 
     if "name" not in data.keys() or "description" not in data.keys():
         return jsonify({"status": "error", "detail": "Missing name or description"}), 400
@@ -44,12 +44,12 @@ def client_get(client_id):
     return jsonify(client.to_dict_client()), 200
 
 
-@bp.route("/client/<int:client_id>", methods=["POST"])
+@bp.route("/client/<int:client_id>", methods=["PATCH"])
 @login_required
 @permissions(one_of=["admin", "owner"])
 def client_post(client_id):
     """Edits a client"""
-    data = request.form
+    data = request.get_json()
 
     client = Client.query.filter_by(id=client_id).first_or_404()
 
@@ -108,52 +108,7 @@ def client_delete(client_id):
     return jsonify({"status": "OK", "detail": "Client {} deleted successfuly".format(client.name)}), 200
 
 
-@bp.route("/client/<int:client_id>/<flavor>/all", methods=["GET"])
-@login_required
-def client_xss_all_get(client_id, flavor):
-    """Gets all XSS of a particular type (reflected of stored) for a specific client"""
-    if flavor != "reflected" and flavor != "stored":
-        return jsonify({"status": "error", "detail": "Unknown XSS type"}), 400
-
-    xss_list = []
-    xss = XSS.query.filter_by(client_id=client_id).filter_by(xss_type=flavor).all()
-
-    for hit in xss:
-        xss_list.append(hit.to_dict_short())
-
-    return jsonify(xss_list), 200
-
-
-@bp.route("/client/<int:client_id>/<int:xss_id>", methods=["GET"])
-@login_required
-def client_xss_get(client_id, xss_id):
-    """Gets a single XSS instance for a client"""
-    xss = XSS.query.filter_by(client_id=client_id).filter_by(id=xss_id).first_or_404()
-
-    return jsonify(xss.to_dict()), 200
-
-
-@bp.route("/client/<int:client_id>/loot", methods=["GET"])
-@login_required
-def client_loot_get(client_id):
-    """Get all captured data for a client"""
-    loot = {}
-
-    xss = XSS.query.filter_by(client_id=client_id).all()
-
-    for hit in xss:
-        for element in json.loads(hit.data).items():
-            if element[0] not in loot.keys():
-                loot[element[0]] = []
-            if element[0] == "fingerprint" or element[0] == "dom" or element[0] == "screenshot":
-                loot[element[0]].append({hit.id: ""})
-            else:
-                loot[element[0]].append({hit.id: element[1]})
-
-    return jsonify(loot), 200
-
-
-@bp.route("/client/all", methods=["GET"])
+@bp.route("/client", methods=["GET"])
 @login_required
 def client_all_get():
     """Gets all clients"""

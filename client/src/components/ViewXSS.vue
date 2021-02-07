@@ -11,14 +11,20 @@
     <b-row>
       <b-col offset-sm="8" sm="4">
         <b-input-group>
-          <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
+          <b-form-input
+            size="sm"
+            v-model="search"
+            type="search"
+            placeholder="Search"
+          ></b-form-input>
           <b-input-group-append>
             <b-button
               variant="outline-secondary"
               size="sm"
               :disabled="!search"
               @click="search = ''"
-            >Clear</b-button>
+              >Clear</b-button
+            >
           </b-input-group-append>
         </b-input-group>
       </b-col>
@@ -37,14 +43,17 @@
       :sort-direction="sortDirection"
       hover
     >
-      <template v-slot:cell(timestamp)="row">{{ convertTimestamp(row.item.timestamp) }}</template>
+      <template v-slot:cell(timestamp)="row">{{
+        convertTimestamp(row.item.timestamp)
+      }}</template>
       <template class="text-right" v-slot:cell(action)="row">
         <b-button
           type="button"
           variant="outline-info"
           v-b-modal.view-details-modal
-          @click="xss_id=row.item.id"
-        >View details</b-button>
+          @click="xss_id = row.item.id"
+          >View details</b-button
+        >
         <b-button
           v-if="owner_id === user_id || is_admin"
           v-b-tooltip.hover
@@ -54,28 +63,49 @@
           type="button"
           variant="outline-danger"
         >
-          <b-icon-trash style="width: 20px; height: 20px;"></b-icon-trash>
+          <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
         </b-button>
       </template>
     </b-table>
 
     <b-row>
       <b-col sm="3">
-        <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"></b-pagination>
+        <b-pagination
+          v-model="currentPage"
+          :total-rows="totalRows"
+          :per-page="perPage"
+        ></b-pagination>
       </b-col>
       <b-col offset-sm="6" sm="3">
         <b-form-select
           size="sm"
           v-model="perPage"
-          :options="[{ value: 5, text: '-- Per page --' },{ value: 5, text: '5' },{ value: 10, text: '10' },{ value: 25, text: '25' }]"
-        >-- Per page --</b-form-select>
+          :options="[
+            { value: 5, text: '-- Per page --' },
+            { value: 5, text: '5' },
+            { value: 10, text: '10' },
+            { value: 25, text: '25' },
+          ]"
+          >-- Per page --</b-form-select
+        >
       </b-col>
     </b-row>
 
-    <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
+    <b-modal
+      ref="deleteXSSModal"
+      id="delete-xss-modal"
+      title="Are you sure?"
+      hide-footer
+    >
       <b-form>
-        <b-button @click="deleteXSS" variant="outline-danger">Yes, delete this entry</b-button>
-        <b-button @click="$refs.deleteXSSModal.hide()" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="deleteXSS" variant="outline-danger"
+          >Yes, delete this entry</b-button
+        >
+        <b-button
+          @click="$refs.deleteXSSModal.hide()"
+          variant="outline-secondary"
+          >Cancel</b-button
+        >
       </b-form>
     </b-modal>
 
@@ -89,9 +119,6 @@ import Vue2Filters from "vue2-filters";
 
 import ViewDetails from "./ViewDetails";
 import moment from "moment";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -136,11 +163,15 @@ export default {
   },
   methods: {
     getXSSList() {
-      const path =
-        basePath + "/client/" + this.client_id + "/" + this.xss_type + "/all";
+      const path = basePath + "/xss";
+
+      const payload = {
+        client_id: this.client_id,
+        type: this.xss_type,
+      };
 
       axios
-        .get(path)
+        .get(path, { params: payload })
         .then((response) => {
           this.dataXSS = response.data;
           for (const index in this.dataXSS) {

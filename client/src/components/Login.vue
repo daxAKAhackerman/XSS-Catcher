@@ -43,8 +43,13 @@
               ></b-form-input>
             </b-form-group>
             <b-form-group id="input-group-remember">
-              <b-form-checkbox-group v-model="form.remember" id="input-field-remember">
-                <b-form-checkbox v-model="form.remember">Remember me:</b-form-checkbox>
+              <b-form-checkbox-group
+                v-model="form.remember"
+                id="input-field-remember"
+              >
+                <b-form-checkbox v-model="form.remember"
+                  >Remember me:</b-form-checkbox
+                >
               </b-form-checkbox-group>
             </b-form-group>
             <b-button @click="postLogin" variant="outline-info">Login</b-button>
@@ -61,9 +66,6 @@ import axios from "axios";
 
 import ChangePassword from "./ChangePassword";
 
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
-
 const basePath = "/api";
 
 export default {
@@ -75,7 +77,7 @@ export default {
       form: {
         username: "",
         password: "",
-        remember: [],
+        remember: false,
       },
       user: {},
       show_password_modal: false,
@@ -83,7 +85,7 @@ export default {
   },
   methods: {
     loginProcess() {
-      const path = basePath + "/user";
+      const path = basePath + "/user/current";
       axios
         .get(path)
         .then((response) => {
@@ -104,11 +106,11 @@ export default {
     },
     postLogin() {
       const path = basePath + "/auth/login";
-      var payload = new URLSearchParams();
-
-      payload.append("username", this.form.username);
-      payload.append("password", this.form.password);
-      payload.append("remember", this.form.remember);
+      const payload = {
+        username: this.form.username,
+        password: this.form.password,
+        remember: this.form.remember,
+      };
 
       axios
         .post(path, payload)
@@ -126,7 +128,7 @@ export default {
         });
     },
     isAuth() {
-      const path = basePath + "/user";
+      const path = basePath + "/user/current";
       axios
         .get(path)
         .then((response) => {

@@ -11,12 +11,20 @@
       <b-form-group class="text-left">
         <div v-if="xss_payload !== ''">
           <b-form-group>
-            <b-form-textarea rows="3" no-auto-shrink readonly v-model="xss_payload"></b-form-textarea>
+            <b-form-textarea
+              rows="3"
+              no-auto-shrink
+              readonly
+              v-model="xss_payload"
+            ></b-form-textarea>
             <br />
             <b-link
               v-clipboard:copy="xss_payload"
-              @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
-            >Copy to clipboard</b-link>
+              @click="
+                makeToast('Payload copied to clipboard. ', 'success', 'OK')
+              "
+              >Copy to clipboard</b-link
+            >
           </b-form-group>
           <hr />
         </div>
@@ -31,7 +39,7 @@
         <hr />
         <b-form-group label="Gather data: ">
           <b-form-checkbox-group
-            @change="options.gatherAll=[]"
+            @change="options.gatherAll = []"
             v-model="options.gatherData"
             :options="options.gatherDataList"
             buttons
@@ -40,7 +48,7 @@
           <br />
           <br />
           <b-form-checkbox-group
-            @change="options.gatherData=[]"
+            @change="options.gatherData = []"
             v-model="options.gatherAll"
             :options="options.gatherAllList"
             buttons
@@ -78,9 +86,6 @@
 
 <script>
 import axios from "axios";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -120,50 +125,43 @@ export default {
   },
   methods: {
     getPayload() {
-      let path =
-        basePath +
-        "/xss/generate/" +
-        this.client_id +
-        "?url=" +
-        encodeURIComponent(location.origin) +
-        "&";
+      const path = basePath + "/xss/generate";
+      const payload = {
+        url: location.origin,
+        code: this.options.code_type,
+        client_id: this.client_id,
+      };
 
       if (this.options.gatherAll.includes("all")) {
-        path += "i_want_it_all=1&";
+        payload.i_want_it_all = 1;
       }
 
       if (this.options.gatherData.includes("cookies")) {
-        path += "cookies=1&";
+        payload.cookies = 1;
       }
 
       if (this.options.gatherData.includes("local_storage")) {
-        path += "local_storage=1&";
+        payload.local_storage = 1;
       }
 
       if (this.options.gatherData.includes("session_storage")) {
-        path += "session_storage=1&";
+        payload.session_storage = 1;
       }
 
       if (this.options.stored) {
-        path += "stored=1&";
+        payload.stored = 1;
       }
 
       if (this.options.gatherData.includes("geturl")) {
-        path += "geturl=1&";
+        payload.geturl = 1;
       }
 
       if (this.options.other) {
-        path += this.options.other + "&";
-      }
-
-      path += "code=" + this.options.code_type;
-
-      if (path.substr(-1) === "&") {
-        path = path.substr(0, path.length - 1);
+        payload.other = this.options.other;
       }
 
       axios
-        .get(path)
+        .get(path, { params: payload })
         .then((response) => {
           this.xss_payload = response.data;
         })

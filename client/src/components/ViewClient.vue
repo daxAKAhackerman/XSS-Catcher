@@ -15,12 +15,17 @@
         label-for="input-field-name"
       >
         <b-form-input
-          @keyup.enter="postClient"
+          @keyup.enter="patchClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-name"
           v-model="client.name"
         ></b-form-input>
-        <b-form-input v-else readonly id="input-field-name" v-model="client.name"></b-form-input>
+        <b-form-input
+          v-else
+          readonly
+          id="input-field-name"
+          v-model="client.name"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -30,12 +35,17 @@
         label-for="input-field-description"
       >
         <b-form-input
-          @keyup.enter="postClient"
+          @keyup.enter="patchClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-description"
           v-model="client.description"
         ></b-form-input>
-        <b-form-input v-else readonly id="input-field-description" v-model="client.description"></b-form-input>
+        <b-form-input
+          v-else
+          readonly
+          id="input-field-description"
+          v-model="client.description"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -45,12 +55,17 @@
         label-for="input-field-mail"
       >
         <b-form-input
-          @keyup.enter="postClient"
+          @keyup.enter="patchClient"
           v-if="owner_id === user_id || is_admin"
           id="input-field-mail"
           v-model="client.mail_to"
         ></b-form-input>
-        <b-form-input v-else readonly id="input-field-mail" v-model="client.mail_to"></b-form-input>
+        <b-form-input
+          v-else
+          readonly
+          id="input-field-mail"
+          v-model="client.mail_to"
+        ></b-form-input>
       </b-form-group>
 
       <b-form-group
@@ -66,14 +81,20 @@
           :options="users_list"
           required
         ></b-form-select>
-        <b-form-input v-else readonly id="input-field-owner" v-model="client.owner"></b-form-input>
+        <b-form-input
+          v-else
+          readonly
+          id="input-field-owner"
+          v-model="client.owner"
+        ></b-form-input>
       </b-form-group>
       <div class="text-right">
         <b-button
           v-if="owner_id === user_id || is_admin"
-          @click="postClient"
+          @click="patchClient"
           variant="outline-info"
-        >Save</b-button>
+          >Save</b-button
+        >
         <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
@@ -82,9 +103,6 @@
 
 <script>
 import axios from "axios";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -129,10 +147,8 @@ export default {
           }
         });
     },
-    postClient() {
+    patchClient() {
       const path = basePath + "/client/" + this.client_id;
-
-      var payload = new URLSearchParams();
 
       let owner = "";
 
@@ -142,15 +158,18 @@ export default {
         }
       }
 
-      payload.append("name", this.client.name);
-      payload.append("description", this.client.description);
-      payload.append("owner", owner);
+      const payload = {
+        name: this.client.name,
+        description: this.client.description,
+        owner: owner,
+      };
+
       if (this.client.mail_to !== "" && this.client.mail_to !== null) {
-        payload.append("mail_to", this.client.mail_to);
+        payload.mail_to = this.client.mail_to;
       }
 
       axios
-        .post(path, payload)
+        .patch(path, payload)
         .then((response) => {
           this.makeToast(response.data.detail, "success", response.data.status);
           this.cleanup();
@@ -168,7 +187,7 @@ export default {
         });
     },
     getUsers() {
-      const path = basePath + "/user/all";
+      const path = basePath + "/user";
 
       axios
         .get(path)

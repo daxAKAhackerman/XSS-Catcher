@@ -63,9 +63,6 @@
 <script>
 import axios from "axios";
 
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
-
 const basePath = "/api";
 
 export default {
@@ -78,13 +75,13 @@ export default {
   },
   methods: {
     changePassword() {
-      const path = basePath + "/user/change_password";
+      const path = basePath + "/user/password";
 
-      var payload = new URLSearchParams();
-
-      payload.append("old_password", this.old_password);
-      payload.append("password1", this.new_password1);
-      payload.append("password2", this.new_password2);
+      const payload = {
+        old_password: this.old_password,
+        password1: this.new_password1,
+        password2: this.new_password2,
+      };
 
       axios
         .post(path, payload)

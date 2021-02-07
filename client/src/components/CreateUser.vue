@@ -13,10 +13,16 @@
         label-cols="3"
         label-for="input-field-username"
       >
-        <b-form-input @keyup.enter="createUser" v-model="username" id="input-field-username"></b-form-input>
+        <b-form-input
+          @keyup.enter="createUser"
+          v-model="username"
+          id="input-field-username"
+        ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="createUser" variant="outline-info">Create user</b-button>
+        <b-button @click="createUser" variant="outline-info"
+          >Create user</b-button
+        >
         <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
@@ -30,7 +36,11 @@
       <p>Username: {{ username }}</p>
       <p>Password: {{ data.detail }}</p>
       <div class="text-right">
-        <b-button @click="$refs.createUserModal.hide()" variant="outline-secondary">Close</b-button>
+        <b-button
+          @click="$refs.createUserModal.hide()"
+          variant="outline-secondary"
+          >Close</b-button
+        >
       </div>
     </b-modal>
   </b-modal>
@@ -38,9 +48,6 @@
 
 <script>
 import axios from "axios";
-
-axios.defaults.headers.post["Content-Type"] =
-  "application/x-www-form-urlencoded";
 
 const basePath = "/api";
 
@@ -53,11 +60,11 @@ export default {
   },
   methods: {
     createUser() {
-      const path = basePath + "/user/new";
+      const path = basePath + "/user/current";
 
-      var payload = new URLSearchParams();
-
-      payload.append("username", this.username);
+      const payload = {
+        username: this.username,
+      };
 
       axios
         .post(path, payload)

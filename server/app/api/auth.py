@@ -9,7 +9,7 @@ def login():
     """Logs a user in"""
     if current_user.is_authenticated:
         return jsonify({"status": "error", "detail": "Already logged in"}), 400
-    data = request.form
+    data = request.get_json()
 
     if "username" not in data.keys() or "password" not in data.keys():
         return jsonify({"status": "error", "detail": "Missing username or password"}), 400

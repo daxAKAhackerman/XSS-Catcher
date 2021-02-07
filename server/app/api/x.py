@@ -14,6 +14,7 @@ from flask_headers import headers
 def catch_xss(flavor, uid):
     """Catches an XSS"""
     client = Client.query.filter_by(uid=uid).first()
+    parameters = None
 
     if client == None:
         return jsonify({"status": "OK"}), 200
