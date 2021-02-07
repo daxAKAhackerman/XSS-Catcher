@@ -37,7 +37,7 @@ def logout(client):
 
 
 def post_x(client, xss_type, uid, **kwargs):
-    return client.post(f"/api/x/{xss_type}/{uid}", data=kwargs)
+    return client.post(f"/api/x/{xss_type}/{uid}", data=json.dumps(kwargs), content_type="application/json")
 
 
 def get_x(client, xss_type, uid, headers={}, **kwargs):

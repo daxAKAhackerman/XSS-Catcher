@@ -195,7 +195,7 @@ export default {
         });
     },
     getSpecificData(loot_type) {
-      const path = basePath + "/xss/" + this.xss_id + "/" + loot_type;
+      const path = basePath + "/xss/" + this.xss_id + "/data/" + loot_type;
 
       axios
         .get(path)

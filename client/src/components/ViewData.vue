@@ -287,7 +287,7 @@ export default {
     },
     deleteData() {
       const path =
-        basePath + "/xss/" + this.to_delete + "/" + this.to_delete_type;
+        basePath + "/xss/" + this.to_delete + "/data/" + this.to_delete_type;
 
       axios
         .delete(path)
@@ -309,7 +309,7 @@ export default {
         });
     },
     getSpecificData(element_id, loot_type, row_index) {
-      const path = basePath + "/xss/" + element_id + "/" + loot_type;
+      const path = basePath + "/xss/" + element_id + "/data/" + loot_type;
 
       axios
         .get(path)

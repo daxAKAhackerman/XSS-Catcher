@@ -126,7 +126,7 @@ export default {
   methods: {
     getPayload() {
       const path = basePath + "/xss/generate";
-      const payload = {
+      let payload = {
         url: location.origin,
         code: this.options.code_type,
         client_id: this.client_id,
@@ -157,7 +157,13 @@ export default {
       }
 
       if (this.options.other) {
-        payload.other = this.options.other;
+        const otherDataList = this.options.other.split("&");
+        let otherDataDict = {};
+        for (const element of otherDataList) {
+          const element_splitted = element.split("=");
+          otherDataDict[element_splitted[0]] = element_splitted[1];
+        }
+        payload = Object.assign(payload, otherDataDict);
       }
 
       axios

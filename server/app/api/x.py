@@ -10,7 +10,7 @@ from flask_cors import cross_origin
 
 
 @bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
-@cross_origin
+@cross_origin()
 def catch_xss(flavor, uid):
     """Catches an XSS"""
     client = Client.query.filter_by(uid=uid).first()
