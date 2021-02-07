@@ -92,7 +92,10 @@ export default {
       });
     },
     cleanup() {
-      this.client = {};
+      this.client = {
+        name: "",
+        description: "",
+      };
       this.$refs.addClientModal.hide();
       this.$parent.getClients();
     },
