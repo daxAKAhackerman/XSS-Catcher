@@ -1,7 +1,7 @@
 Flask==1.1.1
 Flask-Cors==3.0.10
-Flask-Login==0.5.0
 Flask-Migrate==2.5.2
 Flask-SQLAlchemy==2.4.1
 psycopg2-binary==2.8.5
 waitress==1.4.3
+flask-jwt-extended==3.25.0

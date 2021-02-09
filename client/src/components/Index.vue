@@ -56,7 +56,7 @@
             <b-button variant="outline-warning" v-b-modal.change-password-modal
               >Change password</b-button
             >
-            <b-button type="button" variant="outline-warning" @click="getLogout"
+            <b-button type="button" variant="outline-warning" @click="logout"
               >Log out</b-button
             >
           </b-col>
@@ -294,6 +294,21 @@ export default {
     };
   },
   methods: {
+    handleAuthError(error) {
+      if (error.response.status === 401) {
+        this.$router.push({ name: "Login" });
+      } else if (error.response.status === 422) {
+        sessionStorage.removeItem("access_token");
+        delete axios.defaults.headers.common["Authorization"];
+        this.$router.push({ name: "Login" });
+      } else {
+        this.makeToast(
+          error.response.data.detail,
+          "danger",
+          error.response.data.status
+        );
+      }
+    },
     getClients() {
       const path = basePath + "/client";
       axios
@@ -335,25 +350,10 @@ export default {
           }
         });
     },
-    getLogout() {
-      const path = basePath + "/auth/logout";
-      axios
-        .get(path)
-        .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
-          this.$router.push({ name: "Login" });
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
-        });
+    logout() {
+      sessionStorage.removeItem("access_token");
+      delete axios.defaults.headers.common["Authorization"];
+      this.$router.push({ name: "Login" });
     },
     getUser() {
       const path = basePath + "/user/current";
@@ -387,6 +387,10 @@ export default {
     },
   },
   created() {
+    if (sessionStorage.getItem("access_token") !== null) {
+      axios.defaults.headers.common["Authorization"] =
+        "Bearer " + sessionStorage.getItem("access_token");
+    }
     this.getClients();
     this.getUser();
   },

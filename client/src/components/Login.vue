@@ -42,16 +42,6 @@
                 placeholder="Enter password"
               ></b-form-input>
             </b-form-group>
-            <b-form-group id="input-group-remember">
-              <b-form-checkbox-group
-                v-model="form.remember"
-                id="input-field-remember"
-              >
-                <b-form-checkbox v-model="form.remember"
-                  >Remember me:</b-form-checkbox
-                >
-              </b-form-checkbox-group>
-            </b-form-group>
             <b-button @click="postLogin" variant="outline-info">Login</b-button>
           </b-form>
         </b-card>
@@ -76,8 +66,7 @@ export default {
     return {
       form: {
         username: "",
-        password: "",
-        remember: false,
+        password: ""
       },
       user: {},
       show_password_modal: false,
@@ -108,14 +97,25 @@ export default {
       const path = basePath + "/auth/login";
       const payload = {
         username: this.form.username,
-        password: this.form.password,
-        remember: this.form.remember,
+        password: this.form.password
       };
 
       axios
         .post(path, payload)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          sessionStorage.setItem(
+            "access_token",
+            response.data.detail.access_token
+          );
+          if (sessionStorage.getItem("access_token") !== null) {
+            axios.defaults.headers.common["Authorization"] =
+              "Bearer " + sessionStorage.getItem("access_token");
+          }
+          this.makeToast(
+            "Logged in successfully",
+            "success",
+            response.data.status
+          );
           this.loginProcess();
         })
         .catch((error) => {
@@ -128,6 +128,10 @@ export default {
         });
     },
     isAuth() {
+      if (sessionStorage.getItem("access_token") !== null) {
+        axios.defaults.headers.common["Authorization"] =
+          "Bearer " + sessionStorage.getItem("access_token");
+      }
       const path = basePath + "/user/current";
       axios
         .get(path)

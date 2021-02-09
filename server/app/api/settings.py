@@ -5,11 +5,11 @@ from app.models import Settings
 from app.utils import send_mail
 from app.validators import check_length, is_email
 from flask import jsonify, request
-from flask_login import login_required
+from flask_jwt_extended import jwt_required
 
 
 @bp.route("/settings", methods=["GET"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def settings_get():
 
@@ -19,7 +19,7 @@ def settings_get():
 
 
 @bp.route("/settings", methods=["PATCH"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def settings_post():
 
@@ -116,7 +116,7 @@ def settings_post():
 
 
 @bp.route("/settings/smtp_test", methods=["POST"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def smtp_test_post():
     data = request.get_json()

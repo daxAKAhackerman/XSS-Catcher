@@ -72,15 +72,7 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     makeToast(message, variant, title) {

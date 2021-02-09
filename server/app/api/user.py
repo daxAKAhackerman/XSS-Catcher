@@ -4,11 +4,11 @@ from app.decorators import permissions
 from app.models import User
 from app.validators import check_length, is_password, not_empty
 from flask import jsonify, request
-from flask_login import current_user, login_required
+from flask_jwt_extended import get_current_user, jwt_required
 
 
 @bp.route("/user", methods=["POST"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def register():
     """Creates a new user"""
@@ -38,9 +38,11 @@ def register():
 
 
 @bp.route("/user/password", methods=["POST"])
-@login_required
+@jwt_required
 def change_password():
     """Change the current user's password"""
+    current_user = get_current_user()
+
     data = request.get_json()
 
     if ("password1" not in data.keys()) or ("password2" not in data.keys()) or ("old_password" not in data.keys()):
@@ -66,7 +68,7 @@ def change_password():
 
 
 @bp.route("/user/<id>/password", methods=["POST"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def reset_password(id):
     """Resets a user's password"""
@@ -83,17 +85,21 @@ def reset_password(id):
 
 
 @bp.route("/user/current", methods=["GET"])
-@login_required
+@jwt_required
 def user_get():
     """Get the current user"""
+    current_user = get_current_user()
+
     return jsonify(current_user.to_dict()), 200
 
 
 @bp.route("/user/<user_id>", methods=["DELETE"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def user_delete(user_id):
     """Deletes a user"""
+    current_user = get_current_user()
+
     if len(User.query.all()) <= 1:
         return jsonify({"status": "error", "detail": "Can't delete the only user"}), 400
 
@@ -109,10 +115,12 @@ def user_delete(user_id):
 
 
 @bp.route("/user/<user_id>", methods=["PATCH"])
-@login_required
+@jwt_required
 @permissions(all_of=["admin"])
 def user_post(user_id):
     """Modifies a user"""
+    current_user = get_current_user()
+
     if current_user.id == int(user_id):
         return jsonify({"status": "error", "detail": "Can't demote yourself"}), 400
 
@@ -133,7 +141,7 @@ def user_post(user_id):
 
 
 @bp.route("/user", methods=["GET"])
-@login_required
+@jwt_required
 def user_all_get():
     """Gets all users"""
     users = []

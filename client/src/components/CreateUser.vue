@@ -73,15 +73,7 @@ export default {
           this.$refs.viewPasswordModal.show();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     makeToast(message, variant, title) {
@@ -96,7 +88,7 @@ export default {
       this.data = {};
       this.username = "";
       this.$refs.createUserModal.hide();
-      this.$parent.$parent.$parent.getUsers();
+      this.$parent.getUsers();
     },
   },
 };

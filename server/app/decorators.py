@@ -2,11 +2,13 @@ from functools import wraps
 
 from app.models import XSS, Client
 from flask import jsonify
-from flask_login import current_user
+from flask_jwt_extended import get_current_user
 
 
 def permissions(all_of=[], one_of=[]):
     """Manages permissions"""
+
+    current_user = get_current_user()
 
     def deco(orig_func):
         @wraps(orig_func)

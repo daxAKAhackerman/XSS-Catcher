@@ -2,8 +2,7 @@ import json
 import random
 import string
 
-from app import db, login
-from flask_login import UserMixin
+from app import db, jwt
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -93,7 +92,7 @@ class XSS(db.Model):
         return data
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     """Defines a user"""
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -149,10 +148,9 @@ class Settings(db.Model):
         return data
 
 
-@login.user_loader
-def load_user(id):
-    """Returns the user identifier for the session mechanism"""
-    return User.query.get(id)
+@jwt.user_loader_callback_loader
+def user_loader_callback(identity):
+    return User.query.filter_by(username=identity).first()
 
 
 def init_app(app):
