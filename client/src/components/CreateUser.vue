@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     createUser() {
-      const path = basePath + "/user/current";
+      const path = basePath + "/user";
 
       const payload = {
         username: this.username,
