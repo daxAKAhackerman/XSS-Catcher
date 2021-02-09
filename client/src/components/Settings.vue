@@ -177,6 +177,22 @@ export default {
     };
   },
   methods: {
+    handleAuthError(error) {
+      if (error.response.status === 401) {
+        this.$router.push({ name: "Login" });
+      } else if (error.response.status === 422) {
+        sessionStorage.removeItem("access_token");
+        delete axios.defaults.headers.common["Authorization"];
+        this.$router.push({ name: "Login" });
+      } else {
+        this.makeToast(
+          error.response.data.detail,
+          "danger",
+          error.response.data.status
+        );
+        this.getSettings();
+      }
+    },
     getSettings() {
       const path = basePath + "/settings";
 
@@ -226,16 +242,7 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-            this.getSettings();
-          }
+          this.handleAuthError(error);
         });
     },
     testSettings() {
@@ -252,16 +259,7 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-            this.getSettings();
-          }
+          this.handleAuthError(error);
         });
     },
     makeToast(message, variant, title) {

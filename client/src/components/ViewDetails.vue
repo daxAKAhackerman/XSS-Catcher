@@ -183,15 +183,7 @@ export default {
           this.data = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.$parent.$parent.$parent.handleAuthError(error);
         });
     },
     getSpecificData(loot_type) {
@@ -208,15 +200,7 @@ export default {
           this.componentKey += 1;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.$parent.$parent.$parent.handleAuthError(error);
         });
     },
     cleanSpecificData(loot_type) {

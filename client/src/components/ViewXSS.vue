@@ -182,15 +182,7 @@ export default {
           this.totalRows = this.dataXSS.length;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     deleteXSS() {
@@ -204,15 +196,7 @@ export default {
           this.$refs.deleteXSSModal.hide();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     convertTimestamp(timestamp) {

@@ -274,15 +274,7 @@ export default {
           this.data = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     deleteData() {
@@ -297,15 +289,7 @@ export default {
           this.$refs.deleteDataModal.hide();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     getSpecificData(element_id, loot_type, row_index) {
@@ -324,15 +308,7 @@ export default {
           this.componentKey += 1;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     cleanSpecificData(element_id, loot_type, row_index) {
