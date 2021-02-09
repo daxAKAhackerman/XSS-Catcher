@@ -8,11 +8,10 @@ from flask_jwt_extended import get_current_user
 def permissions(all_of=[], one_of=[]):
     """Manages permissions"""
 
-    current_user = get_current_user()
-
     def deco(orig_func):
         @wraps(orig_func)
         def new_func(*args, **kwargs):
+            current_user = get_current_user()
             if len(all_of) != 0:
                 if "admin" in all_of:
                     if not current_user.is_admin:

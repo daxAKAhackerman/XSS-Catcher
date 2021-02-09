@@ -318,15 +318,7 @@ export default {
           this.totalRows = this.clients.length;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleAuthError(error);
         });
     },
     deleteClient() {
@@ -339,15 +331,7 @@ export default {
           this.$refs.deleteClientModal.hide();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleAuthError(error);
         });
     },
     logout() {
@@ -363,15 +347,7 @@ export default {
           this.user = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleAuthError(error);
         });
     },
     makeToast(message, variant, title) {

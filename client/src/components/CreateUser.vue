@@ -73,7 +73,8 @@ export default {
           this.$refs.viewPasswordModal.show();
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          console.log(this.$parent)
+          this.$parent.$parent.$parent.$parent.handleAuthError(error);
         });
     },
     makeToast(message, variant, title) {
@@ -88,7 +89,7 @@ export default {
       this.data = {};
       this.username = "";
       this.$refs.createUserModal.hide();
-      this.$parent.getUsers();
+      this.$parent.$parent.$parent.getUsers();
     },
   },
 };

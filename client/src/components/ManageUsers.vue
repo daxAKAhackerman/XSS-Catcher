@@ -141,15 +141,7 @@ export default {
           this.users = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     deleteUser() {
@@ -164,16 +156,7 @@ export default {
           this.promote = 0;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.$refs.deleteUserModal.hide();
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     promoteUser(promotion, userId) {
@@ -190,15 +173,7 @@ export default {
           this.getUsers();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.$parent.handleAuthError(error);
         });
     },
     resetPassword(userId, username) {

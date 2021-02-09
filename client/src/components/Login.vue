@@ -66,13 +66,22 @@ export default {
     return {
       form: {
         username: "",
-        password: ""
+        password: "",
       },
       user: {},
       show_password_modal: false,
     };
   },
   methods: {
+    handleAuthError(error) {
+      if (error.response.status === 401) {
+        this.$router.push({ name: "Login" });
+      } else if (error.response.status === 422) {
+        sessionStorage.removeItem("access_token");
+        delete axios.defaults.headers.common["Authorization"];
+        this.$router.push({ name: "Login" });
+      }
+    },
     loginProcess() {
       const path = basePath + "/user/current";
       axios
@@ -88,16 +97,14 @@ export default {
           }
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          }
+          this.handleAuthError(error);
         });
     },
     postLogin() {
       const path = basePath + "/auth/login";
       const payload = {
         username: this.form.username,
-        password: this.form.password
+        password: this.form.password,
       };
 
       axios
