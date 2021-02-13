@@ -240,6 +240,68 @@ import Settings from "./Settings";
 
 const basePath = "/api";
 
+axios.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("access_token");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
+
+const axiosRefresh = axios.create();
+axiosRefresh.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("refresh_token");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
+
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  function (error) {
+    const originalRequest = error.config;
+
+    if (
+      error.response.status === 401 &&
+      originalRequest.url === `${basePath}/auth/refresh`
+    ) {
+      sessionStorage.removeItem("access_token");
+      sessionStorage.removeItem("refresh_token");
+      this.$router.push({ name: "Login" });
+      return Promise.reject(error);
+    }
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      return axiosRefresh.post(`${basePath}/auth/refresh`).then((response) => {
+        if (response.status === 200) {
+          sessionStorage.setItem(
+            "access_token",
+            response.data.detail.access_token
+          );
+          return axios(originalRequest);
+        }
+      });
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default {
   components: {
     AddClient,
@@ -295,11 +357,9 @@ export default {
   },
   methods: {
     handleAuthError(error) {
-      if (error.response.status === 401) {
-        this.$router.push({ name: "Login" });
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         sessionStorage.removeItem("access_token");
-        delete axios.defaults.headers.common["Authorization"];
+        sessionStorage.removeItem("refresh_token");
         this.$router.push({ name: "Login" });
       } else {
         this.makeToast(
@@ -335,9 +395,19 @@ export default {
         });
     },
     logout() {
-      sessionStorage.removeItem("access_token");
-      delete axios.defaults.headers.common["Authorization"];
-      this.$router.push({ name: "Login" });
+      const path = basePath + "/auth/logout";
+      axiosRefresh
+        .post(path)
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
+          sessionStorage.removeItem("access_token");
+          sessionStorage.removeItem("refresh_token");
+          delete axios.defaults.headers.common["Authorization"];
+          this.$router.push({ name: "Login" });
+        })
+        .catch((error) => {
+          this.handleAuthError(error);
+        });
     },
     getUser() {
       const path = basePath + "/user/current";
@@ -363,10 +433,6 @@ export default {
     },
   },
   created() {
-    if (sessionStorage.getItem("access_token") !== null) {
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + sessionStorage.getItem("access_token");
-    }
     this.getClients();
     this.getUser();
   },

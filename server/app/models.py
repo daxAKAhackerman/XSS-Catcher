@@ -153,6 +153,15 @@ def user_loader_callback(identity):
     return User.query.filter_by(username=identity).first()
 
 
+blacklist = set()
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token["jti"]
+    return jti in blacklist
+
+
 def init_app(app):
     """Creates the admin user and the settings"""
     with app.app_context():

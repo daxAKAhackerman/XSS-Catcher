@@ -133,11 +133,9 @@ export default {
   },
   methods: {
     handleAuthError(error) {
-      if (error.response.status === 401) {
-        this.$router.push({ name: "Login" });
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         sessionStorage.removeItem("access_token");
-        delete axios.defaults.headers.common["Authorization"];
+        sessionStorage.removeItem("refresh_token");
         this.$router.push({ name: "Login" });
       } else {
         this.$refs.deleteUserModal.hide();

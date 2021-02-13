@@ -143,7 +143,7 @@ def xss_generate():
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
 @jwt_required
 def client_xss_get(xss_id):
-    """Gets a single XSS instance for a client"""
+    """Gets a single XSS instance"""
     xss = XSS.query.filter_by(id=xss_id).first_or_404()
 
     return jsonify(xss.to_dict()), 200
@@ -194,7 +194,7 @@ def xss_loot_delete(xss_id, loot_type):
 @bp.route("/xss", methods=["GET"])
 @jwt_required
 def client_xss_all_get():
-    """Gets all XSS of a particular type (reflected of stored) for a specific client"""
+    """Gets all XSS based on a filter"""
 
     filter_expression = {}
     parameters = request.args.to_dict()
@@ -220,7 +220,7 @@ def client_xss_all_get():
 @bp.route("/xss/data", methods=["GET"])
 @jwt_required
 def client_loot_get():
-    """Get all captured data for a client"""
+    """Get all captured data based on a filter"""
     loot = {}
 
     filter_expression = {}

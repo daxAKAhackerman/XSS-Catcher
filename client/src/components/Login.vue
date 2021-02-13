@@ -58,6 +58,20 @@ import ChangePassword from "./ChangePassword";
 
 const basePath = "/api";
 
+axios.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("access_token");
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
+
 export default {
   components: {
     ChangePassword,
@@ -74,12 +88,15 @@ export default {
   },
   methods: {
     handleAuthError(error) {
-      if (error.response.status === 401) {
-        this.$router.push({ name: "Login" });
-      } else if (error.response.status === 422) {
+      if (error.response.status === 422) {
         sessionStorage.removeItem("access_token");
-        delete axios.defaults.headers.common["Authorization"];
-        this.$router.push({ name: "Login" });
+        sessionStorage.removeItem("refresh_token");
+      } else {
+        this.makeToast(
+          error.response.data.detail,
+          "danger",
+          error.response.data.status
+        );
       }
     },
     loginProcess() {
@@ -114,10 +131,10 @@ export default {
             "access_token",
             response.data.detail.access_token
           );
-          if (sessionStorage.getItem("access_token") !== null) {
-            axios.defaults.headers.common["Authorization"] =
-              "Bearer " + sessionStorage.getItem("access_token");
-          }
+          sessionStorage.setItem(
+            "refresh_token",
+            response.data.detail.refresh_token
+          );
           this.makeToast(
             "Logged in successfully",
             "success",
@@ -135,10 +152,6 @@ export default {
         });
     },
     isAuth() {
-      if (sessionStorage.getItem("access_token") !== null) {
-        axios.defaults.headers.common["Authorization"] =
-          "Bearer " + sessionStorage.getItem("access_token");
-      }
       const path = basePath + "/user/current";
       axios
         .get(path)
