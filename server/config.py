@@ -14,6 +14,6 @@ class Config(object):
     SECRET_KEY = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_ACCESS_TOKEN_EXPIRES = 300
+    JWT_ACCESS_TOKEN_EXPIRES = 10
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ["refresh"]

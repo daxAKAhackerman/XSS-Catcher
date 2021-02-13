@@ -1,5 +1,6 @@
+from app import db
 from app.api import bp
-from app.models import User, blacklist
+from app.models import Blacklist, User
 from flask import jsonify, request
 from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_raw_jwt, jwt_refresh_token_required
 
@@ -36,5 +37,7 @@ def refresh():
 def logout():
     """Adds a refresh token jti to the blacklist"""
     jti = get_raw_jwt()["jti"]
-    blacklist.add(jti)
+    blacklisted_jti = Blacklist(jti=jti)
+    db.session.add(blacklisted_jti)
+    db.session.commit()
     return jsonify({"status": "OK", "detail": "Logged out successfully"}), 200

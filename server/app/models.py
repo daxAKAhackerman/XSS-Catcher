@@ -148,18 +148,23 @@ class Settings(db.Model):
         return data
 
 
+class Blacklist(db.Model):
+    "Holds blacklisted refresh token jti"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    jti = db.Column(db.String(64), nullable=False, unique=True)
+
+
 @jwt.user_loader_callback_loader
 def user_loader_callback(identity):
     return User.query.filter_by(username=identity).first()
 
 
-blacklist = set()
-
-
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token["jti"]
-    return jti in blacklist
+    blacklisted_jti = Blacklist.query.filter_by(jti=jti).first()
+
+    return True if blacklisted_jti else False
 
 
 def init_app(app):
@@ -181,3 +186,9 @@ def init_app(app):
             db.session.add(settings)
             db.session.commit()
             print("[+] Settings initialization successful")
+        if db.session.query(Blacklist).count() == 0:
+            print("[-] JWT blacklist reset not needed")
+        else:
+            db.session.query(Blacklist).delete()
+            db.session.commit()
+            print("[+] JWT blacklist reset successful")

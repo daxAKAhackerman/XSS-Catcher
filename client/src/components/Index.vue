@@ -276,26 +276,15 @@ axios.interceptors.response.use(
   function (error) {
     const originalRequest = error.config;
 
-    if (
-      error.response.status === 401 &&
-      originalRequest.url === `${basePath}/auth/refresh`
-    ) {
-      sessionStorage.removeItem("access_token");
-      sessionStorage.removeItem("refresh_token");
-      this.$router.push({ name: "Login" });
-      return Promise.reject(error);
-    }
-
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       return axiosRefresh.post(`${basePath}/auth/refresh`).then((response) => {
-        if (response.status === 200) {
-          sessionStorage.setItem(
-            "access_token",
-            response.data.detail.access_token
-          );
-          return axios(originalRequest);
-        }
+        sessionStorage.setItem(
+          "access_token",
+          response.data.detail.access_token
+        );
+        return axios(originalRequest);
       });
     }
     return Promise.reject(error);
@@ -357,7 +346,7 @@ export default {
   },
   methods: {
     handleAuthError(error) {
-      if (error.response.status === 422) {
+      if (error.response.status === 422 || error.response.status === 401) {
         sessionStorage.removeItem("access_token");
         sessionStorage.removeItem("refresh_token");
         this.$router.push({ name: "Login" });
@@ -376,6 +365,7 @@ export default {
         .then((response) => {
           this.clients = response.data;
           this.totalRows = this.clients.length;
+          this.getUser();
         })
         .catch((error) => {
           this.handleAuthError(error);
@@ -434,7 +424,6 @@ export default {
   },
   created() {
     this.getClients();
-    this.getUser();
   },
 };
 </script>
