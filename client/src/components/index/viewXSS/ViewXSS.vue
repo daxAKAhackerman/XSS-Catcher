@@ -5,8 +5,8 @@
     title="Triggered XSS"
     hide-footer
     size="lg"
-    @show="getXSSList"
-    @hide="cleanup"
+    @show="getXSSList()"
+    @hide="cleanup()"
   >
     <b-row>
       <b-col offset-sm="8" sm="4">
@@ -91,23 +91,7 @@
       </b-col>
     </b-row>
 
-    <b-modal
-      ref="deleteXSSModal"
-      id="delete-xss-modal"
-      title="Are you sure?"
-      hide-footer
-    >
-      <b-form>
-        <b-button @click="deleteXSS" variant="outline-danger"
-          >Yes, delete this entry</b-button
-        >
-        <b-button
-          @click="$refs.deleteXSSModal.hide()"
-          variant="outline-secondary"
-          >Cancel</b-button
-        >
-      </b-form>
-    </b-modal>
+    <DeleteXSS :to_delete="to_delete" @get-xss-list="getXSSList" />
 
     <ViewDetails :xss_id="xss_id" :client_id="client_id" />
   </b-modal>
@@ -117,7 +101,8 @@
 import axios from "axios";
 import Vue2Filters from "vue2-filters";
 
-import ViewDetails from "./ViewDetails";
+import ViewDetails from "../shared/ViewDetails";
+import DeleteXSS from "./DeleteXSS";
 import moment from "moment";
 
 const basePath = "/api";
@@ -125,6 +110,7 @@ const basePath = "/api";
 export default {
   components: {
     ViewDetails,
+    DeleteXSS,
   },
   props: ["xss_type", "client_id", "is_admin", "owner_id", "user_id"],
   mixins: [Vue2Filters.mixin],
@@ -182,25 +168,10 @@ export default {
           this.totalRows = this.dataXSS.length;
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
-        });
-    },
-    deleteXSS() {
-      const path = basePath + "/xss/" + this.to_delete;
-
-      axios
-        .delete(path)
-        .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
-          this.getXSSList();
-          this.$refs.deleteXSSModal.hide();
-        })
-        .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     convertTimestamp(timestamp) {
-      console.log(timestamp);
       let timestampLocal = moment
         .unix(timestamp)
         .format("YYYY-MM-DD @ HH:mm:ss");
@@ -209,19 +180,11 @@ export default {
     onFiltered(filteredItems) {
       this.totalRows = filteredItems.length;
     },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
-    },
     cleanup() {
       this.dataXSS = [];
       this.xss_id = 0;
       this.to_delete = 0;
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

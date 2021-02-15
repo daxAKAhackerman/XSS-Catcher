@@ -4,8 +4,8 @@
     id="view-client-modal"
     title="Client"
     hide-footer
-    @show="getClient"
-    @hide="cleanup"
+    @show="getClient()"
+    @hide="cleanup()"
   >
     <b-form>
       <b-form-group
@@ -91,11 +91,13 @@
       <div class="text-right">
         <b-button
           v-if="owner_id === user_id || is_admin"
-          @click="patchClient"
+          @click="patchClient()"
           variant="outline-info"
           >Save</b-button
         >
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -136,7 +138,7 @@ export default {
           this.getUsers();
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     patchClient() {
@@ -167,7 +169,7 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     getUsers() {
@@ -179,21 +181,13 @@ export default {
           this.users = response.data;
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.client = {};
       this.$refs.viewClientModal.hide();
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

@@ -5,8 +5,8 @@
     title="Settings"
     hide-footer
     size="md"
-    @show="getSettings"
-    @hide="cleanup"
+    @show="getSettings()"
+    @hide="cleanup()"
   >
     <h3>SMTP settings</h3>
     <hr />
@@ -158,8 +158,8 @@
       </b-form-group>
     </b-form>
     <div class="text-right">
-      <b-button @click="patchSettings" variant="outline-info">Save</b-button>
-      <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+      <b-button @click="patchSettings()" variant="outline-info">Save</b-button>
+      <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
     </div>
   </b-modal>
 </template>
@@ -177,20 +177,6 @@ export default {
     };
   },
   methods: {
-    handleAuthError(error) {
-      if (error.response.status === 422) {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
-        this.$router.push({ name: "Login" });
-      } else {
-        this.makeToast(
-          error.response.data.detail,
-          "danger",
-          error.response.data.status
-        );
-        this.getSettings();
-      }
-    },
     getSettings() {
       const path = basePath + "/settings";
 
@@ -200,7 +186,7 @@ export default {
           this.settings = response.data;
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     patchSettings() {
@@ -240,7 +226,8 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          this.handleAuthError(error);
+          this.handleError(error);
+          this.getSettings();
         });
     },
     testSettings() {
@@ -257,16 +244,8 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          this.handleAuthError(error);
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.$refs.settingsModal.hide();

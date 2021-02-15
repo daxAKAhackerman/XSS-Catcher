@@ -4,7 +4,7 @@
     id="create-user-modal"
     title="Create user"
     hide-footer
-    @hide="cleanup"
+    @hide="cleanup()"
   >
     <b-form>
       <b-form-group
@@ -20,38 +20,37 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="createUser" variant="outline-info"
+        <b-button
+          @click="createUser"
+          variant="outline-info"
+          v-b-modal.view-password-modal
           >Create user</b-button
         >
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
-      </div>
-    </b-form>
-    <b-modal
-      ref="viewPasswordModal"
-      id="view-password-modal"
-      title="User created"
-      hide-footer
-      @hide="cleanup"
-    >
-      <p>Username: {{ username }}</p>
-      <p>Password: {{ data.detail }}</p>
-      <div class="text-right">
-        <b-button
-          @click="$refs.createUserModal.hide()"
-          variant="outline-secondary"
-          >Close</b-button
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
         >
       </div>
-    </b-modal>
+    </b-form>
+
+    <ViewPassword
+      :username="username"
+      :password="data.detail"
+      :cleanup="cleanup"
+    />
   </b-modal>
 </template>
 
 <script>
 import axios from "axios";
 
+import ViewPassword from "./ViewPassword";
+
 const basePath = "/api";
 
 export default {
+  components: {
+    ViewPassword,
+  },
   data() {
     return {
       data: {},
@@ -70,26 +69,16 @@ export default {
         .post(path, payload)
         .then((response) => {
           this.data = response.data;
-          this.$refs.viewPasswordModal.show();
         })
         .catch((error) => {
-          console.log(this.$parent)
-          this.$parent.$parent.$parent.$parent.handleAuthError(error);
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.data = {};
       this.username = "";
       this.$refs.createUserModal.hide();
-      this.$parent.$parent.$parent.getUsers();
+      this.$emit("get-users");
     },
   },
 };

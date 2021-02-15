@@ -1,7 +1,7 @@
 <template>
   <b-modal
-    @show="getXSS"
-    @hide="cleanup"
+    @show="getXSS()"
+    @hide="cleanup()"
     ref="viewDetailsModal"
     id="view-details-modal"
     title="Details"
@@ -183,7 +183,7 @@ export default {
           this.data = response.data;
         })
         .catch((error) => {
-          this.$parent.$parent.$parent.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     getSpecificData(loot_type) {
@@ -200,7 +200,7 @@ export default {
           this.componentKey += 1;
         })
         .catch((error) => {
-          this.$parent.$parent.$parent.$parent.handleAuthError(error);
+          this.handleError(error);
         });
     },
     cleanSpecificData(loot_type) {

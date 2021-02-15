@@ -4,7 +4,7 @@
     id="add-client-modal"
     title="New client"
     hide-footer
-    @hidden="cleanup"
+    @hidden="cleanup()"
   >
     <b-form>
       <b-form-group
@@ -35,8 +35,10 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="postClient" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="postClient()" variant="outline-info">Save</b-button>
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -72,16 +74,8 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          this.$parent.handleAuthError(error);
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.client = {
@@ -89,7 +83,7 @@ export default {
         description: "",
       };
       this.$refs.addClientModal.hide();
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };
