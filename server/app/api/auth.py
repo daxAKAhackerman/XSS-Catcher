@@ -2,10 +2,11 @@ from app import db
 from app.api import bp
 from app.models import Blacklist, User
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_raw_jwt, jwt_refresh_token_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_raw_jwt, jwt_optional, jwt_refresh_token_required
 
 
 @bp.route("/auth/login", methods=["POST"])
+@jwt_optional
 def login():
     """Logs a user in"""
     current_user = get_current_user()
