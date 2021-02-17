@@ -33,6 +33,10 @@ def logout(client, headers):
     return client.post("/api/auth/logout", headers=headers)
 
 
+def refresh(client, headers):
+    return client.post("/api/auth/refresh", headers=headers)
+
+
 def login_get_headers(client, username, password):
     tokens = json.loads(login(client, {}, username=username, password=password).data)["detail"]
     access_header = {"Authorization": f"Bearer {tokens['access_token']}"}

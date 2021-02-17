@@ -25,3 +25,9 @@ def test_logout(client):
     print(refresh_header)
     rv = logout(client, refresh_header)
     assert b"Logged out successfully" in rv.data
+
+
+def test_refresh(client):
+    _, refresh_header = login_get_headers(client, "admin", "xss")
+    rv = refresh(client, refresh_header)
+    assert b"access_token" in rv.data
