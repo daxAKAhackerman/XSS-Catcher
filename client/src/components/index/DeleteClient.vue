@@ -5,7 +5,7 @@
     title="Are you sure?"
     hide-footer
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <div class="text-right">
         <b-button @click="deleteClient" variant="outline-danger"
           >Yes, delete this entry</b-button

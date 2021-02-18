@@ -1,6 +1,6 @@
 <template>
   <b-card>
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-username"
         label="Username:"

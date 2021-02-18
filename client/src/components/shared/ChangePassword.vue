@@ -7,7 +7,7 @@
     @hidden="cleanup()"
     :visible="show_password_modal"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-op"
         label="Old password:"

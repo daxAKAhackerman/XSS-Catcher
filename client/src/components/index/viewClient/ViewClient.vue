@@ -7,7 +7,7 @@
     @show="getClient()"
     @hide="cleanup()"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-name"
         label="Short name:"

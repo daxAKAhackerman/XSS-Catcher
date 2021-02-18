@@ -5,7 +5,7 @@
     title="Are you sure?"
     hide-footer
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-button @click="deleteXSS" variant="outline-danger"
         >Yes, delete this entry</b-button
       >

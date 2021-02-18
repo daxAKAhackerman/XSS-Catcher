@@ -6,7 +6,7 @@
     hide-footer
     @hide="cleanup()"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-username"
         label="Username:"

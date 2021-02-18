@@ -10,7 +10,7 @@
   >
     <h3>SMTP settings</h3>
     <hr />
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-host"
         label="SMTP server: "
