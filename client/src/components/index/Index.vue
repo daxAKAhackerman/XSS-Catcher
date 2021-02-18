@@ -5,10 +5,7 @@
     <b-row>
       <b-col offset-sm="1" sm="10">
         <Navigation
-          @get-clients="
-            getClients();
-            makeToast('Data refreshed', 'success', 'OK');
-          "
+          @get-clients="getClients($event)"
           :user_is_admin="user.is_admin"
           @logout="logout()"
         />
@@ -34,14 +31,14 @@
       </b-col>
     </b-row>
 
-    <AddClient @get-clients="getClients" />
-    <GetPayload :client_id="viewed_client.id" @get-clients="getClients" />
+    <AddClient @get-clients="getClients(false)" />
+    <GetPayload :client_id="viewed_client.id" @get-clients="getClients(false)" />
     <ViewData
       :client_id="viewed_client.id"
       :is_admin="user.is_admin"
       :owner_id="viewed_client.owner_id"
       :user_id="user.id"
-      @get-clients="getClients"
+      @get-clients="getClients(false)"
     />
     <ViewXSS
       :xss_type="xss_type"
@@ -49,19 +46,19 @@
       :is_admin="user.is_admin"
       :owner_id="viewed_client.owner_id"
       :user_id="user.id"
-      @get-clients="getClients"
+      @get-clients="getClients(false)"
     />
     <ViewClient
       :client_id="viewed_client.id"
       :is_admin="user.is_admin"
       :owner_id="viewed_client.owner_id"
       :user_id="user.id"
-      @get-clients="getClients"
+      @get-clients="getClients(false)"
     />
     <ChangePassword :show_password_modal="show_password_modal" />
     <ManageUsers />
     <Settings />
-    <DeleteClient :to_delete="to_delete" @get-clients="getClients" />
+    <DeleteClient :to_delete="to_delete" @get-clients="getClients(false)" />
   </b-container>
 </template>
 
@@ -112,13 +109,16 @@ export default {
     };
   },
   methods: {
-    getClients() {
+    getClients(is_refresh) {
       const path = basePath + "/client";
       axios
         .get(path)
         .then((response) => {
           this.clients = response.data;
           this.totalRows = this.clients.length;
+          if (is_refresh) {
+            this.makeToast("Data refreshed", "success", "OK");
+          }
           this.getUser();
         })
         .catch((error) => {
@@ -209,7 +209,7 @@ export default {
         return Promise.reject(error);
       }
     );
-    this.getClients();
+    this.getClients(false);
   },
 };
 </script>

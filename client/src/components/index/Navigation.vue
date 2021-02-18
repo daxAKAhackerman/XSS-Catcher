@@ -14,7 +14,7 @@
         variant="outline-secondary"
         v-b-tooltip.hover
         title="Refresh data"
-        @click="$emit('get-clients')"
+        @click="$emit('get-clients', true)"
       >
         <b-icon-arrow-repeat
           style="width: 20px; height: 20px"
