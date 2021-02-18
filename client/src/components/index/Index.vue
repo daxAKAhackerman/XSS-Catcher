@@ -185,7 +185,6 @@ export default {
         return response;
       },
       (error) => {
-        console.log(error.response.data.detail)
         let originalRequest = error.config;
 
         if (error.response.status === 422) {

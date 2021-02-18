@@ -20,10 +20,7 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button
-          @click="createUser"
-          variant="outline-info"
-          v-b-modal.view-password-modal
+        <b-button @click="createUser()" variant="outline-info"
           >Create user</b-button
         >
         <b-button @click="cleanup()" variant="outline-secondary"
@@ -35,7 +32,7 @@
     <ViewPassword
       :username="username"
       :password="data.detail"
-      :cleanup="cleanup"
+      @cleanup="cleanup()"
     />
   </b-modal>
 </template>
@@ -69,6 +66,7 @@ export default {
         .post(path, payload)
         .then((response) => {
           this.data = response.data;
+          this.$bvModal.show("view-password-modal");
         })
         .catch((error) => {
           this.handleError(error);
