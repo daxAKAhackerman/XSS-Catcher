@@ -162,7 +162,7 @@ export default {
         return config;
       },
       (error) => {
-        return error;
+        return Promise.reject(error);
       }
     );
 
@@ -176,7 +176,7 @@ export default {
         return config;
       },
       (error) => {
-        return error;
+        return Promise.reject(error);
       }
     );
 
@@ -184,7 +184,8 @@ export default {
       (response) => {
         return response;
       },
-      function (error) {
+      (error) => {
+        console.log(error.response.data.detail)
         let originalRequest = error.config;
 
         if (error.response.status === 422) {
@@ -206,7 +207,7 @@ export default {
               return axios(originalRequest);
             });
         }
-        return error;
+        return Promise.reject(error);
       }
     );
     this.getClients();

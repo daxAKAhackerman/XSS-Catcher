@@ -94,7 +94,7 @@ export default {
         return config;
       },
       (error) => {
-        return error;
+        return Promise.reject(error);
       }
     );
     this.isAuth();
