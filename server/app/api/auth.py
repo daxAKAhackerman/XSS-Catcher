@@ -1,12 +1,12 @@
 from app import db
 from app.api import bp
-from app.models import Blacklist, User
+from app.models import Blocklist, User
 from flask import jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_raw_jwt, jwt_optional, jwt_refresh_token_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_jwt, jwt_required
 
 
 @bp.route("/auth/login", methods=["POST"])
-@jwt_optional
+@jwt_required(optional=True)
 def login():
     """Logs a user in"""
     current_user = get_current_user()
@@ -26,7 +26,7 @@ def login():
 
 
 @bp.route("/auth/refresh", methods=["POST"])
-@jwt_refresh_token_required
+@jwt_required(refresh=True)
 def refresh():
     """Uses a refresh token to generate a new access token"""
     current_user = get_current_user()
@@ -34,11 +34,11 @@ def refresh():
 
 
 @bp.route("/auth/logout", methods=["POST"])
-@jwt_refresh_token_required
+@jwt_required(refresh=True)
 def logout():
-    """Adds a refresh token jti to the blacklist"""
-    jti = get_raw_jwt()["jti"]
-    blacklisted_jti = Blacklist(jti=jti)
-    db.session.add(blacklisted_jti)
+    """Adds a refresh token jti to the blocklist"""
+    jti = get_jwt()["jti"]
+    blocked_jti = Blocklist(jti=jti)
+    db.session.add(blocked_jti)
     db.session.commit()
     return jsonify({"status": "OK", "detail": "Logged out successfully"}), 200

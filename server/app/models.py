@@ -148,23 +148,24 @@ class Settings(db.Model):
         return data
 
 
-class Blacklist(db.Model):
-    "Holds blacklisted refresh token jti"
+class Blocklist(db.Model):
+    "Holds blocked refresh token jti"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     jti = db.Column(db.String(64), nullable=False, unique=True)
 
 
-@jwt.user_loader_callback_loader
-def user_loader_callback(identity):
-    return User.query.filter_by(username=identity).first()
+@jwt.user_lookup_loader
+def user_loader_callback(_, jwt_payload):
+    return User.query.filter_by(username=jwt_payload["sub"]).first()
 
 
-@jwt.token_in_blacklist_loader
-def check_if_token_in_blacklist(decrypted_token):
-    jti = decrypted_token["jti"]
-    blacklisted_jti = Blacklist.query.filter_by(jti=jti).first()
-
-    return True if blacklisted_jti else False
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(_, jwt_payload):
+    if jwt_payload["type"] == "access":
+        return False
+    else:
+        blocked_jti = Blocklist.query.filter_by(jti=jwt_payload["jti"]).first()
+        return True if blocked_jti else False
 
 
 def init_app(app):
@@ -186,9 +187,9 @@ def init_app(app):
             db.session.add(settings)
             db.session.commit()
             print("[+] Settings initialization successful")
-        if db.session.query(Blacklist).count() == 0:
-            print("[-] JWT blacklist reset not needed")
+        if db.session.query(Blocklist).count() == 0:
+            print("[-] JWT blocklist reset not needed")
         else:
-            db.session.query(Blacklist).delete()
+            db.session.query(Blocklist).delete()
             db.session.commit()
-            print("[+] JWT blacklist reset successful")
+            print("[+] JWT blocklist reset successful")

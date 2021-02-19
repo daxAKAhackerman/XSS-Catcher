@@ -1,7 +1,7 @@
 import json
 
 from app import db
-from app.models import Blacklist, Client, Settings, User, init_app
+from app.models import Blocklist, Client, Settings, User, init_app
 from xss import app
 
 from .fixtures import client, client_empty
@@ -56,7 +56,7 @@ def test_init_app_not_needed(client):
     init_app(app)
     assert Settings.query.count() == 1
     assert User.query.count() == 1
-    assert Blacklist.query.count() == 0
+    assert Blocklist.query.count() == 0
 
 
 def test_init_app_needed(client_empty):

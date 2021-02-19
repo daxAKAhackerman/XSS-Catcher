@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required
 
 
 @bp.route("/xss/generate", methods=["GET"])
-@jwt_required
+@jwt_required()
 def xss_generate():
     """Generates an XSS payload"""
 
@@ -141,7 +141,7 @@ def xss_generate():
 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
-@jwt_required
+@jwt_required()
 def client_xss_get(xss_id):
     """Gets a single XSS instance"""
     xss = XSS.query.filter_by(id=xss_id).first_or_404()
@@ -150,7 +150,7 @@ def client_xss_get(xss_id):
 
 
 @bp.route("/xss/<int:xss_id>", methods=["DELETE"])
-@jwt_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id):
     """Deletes an XSS"""
@@ -163,7 +163,7 @@ def xss_delete(xss_id):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
-@jwt_required
+@jwt_required()
 def xss_loot_get(xss_id, loot_type):
     """Gets a specific type of data for an XSS"""
     xss = XSS.query.filter_by(id=xss_id).first_or_404()
@@ -174,7 +174,7 @@ def xss_loot_get(xss_id, loot_type):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
-@jwt_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id, loot_type):
     """Deletes a specific type of data for an XSS"""
@@ -192,7 +192,7 @@ def xss_loot_delete(xss_id, loot_type):
 
 
 @bp.route("/xss", methods=["GET"])
-@jwt_required
+@jwt_required()
 def client_xss_all_get():
     """Gets all XSS based on a filter"""
 
@@ -218,7 +218,7 @@ def client_xss_all_get():
 
 
 @bp.route("/xss/data", methods=["GET"])
-@jwt_required
+@jwt_required()
 def client_loot_get():
     """Get all captured data based on a filter"""
     loot = {}

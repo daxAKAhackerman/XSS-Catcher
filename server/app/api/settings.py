@@ -9,7 +9,7 @@ from flask_jwt_extended import jwt_required
 
 
 @bp.route("/settings", methods=["GET"])
-@jwt_required
+@jwt_required()
 @permissions(all_of=["admin"])
 def settings_get():
 
@@ -19,7 +19,7 @@ def settings_get():
 
 
 @bp.route("/settings", methods=["PATCH"])
-@jwt_required
+@jwt_required()
 @permissions(all_of=["admin"])
 def settings_post():
 
@@ -116,7 +116,7 @@ def settings_post():
 
 
 @bp.route("/settings/smtp_test", methods=["POST"])
-@jwt_required
+@jwt_required()
 @permissions(all_of=["admin"])
 def smtp_test_post():
     data = request.get_json()

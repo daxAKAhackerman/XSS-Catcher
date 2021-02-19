@@ -10,7 +10,7 @@ from flask_jwt_extended import get_current_user, jwt_required
 
 
 @bp.route("/client", methods=["POST"])
-@jwt_required
+@jwt_required()
 def client_put():
     """Creates a new client"""
     current_user = get_current_user()
@@ -38,7 +38,7 @@ def client_put():
 
 
 @bp.route("/client/<int:client_id>", methods=["GET"])
-@jwt_required
+@jwt_required()
 def client_get(client_id):
     """Gets a client's infos"""
     client = Client.query.filter_by(id=client_id).first_or_404()
@@ -47,7 +47,7 @@ def client_get(client_id):
 
 
 @bp.route("/client/<int:client_id>", methods=["PATCH"])
-@jwt_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def client_post(client_id):
     """Edits a client"""
@@ -96,7 +96,7 @@ def client_post(client_id):
 
 
 @bp.route("/client/<int:client_id>", methods=["DELETE"])
-@jwt_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def client_delete(client_id):
     """Deletes a client"""
@@ -111,7 +111,7 @@ def client_delete(client_id):
 
 
 @bp.route("/client", methods=["GET"])
-@jwt_required
+@jwt_required()
 def client_all_get():
     """Gets all clients"""
     client_list = []
