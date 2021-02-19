@@ -6,13 +6,15 @@ from app.decorators import permissions
 from app.models import XSS, Client, User
 from app.validators import check_length, is_email, not_empty
 from flask import jsonify, request
-from flask_login import current_user, login_required
+from flask_jwt_extended import get_current_user, jwt_required
 
 
 @bp.route("/client", methods=["POST"])
-@login_required
+@jwt_required()
 def client_put():
     """Creates a new client"""
+    current_user = get_current_user()
+
     data = request.get_json()
 
     if "name" not in data.keys() or "description" not in data.keys():
@@ -36,7 +38,7 @@ def client_put():
 
 
 @bp.route("/client/<int:client_id>", methods=["GET"])
-@login_required
+@jwt_required()
 def client_get(client_id):
     """Gets a client's infos"""
     client = Client.query.filter_by(id=client_id).first_or_404()
@@ -45,7 +47,7 @@ def client_get(client_id):
 
 
 @bp.route("/client/<int:client_id>", methods=["PATCH"])
-@login_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def client_post(client_id):
     """Edits a client"""
@@ -94,7 +96,7 @@ def client_post(client_id):
 
 
 @bp.route("/client/<int:client_id>", methods=["DELETE"])
-@login_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def client_delete(client_id):
     """Deletes a client"""
@@ -109,7 +111,7 @@ def client_delete(client_id):
 
 
 @bp.route("/client", methods=["GET"])
-@login_required
+@jwt_required()
 def client_all_get():
     """Gets all clients"""
     client_list = []

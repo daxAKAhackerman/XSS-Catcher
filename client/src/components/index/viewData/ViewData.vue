@@ -5,8 +5,8 @@
     title="Captured data"
     hide-footer
     size="xl"
-    @show="getData"
-    @hide="cleanup"
+    @show="getData()"
+    @hide="cleanup()"
   >
     <b-row>
       <b-col offset-sm="8" sm="4">
@@ -205,24 +205,11 @@
       </b-table>
     </div>
 
-    <b-modal
-      ref="deleteDataModal"
-      id="delete-data-modal"
-      title="Are you sure?"
-      hide-footer
-    >
-      <b-form>
-        <b-button @click="deleteData" variant="outline-danger"
-          >Yes, delete this entry</b-button
-        >
-        <b-button
-          @click="$refs.deleteDataModal.hide()"
-          variant="outline-secondary"
-          >Cancel</b-button
-        >
-      </b-form>
-    </b-modal>
-
+    <DeleteData
+      :to_delete="to_delete"
+      :to_delete_type="to_delete_type"
+      @get-data="getData"
+    />
     <ViewDetails :xss_id="xss_detail_id" :client_id="client_id" />
   </b-modal>
 </template>
@@ -230,7 +217,8 @@
 <script>
 import axios from "axios";
 import VueJsonPretty from "vue-json-pretty";
-import ViewDetails from "./ViewDetails";
+import ViewDetails from "../shared/ViewDetails";
+import DeleteData from "./DeleteData";
 
 const basePath = "/api";
 
@@ -239,6 +227,7 @@ export default {
   components: {
     VueJsonPretty,
     ViewDetails,
+    DeleteData,
   },
   data() {
     return {
@@ -262,7 +251,7 @@ export default {
   },
   methods: {
     getData() {
-      const path = basePath + "/xss/data";
+      const path = `${basePath}/xss/data`;
 
       const payload = {
         client_id: this.client_id,
@@ -274,42 +263,11 @@ export default {
           this.data = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
-        });
-    },
-    deleteData() {
-      const path =
-        basePath + "/xss/" + this.to_delete + "/data/" + this.to_delete_type;
-
-      axios
-        .delete(path)
-        .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
-          this.getData();
-          this.$refs.deleteDataModal.hide();
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     getSpecificData(element_id, loot_type, row_index) {
-      const path = basePath + "/xss/" + element_id + "/data/" + loot_type;
+      const path = `${basePath}/xss/${element_id}/data/${loot_type}`;
 
       axios
         .get(path)
@@ -324,34 +282,18 @@ export default {
           this.componentKey += 1;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     cleanSpecificData(element_id, loot_type, row_index) {
       this.data[loot_type][row_index][element_id] = "";
       this.componentKey += 1;
     },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
-    },
     cleanup() {
       this.data = {};
       this.to_delete = 0;
       this.to_delete_type = "";
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

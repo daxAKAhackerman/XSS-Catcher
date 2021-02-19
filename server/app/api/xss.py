@@ -5,11 +5,11 @@ from app.api import bp
 from app.decorators import permissions
 from app.models import XSS, Client
 from flask import jsonify, request
-from flask_login import current_user, login_required
+from flask_jwt_extended import jwt_required
 
 
 @bp.route("/xss/generate", methods=["GET"])
-@login_required
+@jwt_required()
 def xss_generate():
     """Generates an XSS payload"""
 
@@ -141,16 +141,16 @@ def xss_generate():
 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
-@login_required
+@jwt_required()
 def client_xss_get(xss_id):
-    """Gets a single XSS instance for a client"""
+    """Gets a single XSS instance"""
     xss = XSS.query.filter_by(id=xss_id).first_or_404()
 
     return jsonify(xss.to_dict()), 200
 
 
 @bp.route("/xss/<int:xss_id>", methods=["DELETE"])
-@login_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id):
     """Deletes an XSS"""
@@ -163,7 +163,7 @@ def xss_delete(xss_id):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
-@login_required
+@jwt_required()
 def xss_loot_get(xss_id, loot_type):
     """Gets a specific type of data for an XSS"""
     xss = XSS.query.filter_by(id=xss_id).first_or_404()
@@ -174,7 +174,7 @@ def xss_loot_get(xss_id, loot_type):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
-@login_required
+@jwt_required()
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id, loot_type):
     """Deletes a specific type of data for an XSS"""
@@ -192,9 +192,9 @@ def xss_loot_delete(xss_id, loot_type):
 
 
 @bp.route("/xss", methods=["GET"])
-@login_required
+@jwt_required()
 def client_xss_all_get():
-    """Gets all XSS of a particular type (reflected of stored) for a specific client"""
+    """Gets all XSS based on a filter"""
 
     filter_expression = {}
     parameters = request.args.to_dict()
@@ -218,9 +218,9 @@ def client_xss_all_get():
 
 
 @bp.route("/xss/data", methods=["GET"])
-@login_required
+@jwt_required()
 def client_loot_get():
-    """Get all captured data for a client"""
+    """Get all captured data based on a filter"""
     loot = {}
 
     filter_expression = {}

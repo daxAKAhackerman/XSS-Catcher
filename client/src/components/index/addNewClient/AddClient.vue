@@ -4,9 +4,9 @@
     id="add-client-modal"
     title="New client"
     hide-footer
-    @hidden="cleanup"
+    @hidden="cleanup()"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-name"
         label="Name:"
@@ -35,8 +35,10 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="postClient" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="postClient()" variant="outline-info">Save</b-button>
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -58,7 +60,7 @@ export default {
   },
   methods: {
     postClient() {
-      const path = basePath + "/client";
+      const path = `${basePath}/client`;
 
       const payload = {
         name: this.client.name,
@@ -72,24 +74,8 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.client = {
@@ -97,7 +83,7 @@ export default {
         description: "",
       };
       this.$refs.addClientModal.hide();
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

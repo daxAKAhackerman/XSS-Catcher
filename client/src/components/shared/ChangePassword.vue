@@ -4,10 +4,10 @@
     id="change-password-modal"
     title="Change password"
     hide-footer
-    @hidden="cleanup"
-    :visible="$parent.show_password_modal"
+    @hidden="cleanup()"
+    :visible="show_password_modal"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-op"
         label="Old password:"
@@ -15,7 +15,7 @@
         label-for="input-field-op"
       >
         <b-form-input
-          @keyup.enter="changePassword"
+          @keyup.enter="changePassword()"
           v-model="old_password"
           id="input-field-op"
           type="password"
@@ -30,7 +30,7 @@
         label-for="input-field-np"
       >
         <b-form-input
-          @keyup.enter="changePassword"
+          @keyup.enter="changePassword()"
           v-model="new_password1"
           id="input-field-np"
           type="password"
@@ -45,7 +45,7 @@
         label-for="input-field-np2"
       >
         <b-form-input
-          @keyup.enter="changePassword"
+          @keyup.enter="changePassword()"
           v-model="new_password2"
           id="input-field-np2"
           type="password"
@@ -53,8 +53,12 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="changePassword" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="changePassword()" variant="outline-info"
+          >Save</b-button
+        >
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -66,6 +70,7 @@ import axios from "axios";
 const basePath = "/api";
 
 export default {
+  props: ["show_password_modal"],
   data() {
     return {
       old_password: "",
@@ -75,7 +80,7 @@ export default {
   },
   methods: {
     changePassword() {
-      const path = basePath + "/user/password";
+      const path = `${basePath}/user/password`;
 
       const payload = {
         old_password: this.old_password,
@@ -90,24 +95,8 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.old_password = "";

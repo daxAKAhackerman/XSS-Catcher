@@ -2,8 +2,7 @@ import json
 import random
 import string
 
-from app import db, login
-from flask_login import UserMixin
+from app import db, jwt
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -93,7 +92,7 @@ class XSS(db.Model):
         return data
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     """Defines a user"""
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -149,10 +148,24 @@ class Settings(db.Model):
         return data
 
 
-@login.user_loader
-def load_user(id):
-    """Returns the user identifier for the session mechanism"""
-    return User.query.get(id)
+class Blocklist(db.Model):
+    "Holds blocked refresh token jti"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    jti = db.Column(db.String(64), nullable=False, unique=True)
+
+
+@jwt.user_lookup_loader
+def user_loader_callback(_, jwt_payload):
+    return User.query.filter_by(username=jwt_payload["sub"]).first()
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(_, jwt_payload):
+    if jwt_payload["type"] == "access":
+        return False
+    else:
+        blocked_jti = Blocklist.query.filter_by(jti=jwt_payload["jti"]).first()
+        return True if blocked_jti else False
 
 
 def init_app(app):
@@ -174,3 +187,9 @@ def init_app(app):
             db.session.add(settings)
             db.session.commit()
             print("[+] Settings initialization successful")
+        if db.session.query(Blocklist).count() == 0:
+            print("[-] JWT blocklist reset not needed")
+        else:
+            db.session.query(Blocklist).delete()
+            db.session.commit()
+            print("[+] JWT blocklist reset successful")

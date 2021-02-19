@@ -4,10 +4,10 @@
     id="view-client-modal"
     title="Client"
     hide-footer
-    @show="getClient"
-    @hide="cleanup"
+    @show="getClient()"
+    @hide="cleanup()"
   >
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-name"
         label="Short name:"
@@ -91,11 +91,13 @@
       <div class="text-right">
         <b-button
           v-if="owner_id === user_id || is_admin"
-          @click="patchClient"
+          @click="patchClient()"
           variant="outline-info"
           >Save</b-button
         >
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -127,7 +129,7 @@ export default {
   },
   methods: {
     getClient() {
-      const path = basePath + "/client/" + this.client_id;
+      const path = `${basePath}/client/${this.client_id}`;
 
       axios
         .get(path)
@@ -136,19 +138,11 @@ export default {
           this.getUsers();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     patchClient() {
-      const path = basePath + "/client/" + this.client_id;
+      const path = `${basePath}/client/${this.client_id}`;
 
       let owner = "";
 
@@ -175,19 +169,11 @@ export default {
           this.cleanup();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     getUsers() {
-      const path = basePath + "/user";
+      const path = `${basePath}/user`;
 
       axios
         .get(path)
@@ -195,29 +181,13 @@ export default {
           this.users = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.client = {};
       this.$refs.viewClientModal.hide();
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

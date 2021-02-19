@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "78a791b244366c5a8689a350fffb4bd30b59d34f29a6844797ac5de27d6c45f0"
+            "sha256": "145e211e192eb1c0b7e43cc02cfe7a49a46018c81a76b8b5800034c4fde334ee"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -47,13 +47,13 @@
             "index": "pypi",
             "version": "==3.0.10"
         },
-        "flask-login": {
+        "flask-jwt-extended": {
             "hashes": [
-                "sha256:6d33aef15b5bcead780acc339464aae8a6e28f13c90d8b1cf9de8b549d1c0b4b",
-                "sha256:7451b5001e17837ba58945aead261ba425fdf7b4f0448777e597ddab39f4fba0"
+                "sha256:d42015246f61cf7baea474de0657542eb2c3d9b4322cbeac062a418297b265ac",
+                "sha256:e633ca9dcd73aab5d5de5e603e26767cbf0c94be1619bee04ff512ad3ce129d6"
             ],
             "index": "pypi",
-            "version": "==0.5.0"
+            "version": "==4.0.2"
         },
         "flask-migrate": {
             "hashes": [
@@ -187,6 +187,14 @@
             ],
             "index": "pypi",
             "version": "==2.8.5"
+        },
+        "pyjwt": {
+            "hashes": [
+                "sha256:a5c70a06e1f33d81ef25eecd50d50bd30e34de1ca8b2b9fa3fe0daaabcf69bf7",
+                "sha256:b70b15f89dc69b993d8a8d32c299032d5355c82f9b5b7e851d1a6d706dffe847"
+            ],
+            "markers": "python_version >= '3.6'",
+            "version": "==2.0.1"
         },
         "python-dateutil": {
             "hashes": [
@@ -366,7 +374,7 @@
                 "sha256:fbb17c0d0822684b7d6c09915677a32319f16ff1115df5ec05bdcaaee40b35f3",
                 "sha256:fff1f3a586246110f34dc762098b5afd2de88de507559e63553d7da643053786"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4.0'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'",
             "version": "==5.4"
         },
         "distlib": {

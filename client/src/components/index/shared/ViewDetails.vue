@@ -1,7 +1,7 @@
 <template>
   <b-modal
-    @show="getXSS"
-    @hide="cleanup"
+    @show="getXSS()"
+    @hide="cleanup()"
     ref="viewDetailsModal"
     id="view-details-modal"
     title="Details"
@@ -175,7 +175,7 @@ export default {
       return timestampLocal;
     },
     getXSS() {
-      const path = basePath + "/xss/" + this.xss_id;
+      const path = `${basePath}/xss/${this.xss_id}`;
 
       axios
         .get(path)
@@ -183,19 +183,11 @@ export default {
           this.data = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     getSpecificData(loot_type) {
-      const path = basePath + "/xss/" + this.xss_id + "/data/" + loot_type;
+      const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
 
       axios
         .get(path)
@@ -208,15 +200,7 @@ export default {
           this.componentKey += 1;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     cleanSpecificData(loot_type) {

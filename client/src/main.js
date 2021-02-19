@@ -1,8 +1,8 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import App from './App'
-import Login from '@/components/Login'
-import Index from '@/components/Index'
+import Login from '@/components/login/Login'
+import Index from '@/components/index/Index'
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { BootstrapVue, IconsPlugin, BIcon, BIconArrowRepeat, BIconChevronDoubleUp, BIconChevronDoubleDown, BIconTrash, BIconInfo, BIconGear } from 'bootstrap-vue'
@@ -11,7 +11,7 @@ import VueMoment from 'vue-moment'
 import moment from 'moment-timezone'
 import VueCodeHighlight from 'vue-code-highlight'
 import VueClipboard from 'vue-clipboard2'
-
+import { makeToast, handleError } from './utils'
 
 Vue.config.productionTip = false
 VueClipboard.config.autoSetContainer = true
@@ -32,16 +32,23 @@ Vue.component('BIconTrash', BIconTrash)
 Vue.component('BIconInfo', BIconInfo)
 Vue.component('BIconGear', BIconGear)
 
+Vue.mixin({
+    methods: {
+        makeToast,
+        handleError
+    }
+})
+
 const routes = [
-  { path: '/', name: 'Index', component: Index },
-  { path: '/login', name: 'Login', component: Login }
+    { path: '/', name: 'Index', component: Index },
+    { path: '/login', name: 'Login', component: Login }
 ]
 
 const router = new VueRouter({
-  routes
+    routes
 })
 
 new Vue({
-  router,
-  render: h => h(App),
+    router,
+    render: h => h(App),
 }).$mount('#app')

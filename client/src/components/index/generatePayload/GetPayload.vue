@@ -5,7 +5,7 @@
     id="get-payload-modal"
     title="Payload"
     hide-footer
-    @hidden="cleanup"
+    @hidden="cleanup()"
   >
     <b-form v-on:submit.prevent>
       <b-form-group class="text-left">
@@ -77,8 +77,12 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="getPayload" variant="outline-info">Generate</b-button>
-        <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="getPayload()" variant="outline-info"
+          >Generate</b-button
+        >
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -125,7 +129,7 @@ export default {
   },
   methods: {
     getPayload() {
-      const path = basePath + "/xss/generate";
+      const path = `${basePath}/xss/generate`;
       let payload = {
         url: location.origin,
         code: this.options.code_type,
@@ -172,24 +176,8 @@ export default {
           this.xss_payload = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.xss_payload = "";
@@ -199,7 +187,7 @@ export default {
       this.options.other = "";
 
       this.$refs.getPayloadModal.hide();
-      this.$parent.getClients();
+      this.$emit("get-clients");
     },
   },
 };

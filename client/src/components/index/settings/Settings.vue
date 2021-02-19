@@ -5,12 +5,12 @@
     title="Settings"
     hide-footer
     size="md"
-    @show="getSettings"
-    @hide="cleanup"
+    @show="getSettings()"
+    @hide="cleanup()"
   >
     <h3>SMTP settings</h3>
     <hr />
-    <b-form>
+    <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-host"
         label="SMTP server: "
@@ -158,8 +158,8 @@
       </b-form-group>
     </b-form>
     <div class="text-right">
-      <b-button @click="patchSettings" variant="outline-info">Save</b-button>
-      <b-button @click="cleanup" variant="outline-secondary">Cancel</b-button>
+      <b-button @click="patchSettings()" variant="outline-info">Save</b-button>
+      <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
     </div>
   </b-modal>
 </template>
@@ -178,7 +178,7 @@ export default {
   },
   methods: {
     getSettings() {
-      const path = basePath + "/settings";
+      const path = `${basePath}/settings`;
 
       axios
         .get(path)
@@ -186,19 +186,11 @@ export default {
           this.settings = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     patchSettings() {
-      const path = basePath + "/settings";
+      const path = `${basePath}/settings`;
 
       const payload = {};
 
@@ -234,20 +226,12 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-            this.getSettings();
-          }
+          this.handleError(error);
+          this.getSettings();
         });
     },
     testSettings() {
-      const path = basePath + "/settings/smtp_test";
+      const path = `${basePath}/settings/smtp_test`;
 
       const payload = {
         mail_to: this.smtp_test_mail_to,
@@ -260,25 +244,8 @@ export default {
           this.getSettings();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-            this.getSettings();
-          }
+          this.handleError(error);
         });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
     },
     cleanup() {
       this.$refs.settingsModal.hide();

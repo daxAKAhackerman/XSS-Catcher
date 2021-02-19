@@ -14,8 +14,4 @@ class Config(object):
     SECRET_KEY = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = "Lax"
-    REMEMBER_COOKIE_HTTPONLY = True
-    REMEMBER_COOKIE_DURATION = 3600
-    REMEMBER_COOKIE_SAMESITE = "Lax"
+    JWT_ACCESS_TOKEN_EXPIRES = 300

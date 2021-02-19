@@ -5,8 +5,8 @@
     title="Users"
     hide-footer
     size="md"
-    @show="getUsers"
-    @hide="cleanup"
+    @show="getUsers()"
+    @hide="cleanup()"
   >
     <table class="table table-hover">
       <thead>
@@ -77,7 +77,7 @@
       <b-button variant="outline-success" v-b-modal.create-user-modal
         >Create user</b-button
       >
-      <b-button variant="outline-secondary" type="reset" @click="cleanup"
+      <b-button variant="outline-secondary" type="reset" @click="cleanup()"
         >Cancel</b-button
       >
     </div>
@@ -85,27 +85,9 @@
     <b-alert show :variant="alert_type" v-if="show_alert">{{
       alert_msg
     }}</b-alert>
-    <b-modal
-      ref="deleteUserModal"
-      id="delete-user-modal"
-      title="Are you sure?"
-      hide-footer
-    >
-      <b-form>
-        <div class="text-right">
-          <b-button @click="deleteUser" variant="outline-danger"
-            >Yes, delete this user</b-button
-          >
-          <b-button
-            @click="$refs.deleteUserModal.hide()"
-            variant="outline-secondary"
-            >Cancel</b-button
-          >
-        </div>
-      </b-form>
-    </b-modal>
 
-    <CreateUser />
+    <DeleteUser :to_delete="to_delete" @get-users="getUsers" />
+    <CreateUser @get-users="getUsers" />
   </b-modal>
 </template>
 
@@ -114,12 +96,14 @@ import axios from "axios";
 import Vue2Filters from "vue2-filters";
 
 import CreateUser from "./CreateUser";
+import DeleteUser from "./DeleteUser";
 
 const basePath = "/api";
 
 export default {
   components: {
     CreateUser,
+    DeleteUser,
   },
   mixins: [Vue2Filters.mixin],
   data() {
@@ -133,7 +117,7 @@ export default {
   },
   methods: {
     getUsers() {
-      const path = basePath + "/user";
+      const path = `${basePath}/user`;
 
       axios
         .get(path)
@@ -141,43 +125,11 @@ export default {
           this.users = response.data;
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
-        });
-    },
-    deleteUser() {
-      const path = basePath + "/user/" + this.to_delete;
-
-      axios
-        .delete(path)
-        .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
-          this.$refs.deleteUserModal.hide();
-          this.getUsers();
-          this.promote = 0;
-        })
-        .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.$refs.deleteUserModal.hide();
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     promoteUser(promotion, userId) {
-      const path = basePath + "/user/" + userId;
+      const path = `${basePath}/user/${userId}`;
 
       const payload = {
         is_admin: promotion,
@@ -190,34 +142,22 @@ export default {
           this.getUsers();
         })
         .catch((error) => {
-          if (error.response.status === 401) {
-            this.$router.push({ name: "Login" });
-          } else {
-            this.makeToast(
-              error.response.data.detail,
-              "danger",
-              error.response.data.status
-            );
-          }
+          this.handleError(error);
         });
     },
     resetPassword(userId, username) {
-      const path = basePath + "/user/" + userId + "/password";
+      const path = `${basePath}/user/${userId}/password`;
 
-      axios.post(path).then((response) => {
-        this.alert_msg =
-          "New password for user " + username + " is: " + response.data.detail;
-        this.show_alert = true;
-        this.alert_type = "success";
-      });
-    },
-    makeToast(message, variant, title) {
-      this.$root.$bvToast.toast(message, {
-        title: title,
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: variant,
-      });
+      axios
+        .post(path)
+        .then((response) => {
+          this.alert_msg = `New password for user ${username} is: ${response.data.detail}`;
+          this.show_alert = true;
+          this.alert_type = "success";
+        })
+        .catch((error) => {
+          this.handleError(error);
+        });
     },
     cleanup() {
       this.users = [];
