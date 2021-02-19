@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     postClient() {
-      const path = basePath + "/client";
+      const path = `${basePath}/client`;
 
       const payload = {
         name: this.client.name,

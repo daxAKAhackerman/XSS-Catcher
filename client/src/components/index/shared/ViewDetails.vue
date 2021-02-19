@@ -175,7 +175,7 @@ export default {
       return timestampLocal;
     },
     getXSS() {
-      const path = basePath + "/xss/" + this.xss_id;
+      const path = `${basePath}/xss/${this.xss_id}`;
 
       axios
         .get(path)
@@ -187,7 +187,7 @@ export default {
         });
     },
     getSpecificData(loot_type) {
-      const path = basePath + "/xss/" + this.xss_id + "/data/" + loot_type;
+      const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
 
       axios
         .get(path)

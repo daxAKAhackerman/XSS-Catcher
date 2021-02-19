@@ -6,7 +6,7 @@
     hide-footer
   >
     <b-form v-on:submit.prevent>
-      <b-button @click="deleteXSS" variant="outline-danger"
+      <b-button @click="deleteXSS()" variant="outline-danger"
         >Yes, delete this entry</b-button
       >
       <b-button @click="$refs.deleteXSSModal.hide()" variant="outline-secondary"
@@ -24,7 +24,7 @@ export default {
   props: ["to_delete"],
   methods: {
     deleteXSS() {
-      const path = basePath + "/xss/" + this.to_delete;
+      const path = `${basePath}/xss/${this.to_delete}`;
 
       axios
         .delete(path)

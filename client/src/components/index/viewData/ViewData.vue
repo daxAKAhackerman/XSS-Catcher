@@ -251,7 +251,7 @@ export default {
   },
   methods: {
     getData() {
-      const path = basePath + "/xss/data";
+      const path = `${basePath}/xss/data`;
 
       const payload = {
         client_id: this.client_id,
@@ -267,7 +267,7 @@ export default {
         });
     },
     getSpecificData(element_id, loot_type, row_index) {
-      const path = basePath + "/xss/" + element_id + "/data/" + loot_type;
+      const path = `${basePath}/xss/${element_id}/data/${loot_type}`;
 
       axios
         .get(path)

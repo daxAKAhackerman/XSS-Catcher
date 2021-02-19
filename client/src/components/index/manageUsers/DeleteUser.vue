@@ -7,7 +7,7 @@
   >
     <b-form v-on:submit.prevent>
       <div class="text-right">
-        <b-button @click="deleteUser" variant="outline-danger"
+        <b-button @click="deleteUser()" variant="outline-danger"
           >Yes, delete this user</b-button
         >
         <b-button
@@ -29,7 +29,7 @@ export default {
   props: ["to_delete"],
   methods: {
     deleteUser() {
-      const path = basePath + "/user/" + this.to_delete;
+      const path = `${basePath}/user/${this.to_delete}`;
 
       axios
         .delete(path)

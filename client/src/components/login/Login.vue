@@ -51,7 +51,7 @@ export default {
       }
     },
     loginProcess() {
-      const path = basePath + "/user/current";
+      const path = `${basePath}/user/current`;
       axiosLogin
         .get(path)
         .then((response) => {
@@ -69,7 +69,7 @@ export default {
         });
     },
     isAuth() {
-      const path = basePath + "/user/current";
+      const path = `${basePath}/user/current`;
       axiosLogin
         .get(path)
         .then((response) => {

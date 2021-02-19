@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     postLogin() {
-      const path = basePath + "/auth/login";
+      const path = `${basePath}/auth/login`;
       const payload = {
         username: this.form.username,
         password: this.form.password,

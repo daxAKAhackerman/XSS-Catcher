@@ -149,7 +149,7 @@ export default {
   },
   methods: {
     getXSSList() {
-      const path = basePath + "/xss";
+      const path = `${basePath}/xss`;
 
       const payload = {
         client_id: this.client_id,

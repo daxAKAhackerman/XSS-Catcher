@@ -129,7 +129,7 @@ export default {
   },
   methods: {
     getClient() {
-      const path = basePath + "/client/" + this.client_id;
+      const path = `${basePath}/client/${this.client_id}`;
 
       axios
         .get(path)
@@ -142,7 +142,7 @@ export default {
         });
     },
     patchClient() {
-      const path = basePath + "/client/" + this.client_id;
+      const path = `${basePath}/client/${this.client_id}`;
 
       let owner = "";
 
@@ -173,7 +173,7 @@ export default {
         });
     },
     getUsers() {
-      const path = basePath + "/user";
+      const path = `${basePath}/user`;
 
       axios
         .get(path)

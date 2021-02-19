@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     getUsers() {
-      const path = basePath + "/user";
+      const path = `${basePath}/user`;
 
       axios
         .get(path)
@@ -129,7 +129,7 @@ export default {
         });
     },
     promoteUser(promotion, userId) {
-      const path = basePath + "/user/" + userId;
+      const path = `${basePath}/user/${userId}`;
 
       const payload = {
         is_admin: promotion,
@@ -146,16 +146,12 @@ export default {
         });
     },
     resetPassword(userId, username) {
-      const path = basePath + "/user/" + userId + "/password";
+      const path = `${basePath}/user/${userId}/password`;
 
       axios
         .post(path)
         .then((response) => {
-          this.alert_msg =
-            "New password for user " +
-            username +
-            " is: " +
-            response.data.detail;
+          this.alert_msg = `New password for user ${username} is: ${response.data.detail}`;
           this.show_alert = true;
           this.alert_type = "success";
         })

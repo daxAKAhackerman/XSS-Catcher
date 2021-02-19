@@ -129,7 +129,7 @@ export default {
   },
   methods: {
     getPayload() {
-      const path = basePath + "/xss/generate";
+      const path = `${basePath}/xss/generate`;
       let payload = {
         url: location.origin,
         code: this.options.code_type,

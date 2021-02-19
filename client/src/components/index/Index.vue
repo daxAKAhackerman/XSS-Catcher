@@ -32,7 +32,10 @@
     </b-row>
 
     <AddClient @get-clients="getClients(false)" />
-    <GetPayload :client_id="viewed_client.id" @get-clients="getClients(false)" />
+    <GetPayload
+      :client_id="viewed_client.id"
+      @get-clients="getClients(false)"
+    />
     <ViewData
       :client_id="viewed_client.id"
       :is_admin="user.is_admin"
@@ -110,7 +113,7 @@ export default {
   },
   methods: {
     getClients(is_refresh) {
-      const path = basePath + "/client";
+      const path = `${basePath}/client`;
       axios
         .get(path)
         .then((response) => {
@@ -126,7 +129,7 @@ export default {
         });
     },
     logout() {
-      const path = basePath + "/auth/logout";
+      const path = `${basePath}/auth/logout`;
       axiosRefresh
         .post(path)
         .then((response) => {
@@ -140,7 +143,7 @@ export default {
         });
     },
     getUser() {
-      const path = basePath + "/user/current";
+      const path = `${basePath}/user/current`;
       axios
         .get(path)
         .then((response) => {

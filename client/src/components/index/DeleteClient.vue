@@ -28,7 +28,7 @@ export default {
   props: ["to_delete"],
   methods: {
     deleteClient() {
-      const path = basePath + "/client/" + this.to_delete;
+      const path = `${basePath}/client/${this.to_delete}`;
       axios
         .delete(path)
         .then((response) => {

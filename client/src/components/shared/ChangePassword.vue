@@ -53,8 +53,12 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="changePassword()" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="changePassword()" variant="outline-info"
+          >Save</b-button
+        >
+        <b-button @click="cleanup()" variant="outline-secondary"
+          >Cancel</b-button
+        >
       </div>
     </b-form>
   </b-modal>
@@ -76,7 +80,7 @@ export default {
   },
   methods: {
     changePassword() {
-      const path = basePath + "/user/password";
+      const path = `${basePath}/user/password`;
 
       const payload = {
         old_password: this.old_password,

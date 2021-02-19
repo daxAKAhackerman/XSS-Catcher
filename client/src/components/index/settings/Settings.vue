@@ -178,7 +178,7 @@ export default {
   },
   methods: {
     getSettings() {
-      const path = basePath + "/settings";
+      const path = `${basePath}/settings`;
 
       axios
         .get(path)
@@ -190,7 +190,7 @@ export default {
         });
     },
     patchSettings() {
-      const path = basePath + "/settings";
+      const path = `${basePath}/settings`;
 
       const payload = {};
 
@@ -231,7 +231,7 @@ export default {
         });
     },
     testSettings() {
-      const path = basePath + "/settings/smtp_test";
+      const path = `${basePath}/settings/smtp_test`;
 
       const payload = {
         mail_to: this.smtp_test_mail_to,
