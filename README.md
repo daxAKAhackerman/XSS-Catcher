@@ -32,7 +32,6 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 -   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs2](https://github.com/Valve/fingerprintjs2)
 -   Captures the full DOM so you can easily know where the payload triggered
 -   Granular deletion of captured data
--   Uses db initialisation scripts with Flask-Migrate, so using an alternative database only requires minor modifications of the docker-compose.yml file
 
 ## Installation
 
@@ -90,6 +89,34 @@ In order to avoid JavaScript mixed content errors when the XSS payload is trigge
 ### Database looks empty after migrating from v1.0.0 to v1.1.0 and up
 
 Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default.
+
+### I accidentally deleted the `.env` file that contained my database password
+
+You can set a new database password by following these steps:
+
+```bash
+# While XSS Catcher is running, attach to the database container
+$ docker exec -it xss-catcher_db_1 bash
+
+# Log into the PostgreSQL database
+$ psql -U user xss
+
+# Set a new password for the user "user"
+$ \password user
+
+# Exit PostgreSQL and the container
+$ exit
+$ exit
+
+# Create a new file in the XSS Catcher directory named ".env" with the following content
+POSTGRES_PASSWORD=YOUR_NEW_PASSWORD
+POSTGRES_USER=user
+POSTGRES_DB=xss
+
+# Stop the application and start it again
+$ make stop
+$ make start
+```
 
 ###
 
