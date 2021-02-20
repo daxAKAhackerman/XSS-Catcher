@@ -29,7 +29,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 -   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
 -   Allows capture of cookies, local storage, session storage and any other specified parameters
 -   Payload can be customized by the users as he pleases. Simply pass your data in the query string or POST body and the application will catch it!
--   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs2](https://github.com/Valve/fingerprintjs2)
+-   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
 -   Captures the full DOM so you can easily know where the payload triggered
 -   Granular deletion of captured data
 
@@ -125,7 +125,7 @@ $ make start
 -   [Flask](https://flask.palletsprojects.com/)
 -   [VueJS](https://vuejs.org/)
 -   [BootstrapVue](https://bootstrap-vue.org/)
--   [Fingerprint.js](https://github.com/Valve/fingerprintjs2)
+-   [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs)
 -   [html2canvas](https://github.com/niklasvh/html2canvas)
 -   [Bootswatch Slate theme](https://bootswatch.com/slate/)
 -   [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
