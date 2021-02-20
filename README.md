@@ -32,7 +32,6 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 -   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs2](https://github.com/Valve/fingerprintjs2)
 -   Captures the full DOM so you can easily know where the payload triggered
 -   Granular deletion of captured data
--   Uses db initialisation scripts with Flask-Migrate, so using an alternative database only requires minor modifications of the docker-compose.yml file
 
 ## Installation
 
