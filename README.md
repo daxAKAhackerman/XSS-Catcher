@@ -90,7 +90,7 @@ In order to avoid JavaScript mixed content errors when the XSS payload is trigge
 
 Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default.
 
-### I accidentaly deleted the `.env` file that contained my database password
+### I accidentally deleted the `.env` file that contained my database password
 
 You can set a new database password by following these steps:
 
