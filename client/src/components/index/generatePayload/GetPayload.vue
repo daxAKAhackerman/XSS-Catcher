@@ -1,90 +1,75 @@
 <template>
   <b-modal
-    size="md"
+    size=""
     ref="getPayloadModal"
     id="get-payload-modal"
     title="Payload"
     hide-footer
     @hidden="cleanup()"
   >
-    <b-form v-on:submit.prevent>
-      <b-form-group class="text-left">
-        <div v-if="xss_payload !== ''">
-          <b-form-group>
-            <b-form-textarea
-              rows="3"
-              no-auto-shrink
-              readonly
-              v-model="xss_payload"
-            ></b-form-textarea>
-            <br />
-            <b-link
-              v-clipboard:copy="xss_payload"
-              @click="
-                makeToast('Payload copied to clipboard. ', 'success', 'OK')
-              "
-              >Copy to clipboard</b-link
-            >
-          </b-form-group>
-          <hr />
-        </div>
-        <b-form-group label="XSS type: ">
-          <b-form-radio-group
-            v-model="options.stored"
-            :options="options.typeList"
-            buttons
-            button-variant="outline-primary"
-          ></b-form-radio-group>
-        </b-form-group>
-        <hr />
-        <b-form-group label="Gather data: ">
-          <b-form-checkbox-group
-            @change="options.gatherAll = []"
-            v-model="options.gatherData"
-            :options="options.gatherDataList"
-            buttons
-            button-variant="outline-primary"
-          ></b-form-checkbox-group>
-          <br />
-          <br />
-          <b-form-checkbox-group
-            @change="options.gatherData = []"
-            v-model="options.gatherAll"
-            :options="options.gatherAllList"
-            buttons
-            button-variant="outline-primary"
-          ></b-form-checkbox-group>
-        </b-form-group>
-        <hr />
-        <b-form-group label="Code type: ">
-          <b-form-radio-group
-            v-model="options.code_type"
-            :options="options.codeTypeList"
-            buttons
-            button-variant="outline-primary"
-          ></b-form-radio-group>
-        </b-form-group>
-        <hr />
-      </b-form-group>
+    <div v-if="xss_payload !== ''">
+      <b-form-textarea
+        rows="3"
+        no-auto-shrink
+        readonly
+        v-model="xss_payload"
+      ></b-form-textarea>
+      <br />
+      <b-link
+        v-clipboard:copy="xss_payload"
+        @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
+        >Copy to clipboard</b-link
+      >
+      <hr />
+    </div>
+    <b-form-radio-group
+      class="payload-double-selector"
+      v-model="options.stored"
+      :options="options.typeList"
+      buttons
+      button-variant="outline-primary"
+    ></b-form-radio-group>
+    <hr />
+    <b-form-radio-group
+      class="payload-double-selector"
+      v-model="options.code_type"
+      :options="options.codeTypeList"
+      buttons
+      button-variant="outline-primary"
+    ></b-form-radio-group>
+    <hr />
+    <b-form-checkbox-group
+      class="payload-single-selector"
+      stacked
+      @change="options.gatherAll = []"
+      v-model="options.gatherData"
+      :options="options.gatherDataList"
+      buttons
+      button-variant="outline-primary"
+    ></b-form-checkbox-group>
+    <br />
+    <br />
+    <b-form-checkbox-group
+      class="payload-single-selector"
+      @change="options.gatherData = []"
+      v-model="options.gatherAll"
+      :options="options.gatherAllList"
+      buttons
+      button-variant="outline-primary"
+    ></b-form-checkbox-group>
+    <hr />
 
-      <b-form-group label="Other data: ">
-        <b-form-input
-          @keyup.enter="getPayload"
-          v-model="options.other"
-          name="input"
-          label="Other data: "
-          placeholder="param1=value1&param2=value2"
-        ></b-form-input>
-      </b-form-group>
-      <div class="text-right">
-        <b-button @click="getPayload()" variant="outline-info"
-          >Generate</b-button
-        >
-        <b-button @click="cleanup()" variant="outline-secondary"
-          >Cancel</b-button
-        >
-      </div>
-    </b-form>
+    <b-form-input
+      @keyup.enter="getPayload"
+      v-model="options.other"
+      name="input"
+      label="Other data: "
+      placeholder="param1=value1&param2=value2"
+    ></b-form-input>
+    <div class="text-right">
+      <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
+      <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+    </div>
   </b-modal>
 </template>
 
@@ -194,6 +179,18 @@ export default {
 </script>
 
 <style>
+.payload-single-selector {
+  width: 100%;
+}
+
+.payload-double-selector {
+  width: 100%;
+}
+
+.payload-double-selector label {
+  width: 50%;
+}
+
 .btn-outline-primary:not(:disabled):not(.disabled):active,
 .btn-outline-primary:not(:disabled):not(.disabled).active,
 .show > .btn-outline-primary.dropdown-toggle {
