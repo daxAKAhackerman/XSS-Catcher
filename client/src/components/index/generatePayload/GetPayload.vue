@@ -22,28 +22,31 @@
       >
       <hr />
     </div>
+    <p>XSS type</p>
     <b-form-radio-group
       class="payload-double-selector"
-      v-model="options.stored"
-      :options="options.typeList"
+      v-model="xss_type"
+      :options="options.xss_type"
       buttons
       button-variant="outline-primary"
     ></b-form-radio-group>
     <hr />
+    <p>Code type</p>
     <b-form-radio-group
       class="payload-double-selector"
-      v-model="options.code_type"
-      :options="options.codeTypeList"
+      v-model="code_type"
+      :options="options.code_type"
       buttons
       button-variant="outline-primary"
     ></b-form-radio-group>
     <hr />
+    <p>Data to gather</p>
     <b-form-checkbox-group
       class="payload-single-selector"
       stacked
-      @change="options.gatherAll = []"
-      v-model="options.gatherData"
-      :options="options.gatherDataList"
+      @change="all = []"
+      v-model="to_gather"
+      :options="options.to_gather"
       buttons
       button-variant="outline-primary"
     ></b-form-checkbox-group>
@@ -51,21 +54,34 @@
     <br />
     <b-form-checkbox-group
       class="payload-single-selector"
-      @change="options.gatherData = []"
-      v-model="options.gatherAll"
-      :options="options.gatherAllList"
+      @change="to_gather = []"
+      v-model="all"
+      :options="options.all"
       buttons
       button-variant="outline-primary"
     ></b-form-checkbox-group>
     <hr />
-
-    <b-form-input
-      @keyup.enter="getPayload"
-      v-model="options.other"
-      name="input"
-      label="Other data: "
-      placeholder="param1=value1&param2=value2"
-    ></b-form-input>
+    <p>Additionnal parameters</p>
+    <div v-for="data in other_data" :key="data.id">
+      <b-row>
+        <b-col sm="4">
+          <b-form-input v-model="data.key" name="input"></b-form-input>
+        </b-col>
+        <b-col sm="4">
+          <b-form-input v-model="data.value" name="input"></b-form-input>
+        </b-col>
+        <b-col sm="2">
+          <b-button
+            @click="other_data.push({ id: data.id + 1, key: '', value: '' })"
+            >+</b-button
+          >
+        </b-col>
+        <b-col sm="2">
+          <b-button>-</b-button>
+        </b-col>
+      </b-row>
+    </div>
+    <br />
     <div class="text-right">
       <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
       <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
@@ -83,33 +99,33 @@ export default {
   data() {
     return {
       options: {
-        gatherData: [],
-        gatherAll: [],
-        gatherDataList: [
+        to_gather: [
           { text: "Local storage", value: "local_storage" },
           { text: "Session storage", value: "session_storage" },
           { text: "Cookies", value: "cookies" },
-          { text: "Origin URL", value: "geturl" },
+          { text: "Origin URL", value: "origin_url" },
+          { text: "Referrer", value: "referrer" },
+          { text: "DOM", value: "dom" },
+          { text: "Screenshot", value: "screenshot" },
+          { text: "Fingerprint", value: "fingerprint" },
         ],
-        typeList: [
-          { text: "Reflected", value: false },
-          { text: "Stored", value: true },
+        xss_type: [
+          { text: "Stored", value: "stored" },
+          { text: "Reflected", value: "reflected" },
         ],
-        codeTypeList: [
+        code_type: [
           { text: "HTML", value: "html" },
           { text: "JavaScript", value: "js" },
         ],
-        gatherAllList: [
-          {
-            text: "All of the above + screenshot/fingerprint/DOM",
-            value: "all",
-          },
-        ],
-        stored: false,
-        code_type: "html",
-        other: "",
+        all: [{ text: "All of the above", value: "all" }],
       },
+      to_gather: [],
+      all: [],
+      xss_type: "stored",
+      code_type: "html",
       xss_payload: "",
+      number_of_other_data: 0,
+      other_data: [],
     };
   },
   methods: {
