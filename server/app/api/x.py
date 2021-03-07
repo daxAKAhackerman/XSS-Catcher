@@ -31,7 +31,10 @@ def catch_xss(flavor, uid):
     if request.method == "GET":
         parameters = request.args.to_dict()
     elif request.method == "POST":
-        parameters = request.get_json()
+        if request.is_json:
+            parameters = request.get_json()
+        else:
+            parameters = request.form
 
     headers = []
     for header in request.headers:

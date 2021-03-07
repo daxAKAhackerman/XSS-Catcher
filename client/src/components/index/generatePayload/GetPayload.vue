@@ -1,6 +1,6 @@
 <template>
   <b-modal
-    size=""
+    size="xl"
     ref="getPayloadModal"
     id="get-payload-modal"
     title="Payload"
@@ -43,7 +43,6 @@
     <p>Data to gather</p>
     <b-form-checkbox-group
       class="payload-single-selector"
-      stacked
       @change="all = []"
       v-model="to_gather"
       :options="options.to_gather"
@@ -61,26 +60,40 @@
       button-variant="outline-primary"
     ></b-form-checkbox-group>
     <hr />
-    <p>Additionnal parameters</p>
-    <div v-for="data in other_data" :key="data.id">
+    <p>Custom tags</p>
+    <div v-for="(data, index) in custom_tags" :key="index">
       <b-row>
-        <b-col sm="4">
-          <b-form-input v-model="data.key" name="input"></b-form-input>
+        <b-col sm="5">
+          <b-form-input
+            placeholder="key"
+            v-model="data.key"
+            name="input"
+          ></b-form-input>
         </b-col>
-        <b-col sm="4">
-          <b-form-input v-model="data.value" name="input"></b-form-input>
+        <b-col sm="5">
+          <b-form-input
+            placeholder="value"
+            v-model="data.value"
+            name="input"
+          ></b-form-input>
         </b-col>
         <b-col sm="2">
           <b-button
-            @click="other_data.push({ id: data.id + 1, key: '', value: '' })"
-            >+</b-button
+            block
+            variant="outline-danger"
+            @click="custom_tags.splice(index, 1)"
+            >-</b-button
           >
         </b-col>
-        <b-col sm="2">
-          <b-button>-</b-button>
-        </b-col>
       </b-row>
+      <br />
     </div>
+    <b-button
+      block
+      variant="outline-success"
+      @click="custom_tags.push({ key: '', value: '' })"
+      >+</b-button
+    >
     <br />
     <div class="text-right">
       <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
@@ -110,8 +123,8 @@ export default {
           { text: "Fingerprint", value: "fingerprint" },
         ],
         xss_type: [
-          { text: "Stored", value: "stored" },
-          { text: "Reflected", value: "reflected" },
+          { text: "Stored", value: "s" },
+          { text: "Reflected", value: "r" },
         ],
         code_type: [
           { text: "HTML", value: "html" },
@@ -121,11 +134,10 @@ export default {
       },
       to_gather: [],
       all: [],
-      xss_type: "stored",
+      xss_type: "s",
       code_type: "html",
       xss_payload: "",
-      number_of_other_data: 0,
-      other_data: [],
+      custom_tags: [],
     };
   },
   methods: {
@@ -133,59 +145,42 @@ export default {
       const path = `${basePath}/xss/generate`;
       let payload = {
         url: location.origin,
-        code: this.options.code_type,
+        code_type: this.code_type,
+        xss_type: this.xss_type,
         client_id: this.client_id,
+        to_gather: this.to_gather,
+        custom_tags: this.custom_tags,
       };
 
-      if (this.options.gatherAll.includes("all")) {
-        payload.i_want_it_all = 1;
-      }
-
-      if (this.options.gatherData.includes("cookies")) {
-        payload.cookies = 1;
-      }
-
-      if (this.options.gatherData.includes("local_storage")) {
-        payload.local_storage = 1;
-      }
-
-      if (this.options.gatherData.includes("session_storage")) {
-        payload.session_storage = 1;
-      }
-
-      if (this.options.stored) {
-        payload.stored = 1;
-      }
-
-      if (this.options.gatherData.includes("geturl")) {
-        payload.geturl = 1;
-      }
-
-      if (this.options.other) {
-        const otherDataList = this.options.other.split("&");
-        let otherDataDict = {};
-        for (const element of otherDataList) {
-          const element_splitted = element.split("=");
-          otherDataDict[element_splitted[0]] = element_splitted[1];
-        }
-        payload = Object.assign(payload, otherDataDict);
+      if (this.all.includes("all")) {
+        payload.to_gather = [
+          "local_storage",
+          "session_storage",
+          "cookies",
+          "origin_url",
+          "referrer",
+          "dom",
+          "screenshot",
+          "fingerprint",
+        ];
       }
 
       axios
-        .get(path, { params: payload })
+        .post(path, payload)
         .then((response) => {
-          this.xss_payload = response.data;
+          this.xss_payload = response.data.detail;
         })
         .catch((error) => {
           this.handleError(error);
         });
     },
     cleanup() {
+      this.to_gather = [];
+      this.all = [];
+      this.xss_type = "stored";
+      this.code_type = "html";
       this.xss_payload = "";
-      this.options.gatherData = [];
-      this.options.stored = false;
-      this.options.code_type = "html";
-      this.options.other = "";
+      this.custom_tags = [];
 
       this.$refs.getPayloadModal.hide();
       this.$emit("get-clients");
