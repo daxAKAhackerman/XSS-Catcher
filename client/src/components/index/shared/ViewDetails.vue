@@ -23,6 +23,12 @@
       </b-tr>
       <b-tr>
         <b-td valign="top">
+          <b>Tags:</b>
+        </b-td>
+        <b-td><b-badge variant="info" v-for="tag in data.tags" :key="tag">{{ tag }}</b-badge></b-td>
+      </b-tr>
+      <b-tr>
+        <b-td valign="top">
           <b>HTTP headers:</b>
         </b-td>
         <b-td>

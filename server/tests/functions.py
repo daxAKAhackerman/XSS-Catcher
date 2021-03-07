@@ -51,6 +51,10 @@ def post_x(client, headers, xss_type, uid, **kwargs):
     return client.post(f"/api/x/{xss_type}/{uid}", data=json.dumps(kwargs), content_type="application/json", headers=headers)
 
 
+def post_x_form(client, headers, xss_type, uid, **kwargs):
+    return client.post(f"/api/x/{xss_type}/{uid}", data=kwargs, headers=headers)
+
+
 def get_x(client, headers, xss_type, uid, **kwargs):
     return client.get(f"/api/x/{xss_type}/{uid}", query_string=kwargs, headers=headers)
 
@@ -105,7 +109,7 @@ def get_users(client, headers):
 
 
 def generate_payload(client, headers, **kwargs):
-    return client.get(f"/api/xss/generate", query_string=kwargs, headers=headers)
+    return client.post(f"/api/xss/generate", data=json.dumps(kwargs), content_type="application/json", headers=headers)
 
 
 def delete_xss(client, headers, id):

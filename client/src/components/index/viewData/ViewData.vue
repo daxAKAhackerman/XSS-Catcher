@@ -39,6 +39,7 @@
         :fields="fields"
         :items="data[element_name]"
         :filter="search"
+        :filter-function="filterFunction"
         hover
         style="table-layout: fixed; width: 100%"
         thead-class="invisible"
@@ -176,6 +177,11 @@
             </div>
           </div>
         </template>
+        <template v-slot:cell(tags)="row">
+          <b-badge variant="info" v-for="tag in tags[Object.keys(row.item)[0]]" :key="tag">{{
+            tag
+          }}</b-badge>
+        </template>
         <template v-slot:cell(action)="row">
           <b-button
             type="button"
@@ -234,7 +240,10 @@ export default {
       fields: [
         {
           key: "data",
-          class: "text-left width88",
+          class: "text-left width75",
+        },
+        {
+          key: "tags",
         },
         {
           key: "action",
@@ -242,6 +251,7 @@ export default {
         },
       ],
       data: {},
+      tags: {},
       to_delete: 0,
       to_delete_type: "",
       search: "",
@@ -260,6 +270,8 @@ export default {
       axios
         .get(path, { params: payload })
         .then((response) => {
+          this.tags = response.data.tags;
+          delete response.data.tags;
           this.data = response.data;
         })
         .catch((error) => {
@@ -285,6 +297,15 @@ export default {
           this.handleError(error);
         });
     },
+    filterFunction(item, filter) {
+      if (JSON.stringify(Object.values(item)[0]).includes(filter)) {
+        return true;
+      } else if (this.tags[Object.keys(item)[0]].join().includes(filter)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     cleanSpecificData(element_id, loot_type, row_index) {
       this.data[loot_type][row_index][element_id] = "";
       this.componentKey += 1;
@@ -300,8 +321,8 @@ export default {
 </script>
 
 <style>
-.width88 {
-  width: 88%;
+.width75 {
+  width: 75%;
 }
 .invisible {
   display: none;

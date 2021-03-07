@@ -14,9 +14,10 @@ def test_new_xss(client):
     client_obj = Client.query.filter_by(id=1).first()
     post_x(
         client,
-        access_header,
+        {},
         "r",
         client_obj.uid,
+        tags="tag1,tag2",
         cookies="cookie=good",
         local_storage='{"local":"good"}',
         session_storage='{"session":"good"}',
@@ -24,9 +25,11 @@ def test_new_xss(client):
         fingerprint='["good"]',
         dom="<br />",
     )
-    get_x(client, {**access_header, "X-Forwarded-For": "127.0.0.2"}, "s", client_obj.uid)
+    get_x(client, {"X-Forwarded-For": "127.0.0.2"}, "s", client_obj.uid)
+    post_x_form(client, {}, "s", client_obj.uid, cookies="cookie=good")
     xss1 = XSS.query.filter_by(id=1).first()
     xss2 = XSS.query.filter_by(id=2).first()
+    xss3 = XSS.query.filter_by(id=3).first()
     xss1_json = json.loads(xss1.data)
     assert xss1_json["cookies"][0] == {"cookie": "good"}
     assert xss1_json["local_storage"][0] == {"local": "good"}
@@ -36,15 +39,18 @@ def test_new_xss(client):
     assert xss1_json["dom"] == "<html>\n<br />\n</html>"
     assert xss1.xss_type == "reflected"
     assert xss1.ip_addr == "127.0.0.1"
+    assert xss1.tags == '["tag1", "tag2"]'
     for header in json.loads(xss1.headers):
         if "User-Agent" in header.keys():
             assert "werkzeug" in header["User-Agent"]
     int(xss1.timestamp)
     assert xss2.xss_type == "stored"
     assert xss2.ip_addr == "127.0.0.2"
+    xss3_json = json.loads(xss3.data)
+    assert xss3_json["cookies"][0] == {"cookie": "good"}
     rv = get_x(client, access_header, "r", "AAAAA")
     assert rv._status_code == 200
-    assert XSS.query.count() == 2
+    assert XSS.query.count() == 3
     patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca")
     edit_client(client, access_header, 1, mail_to="dax@hackerman.ca")
     get_x(client, access_header, "s", client_obj.uid)

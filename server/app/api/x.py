@@ -73,11 +73,10 @@ def catch_xss(flavor, uid):
                     data["session_storage"].append({element[0]: element[1]})
         else:
             if value != "" and value != "{}":
-                if param == "fingerprint":
-                    data["fingerprint"] = json.loads(value)
                 if param == "dom":
                     data["dom"] = "<html>\n{}\n</html>".format(value)
-                if param == "tags":
+                    print(data)
+                elif param == "tags":
                     tags = value.split(",")
                 else:
                     data[param] = value
