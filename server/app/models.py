@@ -60,7 +60,7 @@ class XSS(db.Model):
     headers = db.Column(db.Text)
     ip_addr = db.Column(db.String(15))
     data = db.Column(db.Text)
-    tags = db.Column(db.Text, default="[]", nullable=True)
+    tags = db.Column(db.Text, default="[]", nullable=False)
     timestamp = db.Column(db.Integer)
     client_id = db.Column(db.Integer, db.ForeignKey("client.id"))
     xss_type = db.Column(db.String(9))
