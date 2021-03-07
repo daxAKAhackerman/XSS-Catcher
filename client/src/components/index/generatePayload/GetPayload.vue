@@ -60,40 +60,8 @@
       button-variant="outline-primary"
     ></b-form-checkbox-group>
     <hr />
-    <p>Custom tags</p>
-    <div v-for="(data, index) in custom_tags" :key="index">
-      <b-row>
-        <b-col sm="5">
-          <b-form-input
-            placeholder="key"
-            v-model="data.key"
-            name="input"
-          ></b-form-input>
-        </b-col>
-        <b-col sm="5">
-          <b-form-input
-            placeholder="value"
-            v-model="data.value"
-            name="input"
-          ></b-form-input>
-        </b-col>
-        <b-col sm="2">
-          <b-button
-            block
-            variant="outline-danger"
-            @click="custom_tags.splice(index, 1)"
-            >-</b-button
-          >
-        </b-col>
-      </b-row>
-      <br />
-    </div>
-    <b-button
-      block
-      variant="outline-success"
-      @click="custom_tags.push({ key: '', value: '' })"
-      >+</b-button
-    >
+    <p>Tags</p>
+    <b-form-tags tag-variant="info" v-model="tags"></b-form-tags>
     <br />
     <div class="text-right">
       <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
@@ -137,7 +105,7 @@ export default {
       xss_type: "s",
       code_type: "html",
       xss_payload: "",
-      custom_tags: [],
+      tags: [],
     };
   },
   methods: {
@@ -149,7 +117,7 @@ export default {
         xss_type: this.xss_type,
         client_id: this.client_id,
         to_gather: this.to_gather,
-        custom_tags: this.custom_tags,
+        tags: this.tags,
       };
 
       if (this.all.includes("all")) {
@@ -177,10 +145,10 @@ export default {
     cleanup() {
       this.to_gather = [];
       this.all = [];
-      this.xss_type = "stored";
+      this.xss_type = "s";
       this.code_type = "html";
       this.xss_payload = "";
-      this.custom_tags = [];
+      this.tags = [];
 
       this.$refs.getPayloadModal.hide();
       this.$emit("get-clients");

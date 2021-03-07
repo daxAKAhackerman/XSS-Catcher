@@ -33,9 +33,15 @@ var FingerprintJS = function (e) { "use strict"; function t(e, t) { e = [e[0] >>
 
 
 async function gatherData(data_to_query) {
-    let data_to_send = data_to_query.custom_tags
+    let data_to_send = {}
+    if (data_to_query?.legacy_tags) {
+        data_to_send = data_to_query.legacy_tags
+    }
 
     try {
+        if (data_to_query.tags.length > 0) {
+            data_to_send.tags = data_to_query.tags.join()
+        }
         if (data_to_query.to_gather.includes("local_storage")) {
             data_to_send.local_storage = JSON.stringify(localStorage)
         }
@@ -76,17 +82,17 @@ function serverCallback(baseURL, data) {
 
 function sendData() {
 
-    let data_to_query = { url: "", to_gather: [], custom_tags: {} }
+    let data_to_query = { url: "", to_gather: [], tags: [], legacy_tags: {} }
 
     if (arguments.length === 1) {
         data_to_query = JSON.parse(atob(arguments[0]))
     } else if (arguments.length === 2) {
         data_to_query.url = arguments[0]
         data_to_query.to_gather = ["local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"]
-        const tag_list = arguments[1].split("&")
-        for (const tag of tag_list) {
-            const tag_splitted = tag.split("=")
-            data_to_query.custom_tags[tag_splitted[0]] = tag_splitted[1]
+        const legacy_tag_list = arguments[1].split("&")
+        for (const legacy_tag of legacy_tag_list) {
+            const legacy_tag_splitted = legacy_tag.split("=")
+            data_to_query.legacy_tags[legacy_tag_splitted[0]] = legacy_tag_splitted[1]
         }
     }
 

@@ -37,6 +37,7 @@ def catch_xss(flavor, uid):
             parameters = request.form
 
     headers = []
+    tags = []
     for header in request.headers:
         headers.append({header[0]: header[1]})
 
@@ -76,10 +77,20 @@ def catch_xss(flavor, uid):
                     data["fingerprint"] = json.loads(value)
                 if param == "dom":
                     data["dom"] = "<html>\n{}\n</html>".format(value)
+                if param == "tags":
+                    tags = value.split(",")
                 else:
                     data[param] = value
 
-    xss = XSS(headers=json.dumps(headers), ip_addr=ip_addr, client_id=client.id, xss_type=xss_type, data=json.dumps(data), timestamp=int(time.time()))
+    xss = XSS(
+        headers=json.dumps(headers),
+        ip_addr=ip_addr,
+        client_id=client.id,
+        xss_type=xss_type,
+        data=json.dumps(data),
+        timestamp=int(time.time()),
+        tags=json.dumps(tags),
+    )
     db.session.add(xss)
     db.session.commit()
 
