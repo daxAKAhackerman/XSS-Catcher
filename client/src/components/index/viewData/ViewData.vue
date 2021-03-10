@@ -178,9 +178,12 @@
           </div>
         </template>
         <template v-slot:cell(tags)="row">
-          <b-badge variant="info" v-for="tag in tags[Object.keys(row.item)[0]]" :key="tag">{{
-            tag
-          }}</b-badge>
+          <b-badge
+            variant="info"
+            v-for="tag in tags[Object.keys(row.item)[0]]"
+            :key="tag"
+            >{{ tag }}</b-badge
+          >
         </template>
         <template v-slot:cell(action)="row">
           <b-button
@@ -278,18 +281,19 @@ export default {
           this.handleError(error);
         });
     },
-    getSpecificData(element_id, loot_type, row_index) {
+    getSpecificData(element_id, loot_type) {
       const path = `${basePath}/xss/${element_id}/data/${loot_type}`;
 
       axios
         .get(path)
         .then((response) => {
-          if (loot_type === "fingerprint") {
-            this.data[loot_type][row_index][element_id] = JSON.parse(
-              response.data.data
-            );
-          } else {
-            this.data[loot_type][row_index][element_id] = response.data.data;
+          for (const [index, xss] of this.data[loot_type].entries()) {
+            if (Object.keys(xss)[0] == element_id) {
+              this.data[loot_type][index][element_id] =
+                loot_type === "fingerprint"
+                  ? JSON.parse(response.data.data)
+                  : response.data.data;
+            }
           }
           this.componentKey += 1;
         })
@@ -306,8 +310,12 @@ export default {
         return false;
       }
     },
-    cleanSpecificData(element_id, loot_type, row_index) {
-      this.data[loot_type][row_index][element_id] = "";
+    cleanSpecificData(element_id, loot_type) {
+      for (const [index, xss] of this.data[loot_type].entries()) {
+        if (Object.keys(xss)[0] == element_id) {
+          this.data[loot_type][index][element_id] = "";
+        }
+      }
       this.componentKey += 1;
     },
     cleanup() {
