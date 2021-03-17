@@ -36,10 +36,10 @@ def catch_xss(flavor, uid):
         else:
             parameters = request.form
 
-    headers = []
+    headers = {}
     tags = []
     for header in request.headers:
-        headers.append({header[0]: header[1]})
+        headers.update({header[0]: header[1]})
 
     data = {}
 
@@ -48,34 +48,33 @@ def catch_xss(flavor, uid):
         if param == "cookies":
             if value != "":
                 if "cookies" not in data.keys():
-                    data["cookies"] = []
+                    data["cookies"] = {}
                 cookies_list = value.split("; ")
                 for cookie in cookies_list:
                     cookie_array = cookie.split("=")
                     cookie_name = cookie_array[0]
                     cookie_value = "".join(cookie_array[1:])
-                    data["cookies"].append({cookie_name: cookie_value})
+                    data["cookies"].update({cookie_name: cookie_value})
 
         elif param == "local_storage":
             if value != "" and value != "{}":
                 if "local_storage" not in data.keys():
-                    data["local_storage"] = []
+                    data["local_storage"] = {}
                 local_storage = json.loads(value)
-                for element in local_storage.items():
-                    data["local_storage"].append({element[0]: element[1]})
+                for element_name, element_value in local_storage.items():
+                    data["local_storage"].update({element_name: element_value})
 
         elif param == "session_storage":
             if value != "" and value != "{}":
                 if "session_storage" not in data.keys():
-                    data["session_storage"] = []
+                    data["session_storage"] = {}
                 session_storage = json.loads(value)
-                for element in session_storage.items():
-                    data["session_storage"].append({element[0]: element[1]})
+                for element_name, element_value in session_storage.items():
+                    data["session_storage"].update({element_name: element_value})
         else:
             if value != "" and value != "{}":
                 if param == "dom":
                     data["dom"] = "<html>\n{}\n</html>".format(value)
-                    print(data)
                 elif param == "tags":
                     tags = value.split(",")
                 else:

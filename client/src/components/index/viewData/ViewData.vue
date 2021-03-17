@@ -30,14 +30,14 @@
       </b-col>
     </b-row>
     <div
-      v-for="(element_value, element_name) in data"
+      v-for="(element_value, element_name) in dataObject"
       v-bind:key="element_name"
     >
       <h4>{{ element_name }}</h4>
 
       <b-table
         :fields="fields"
-        :items="data[element_name]"
+        :items="element_value"
         :filter="search"
         :filter-function="filterFunction"
         hover
@@ -48,34 +48,18 @@
           <div style="word-wrap: break-word">
             <div v-if="element_name == 'screenshot'">
               <p>
-                <a
-                  href="#"
-                  v-b-toggle="
-                    'collapse-img-' + String(Object.keys(row.item)[0])
-                  "
+                <a href="#" v-b-toggle="`collapse-img-${row.item.xss_id}`"
                   >[Click to view screenshot...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="'collapse-img-' + String(Object.keys(row.item)[0])"
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  :id="`collapse-img-${row.item.xss_id}`"
                 >
                   <img
                     :key="componentKey"
                     style="max-width: 100%"
-                    :src="Object.values(row.item)[0]"
+                    :src="row.item.data"
                   />
                 </b-collapse>
               </p>
@@ -84,69 +68,37 @@
               <p>
                 <a
                   href="#"
-                  v-b-toggle="
-                    'collapse-fingerprint-' + String(Object.keys(row.item)[0])
-                  "
+                  v-b-toggle="`collapse-fingerprint-${row.item.xss_id}`"
                   >[Click to view fingerprint...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="
-                    'collapse-fingerprint-' + String(Object.keys(row.item)[0])
-                  "
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  :id="`collapse-fingerprint-${row.item.xss_id}`"
                 >
                   <vue-json-pretty
                     :key="componentKey"
                     :deep="2"
                     :showLength="true"
-                    :data="Object.values(row.item)[0]"
+                    :data="row.item.data"
                   ></vue-json-pretty>
                 </b-collapse>
               </p>
             </div>
             <div v-else-if="element_name == 'dom'">
               <p>
-                <a
-                  href="#"
-                  v-b-toggle="
-                    'collapse-dom-' + String(Object.keys(row.item)[0])
-                  "
+                <a href="#" v-b-toggle="`collapse-dom-${row.item.xss_id}`"
                   >[Click to view DOM...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="'collapse-dom-' + String(Object.keys(row.item)[0])"
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  :id="`collapse-dom-${row.item.xss_id}`"
                 >
                   <div :key="componentKey" v-highlight>
                     <pre
                       class="language-html"
-                    ><code>{{ Object.values(row.item)[0] }}</code></pre>
+                    ><code>{{ row.item.data }}</code></pre>
                   </div>
                 </b-collapse>
               </p>
@@ -158,32 +110,22 @@
                 element_name == 'session_storage'
               "
             >
-              <div v-for="(value, param) in row.item" v-bind:key="param">
-                <div
-                  v-for="(value_deep, param_deep) in value"
-                  v-bind:key="param_deep"
-                >
-                  <code
-                    >{{ Object.keys(value_deep)[0] }} =>
-                    {{ Object.values(value_deep)[0] }}</code
-                  >
-                </div>
-              </div>
+              <code
+                >{{ Object.keys(row.item.data)[0] }} =>
+                {{ Object.values(row.item.data)[0] }}</code
+              >
             </div>
             <div v-else>
               <p>
-                <code>{{ Object.values(row.item)[0] }}</code>
+                <code>{{ row.item.data }}</code>
               </p>
             </div>
           </div>
         </template>
         <template v-slot:cell(tags)="row">
-          <b-badge
-            variant="info"
-            v-for="tag in tags[Object.keys(row.item)[0]]"
-            :key="tag"
-            >{{ tag }}</b-badge
-          >
+          <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{
+            tag
+          }}</b-badge>
         </template>
         <template v-slot:cell(action)="row">
           <b-button
@@ -253,14 +195,32 @@ export default {
           class: "text-right",
         },
       ],
-      data: {},
-      tags: {},
+      filterIncludeFields: ["data", "tags"],
+      data: [],
       to_delete: 0,
       to_delete_type: "",
       search: "",
       componentKey: 0,
       xss_detail_id: 0,
     };
+  },
+  computed: {
+    dataObject: function () {
+      let dataObject = {};
+      for (const xss of this.data) {
+        for (const element in xss.data) {
+          if (dataObject[element] === undefined) {
+            dataObject[element] = [];
+          }
+          dataObject[element].push({
+            xss_id: xss.xss_id,
+            tags: xss.tags,
+            data: xss.data[element],
+          });
+        }
+      }
+      return dataObject;
+    },
   },
   methods: {
     getData() {
@@ -273,23 +233,21 @@ export default {
       axios
         .get(path, { params: payload })
         .then((response) => {
-          this.tags = response.data.tags;
-          delete response.data.tags;
           this.data = response.data;
         })
         .catch((error) => {
           this.handleError(error);
         });
     },
-    getSpecificData(element_id, loot_type) {
-      const path = `${basePath}/xss/${element_id}/data/${loot_type}`;
+    getSpecificData(xss_id, loot_type) {
+      const path = `${basePath}/xss/${xss_id}/data/${loot_type}`;
 
       axios
         .get(path)
         .then((response) => {
-          for (const [index, xss] of this.data[loot_type].entries()) {
-            if (Object.keys(xss)[0] == element_id) {
-              this.data[loot_type][index][element_id] =
+          for (const [i, xss] of this.data.entries()) {
+            if (xss.xss_id === xss_id) {
+              this.data[i].data[loot_type] =
                 loot_type === "fingerprint"
                   ? JSON.parse(response.data.data)
                   : response.data.data;
@@ -301,25 +259,25 @@ export default {
           this.handleError(error);
         });
     },
+    cleanSpecificData(xss_id, loot_type) {
+      for (const [i, xss] of this.data.entries()) {
+        if (xss.xss_id === xss_id) {
+          this.data[i].data[loot_type] = "";
+        }
+      }
+      this.componentKey += 1;
+    },
     filterFunction(item, filter) {
-      if (JSON.stringify(Object.values(item)[0]).includes(filter)) {
+      if (JSON.stringify(item.tags).includes(filter)) {
         return true;
-      } else if (this.tags[Object.keys(item)[0]].join().includes(filter)) {
+      } else if (JSON.stringify(item.data).includes(filter)) {
         return true;
       } else {
         return false;
       }
     },
-    cleanSpecificData(element_id, loot_type) {
-      for (const [index, xss] of this.data[loot_type].entries()) {
-        if (Object.keys(xss)[0] == element_id) {
-          this.data[loot_type][index][element_id] = "";
-        }
-      }
-      this.componentKey += 1;
-    },
     cleanup() {
-      this.data = {};
+      this.data = [];
       this.to_delete = 0;
       this.to_delete_type = "";
       this.$emit("get-clients");

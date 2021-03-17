@@ -188,7 +188,7 @@ def client_xss_all_get():
 @jwt_required()
 def client_loot_get():
     """Get all captured data based on a filter"""
-    loot = {}
+    loot = []
 
     filter_expression = {}
     parameters = request.args.to_dict()
@@ -201,16 +201,13 @@ def client_loot_get():
     xss = XSS.query.filter_by(**filter_expression).all()
 
     for hit in xss:
-        for element in json.loads(hit.data).items():
-            if element[0] not in loot.keys():
-                loot[element[0]] = []
-            if element[0] == "fingerprint" or element[0] == "dom" or element[0] == "screenshot":
-                loot[element[0]].append({hit.id: ""})
+        loot_entry = {"xss_id": hit.id, "tags": json.loads(hit.tags), "data": {}}
+        for element_name, element_value in json.loads(hit.data).items():
+            if element_name in ["fingerprint", "dom", "screenshot"]:
+                loot_entry["data"].update({element_name: ""})
             else:
-                loot[element[0]].append({hit.id: element[1]})
-            if hit.tags:
-                if "tags" not in loot:
-                    loot["tags"] = {}
-                loot["tags"][hit.id] = json.loads(hit.tags)
+                loot_entry["data"].update({element_name: element_value})
+
+        loot.append(loot_entry)
 
     return jsonify(loot), 200
