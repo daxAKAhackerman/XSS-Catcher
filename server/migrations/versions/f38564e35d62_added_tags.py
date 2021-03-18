@@ -32,7 +32,9 @@ def upgrade():
         for element_name, element_value in xss_data.items():
             if element_name in ["local_storage", "session_storage", "cookies"]:
                 if isinstance(element_value, list):
-                    new_data = {k: v for k, v in element_value.items()}
+                    new_data = {}
+                    for single_element in element_value:
+                        new_data.update(single_element)
                     xss_data[element_name] = new_data
 
     session.commit()
