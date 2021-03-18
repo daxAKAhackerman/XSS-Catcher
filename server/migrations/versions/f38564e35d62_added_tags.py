@@ -36,6 +36,7 @@ def upgrade():
                     for single_element in element_value:
                         new_data.update(single_element)
                     xss_data[element_name] = new_data
+        xss.data = xss_data
 
     session.commit()
 
