@@ -93,6 +93,7 @@
                 <b-collapse
                   @hidden="cleanSpecificData(row.item.xss_id, element_name)"
                   @show="getSpecificData(row.item.xss_id, element_name)"
+                  @shown="componentKey += 1"
                   :id="`collapse-dom-${row.item.xss_id}`"
                 >
                   <div :key="componentKey" v-highlight>
