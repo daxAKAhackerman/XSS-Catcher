@@ -126,7 +126,7 @@ def test_get_loot(client):
     client_name1 = Client.query.first()
     get_x(client, access_header, "s", client_name1.uid, cookies="cookie=good")
     rv = get_loot_type(client, access_header, 1, "cookies")
-    assert json.loads(rv.data)["data"][0] == {"cookie": "good"}
+    assert json.loads(rv.data)["data"] == {"cookie": "good"}
 
 
 def test_delete_loot(client):
@@ -166,7 +166,11 @@ def test_get_all_loot(client):
     client1 = Client.query.filter_by(id=1).first()
     get_x(client, access_header, "r", client1.uid, test_data="test", dom="<h1>test</h1>")
     rv = get_loot(client, access_header, client_id=1)
-    assert json.loads(rv.data)["test_data"][0]["1"] == "test"
-    assert json.loads(rv.data)["dom"][0]["1"] == ""
+    for xss in json.loads(rv.data):
+        for element_name, element_value in xss["data"].items():
+            if element_name == "test_data":
+                assert element_value == "test"
+            if element_name == "dom":
+                assert element_value == ""
     rv = get_loot(client, access_header, client_id="asd")
     assert b"Bad client ID" in rv.data

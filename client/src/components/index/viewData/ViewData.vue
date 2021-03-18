@@ -134,7 +134,7 @@
             title="View details"
             variant="outline-info"
             v-b-modal.view-details-modal
-            @click="xss_detail_id = String(Object.keys(row.item)[0])"
+            @click="xss_detail_id = row.item.xss_id"
           >
             <b-icon-info style="width: 20px; height: 20px"></b-icon-info>
           </b-button>
@@ -144,7 +144,7 @@
             title="Delete data"
             @click="
               to_delete_type = element_name;
-              to_delete = Object.keys(row.item)[0];
+              to_delete = row.item.xss_id;
             "
             v-b-modal.delete-data-modal
             type="button"
@@ -219,7 +219,13 @@ export default {
           });
         }
       }
-      return dataObject;
+      const orderedDataObject = Object.keys(dataObject)
+        .sort()
+        .reduce((obj, key) => {
+          obj[key] = dataObject[key];
+          return obj;
+        }, {});
+      return orderedDataObject;
     },
   },
   methods: {

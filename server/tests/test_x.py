@@ -31,23 +31,21 @@ def test_new_xss(client):
     xss2 = XSS.query.filter_by(id=2).first()
     xss3 = XSS.query.filter_by(id=3).first()
     xss1_json = json.loads(xss1.data)
-    assert xss1_json["cookies"][0] == {"cookie": "good"}
-    assert xss1_json["local_storage"][0] == {"local": "good"}
-    assert xss1_json["session_storage"][0] == {"session": "good"}
+    assert xss1_json["cookies"] == {"cookie": "good"}
+    assert xss1_json["local_storage"] == {"local": "good"}
+    assert xss1_json["session_storage"] == {"session": "good"}
     assert xss1_json["param"] == "good"
     assert xss1_json["fingerprint"] == '["good"]'
     assert xss1_json["dom"] == "<html>\n<br />\n</html>"
     assert xss1.xss_type == "reflected"
     assert xss1.ip_addr == "127.0.0.1"
     assert xss1.tags == '["tag1", "tag2"]'
-    for header in json.loads(xss1.headers):
-        if "User-Agent" in header.keys():
-            assert "werkzeug" in header["User-Agent"]
+    assert "werkzeug" in json.loads(xss1.headers)["User-Agent"]
     int(xss1.timestamp)
     assert xss2.xss_type == "stored"
     assert xss2.ip_addr == "127.0.0.2"
     xss3_json = json.loads(xss3.data)
-    assert xss3_json["cookies"][0] == {"cookie": "good"}
+    assert xss3_json["cookies"] == {"cookie": "good"}
     rv = get_x(client, access_header, "r", "AAAAA")
     assert rv._status_code == 200
     assert XSS.query.count() == 3
