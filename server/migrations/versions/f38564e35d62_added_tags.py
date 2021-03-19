@@ -38,6 +38,13 @@ def upgrade():
                     xss_data[element_name] = new_data
         xss.data = json.dumps(xss_data)
 
+        xss_headers = json.loads(xss.headers)
+        new_headers = {}
+        if isinstance(xss_headers, list):
+            for header in xss_headers:
+                new_headers.update(header)
+            xss.headers = json.dumps(new_headers)
+
     session.commit()
 
     # ### end Alembic commands ###
