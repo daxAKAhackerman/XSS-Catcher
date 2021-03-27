@@ -57,6 +57,9 @@ $ make deploy
 # Pull the repository
 $ git pull
 
+# Before running an update, it is recommended to make a copy of your database in case something unexpected happens
+$ cp -r /var/lib/docker/volumes/xss-catcher_xss-db/ /var/lib/docker/volumes/xss-catcher_xss-db-bak/
+
 # Update the application
 $ make update
 ```
