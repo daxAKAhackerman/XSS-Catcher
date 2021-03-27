@@ -27,11 +27,11 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 -   Separates the gathered data by clients
 -   Multi-user with administrative and low privilege users
 -   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
--   Allows capture of cookies, local storage, session storage and any other specified parameters
--   Payload can be customized by the users as he pleases. Simply pass your data in the query string or POST body and the application will catch it!
+-   Allows capture of cookies, local storage, session storage, and more.
+-   Acts as a "catch-all" endpoint. Just send your data in the querystring (GET) or body (POST) to your client's URL and XSS Catcher will catch it!
 -   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
 -   Captures the full DOM so you can easily know where the payload triggered
--   Granular deletion of captured data
+-   Allows you to add custom tags to your XSS to better categorize them.
 
 ## Installation
 
@@ -56,6 +56,9 @@ $ make deploy
 ```bash
 # Pull the repository
 $ git pull
+
+# Before running an update, it is recommended to make a copy of your database in case something unexpected happens
+$ cp -r /var/lib/docker/volumes/xss-catcher_xss-db/ /var/lib/docker/volumes/xss-catcher_xss-db-bak/
 
 # Update the application
 $ make update

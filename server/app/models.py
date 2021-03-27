@@ -60,6 +60,7 @@ class XSS(db.Model):
     headers = db.Column(db.Text)
     ip_addr = db.Column(db.String(15))
     data = db.Column(db.Text)
+    tags = db.Column(db.Text, server_default="[]", nullable=False)
     timestamp = db.Column(db.Integer)
     client_id = db.Column(db.Integer, db.ForeignKey("client.id"))
     xss_type = db.Column(db.String(9))
@@ -72,6 +73,7 @@ class XSS(db.Model):
             "ip_addr": self.ip_addr,
             "data": json.loads(self.data) if self.data != None else self.data,
             "timestamp": self.timestamp,
+            "tags": json.loads(self.tags),
         }
         if "fingerprint" in data["data"].keys():
             data["data"]["fingerprint"] = ""
@@ -84,11 +86,7 @@ class XSS(db.Model):
 
     def to_dict_short(self):
         """Returns an abridged representation of XSS"""
-        data = {
-            "id": self.id,
-            "ip_addr": self.ip_addr,
-            "timestamp": self.timestamp,
-        }
+        data = {"id": self.id, "ip_addr": self.ip_addr, "timestamp": self.timestamp, "tags": json.loads(self.tags)}
         return data
 
 

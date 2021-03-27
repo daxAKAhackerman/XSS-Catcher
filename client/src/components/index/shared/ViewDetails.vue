@@ -23,17 +23,23 @@
       </b-tr>
       <b-tr>
         <b-td valign="top">
+          <b>Tags:</b>
+        </b-td>
+        <b-td
+          ><b-badge variant="info" v-for="tag in data.tags" :key="tag">{{
+            tag
+          }}</b-badge></b-td
+        >
+      </b-tr>
+      <b-tr>
+        <b-td valign="top">
           <b>HTTP headers:</b>
         </b-td>
         <b-td>
           <div v-highlight>
             <pre
               class="language-http"
-            ><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name"><div
-  v-for="(header_value_deep, header_name_deep) in header_value"
-  v-bind:key="header_name_deep"
->{{ header_name_deep }}: {{ header_value_deep }}
-</div></div></code></pre>
+            ><code :key="componentKey"><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name">{{ header_name }}: {{ header_value }}</div></code></pre>
           </div>
         </b-td>
       </b-tr>
@@ -116,13 +122,8 @@
               "
             >
               <h4>{{ data_name }}</h4>
-              <div v-for="(value, param) in data_value" v-bind:key="param">
-                <div
-                  v-for="(value_deep, param_deep) in value"
-                  v-bind:key="param_deep"
-                >
-                  <code>{{ param_deep }} => {{ value_deep }}</code>
-                </div>
+              <div v-for="(item, key) in data_value" v-bind:key="key">
+                <code>{{ key }} => {{ item }}</code>
               </div>
               <p></p>
             </div>
@@ -187,7 +188,7 @@ export default {
         });
     },
     getSpecificData(loot_type) {
-      const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
+       const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
 
       axios
         .get(path)

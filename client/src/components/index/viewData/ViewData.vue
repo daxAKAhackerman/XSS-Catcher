@@ -30,15 +30,16 @@
       </b-col>
     </b-row>
     <div
-      v-for="(element_value, element_name) in data"
+      v-for="(element_value, element_name) in dataObject"
       v-bind:key="element_name"
     >
       <h4>{{ element_name }}</h4>
 
       <b-table
         :fields="fields"
-        :items="data[element_name]"
+        :items="element_value"
         :filter="search"
+        :filter-function="filterFunction"
         hover
         style="table-layout: fixed; width: 100%"
         thead-class="invisible"
@@ -47,34 +48,18 @@
           <div style="word-wrap: break-word">
             <div v-if="element_name == 'screenshot'">
               <p>
-                <a
-                  href="#"
-                  v-b-toggle="
-                    'collapse-img-' + String(Object.keys(row.item)[0])
-                  "
+                <a href="#" v-b-toggle="`collapse-img-${row.item.xss_id}`"
                   >[Click to view screenshot...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="'collapse-img-' + String(Object.keys(row.item)[0])"
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  :id="`collapse-img-${row.item.xss_id}`"
                 >
                   <img
                     :key="componentKey"
                     style="max-width: 100%"
-                    :src="Object.values(row.item)[0]"
+                    :src="row.item.data"
                   />
                 </b-collapse>
               </p>
@@ -83,69 +68,38 @@
               <p>
                 <a
                   href="#"
-                  v-b-toggle="
-                    'collapse-fingerprint-' + String(Object.keys(row.item)[0])
-                  "
+                  v-b-toggle="`collapse-fingerprint-${row.item.xss_id}`"
                   >[Click to view fingerprint...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="
-                    'collapse-fingerprint-' + String(Object.keys(row.item)[0])
-                  "
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  :id="`collapse-fingerprint-${row.item.xss_id}`"
                 >
                   <vue-json-pretty
                     :key="componentKey"
                     :deep="2"
                     :showLength="true"
-                    :data="Object.values(row.item)[0]"
+                    :data="row.item.data"
                   ></vue-json-pretty>
                 </b-collapse>
               </p>
             </div>
             <div v-else-if="element_name == 'dom'">
               <p>
-                <a
-                  href="#"
-                  v-b-toggle="
-                    'collapse-dom-' + String(Object.keys(row.item)[0])
-                  "
+                <a href="#" v-b-toggle="`collapse-dom-${row.item.xss_id}`"
                   >[Click to view DOM...]</a
                 >
                 <b-collapse
-                  @hidden="
-                    cleanSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  @show="
-                    getSpecificData(
-                      String(Object.keys(row.item)[0]),
-                      element_name,
-                      row.index
-                    )
-                  "
-                  :id="'collapse-dom-' + String(Object.keys(row.item)[0])"
+                  @hidden="cleanSpecificData(row.item.xss_id, element_name)"
+                  @show="getSpecificData(row.item.xss_id, element_name)"
+                  @shown="componentKey += 1"
+                  :id="`collapse-dom-${row.item.xss_id}`"
                 >
                   <div :key="componentKey" v-highlight>
                     <pre
                       class="language-html"
-                    ><code>{{ Object.values(row.item)[0] }}</code></pre>
+                    ><code>{{ row.item.data }}</code></pre>
                   </div>
                 </b-collapse>
               </p>
@@ -157,24 +111,24 @@
                 element_name == 'session_storage'
               "
             >
-              <div v-for="(value, param) in row.item" v-bind:key="param">
-                <div
-                  v-for="(value_deep, param_deep) in value"
-                  v-bind:key="param_deep"
-                >
-                  <code
-                    >{{ Object.keys(value_deep)[0] }} =>
-                    {{ Object.values(value_deep)[0] }}</code
-                  >
-                </div>
+              <div
+                v-for="(element_key, element_value) in row.item.data"
+                v-bind:key="element_key"
+              >
+                <code>{{ element_key }} => {{ element_value }}</code>
               </div>
             </div>
             <div v-else>
               <p>
-                <code>{{ Object.values(row.item)[0] }}</code>
+                <code>{{ row.item.data }}</code>
               </p>
             </div>
           </div>
+        </template>
+        <template v-slot:cell(tags)="row">
+          <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{
+            tag
+          }}</b-badge>
         </template>
         <template v-slot:cell(action)="row">
           <b-button
@@ -183,7 +137,7 @@
             title="View details"
             variant="outline-info"
             v-b-modal.view-details-modal
-            @click="xss_detail_id = String(Object.keys(row.item)[0])"
+            @click="xss_detail_id = row.item.xss_id"
           >
             <b-icon-info style="width: 20px; height: 20px"></b-icon-info>
           </b-button>
@@ -193,7 +147,7 @@
             title="Delete data"
             @click="
               to_delete_type = element_name;
-              to_delete = Object.keys(row.item)[0];
+              to_delete = row.item.xss_id;
             "
             v-b-modal.delete-data-modal
             type="button"
@@ -234,20 +188,48 @@ export default {
       fields: [
         {
           key: "data",
-          class: "text-left width88",
+          class: "text-left width75",
+        },
+        {
+          key: "tags",
         },
         {
           key: "action",
           class: "text-right",
         },
       ],
-      data: {},
+      filterIncludeFields: ["data", "tags"],
+      data: [],
       to_delete: 0,
       to_delete_type: "",
       search: "",
       componentKey: 0,
       xss_detail_id: 0,
     };
+  },
+  computed: {
+    dataObject: function () {
+      let dataObject = {};
+      for (const xss of this.data) {
+        for (const element in xss.data) {
+          if (dataObject[element] === undefined) {
+            dataObject[element] = [];
+          }
+          dataObject[element].push({
+            xss_id: xss.xss_id,
+            tags: xss.tags,
+            data: xss.data[element],
+          });
+        }
+      }
+      const orderedDataObject = Object.keys(dataObject)
+        .sort()
+        .reduce((obj, key) => {
+          obj[key] = dataObject[key];
+          return obj;
+        }, {});
+      return orderedDataObject;
+    },
   },
   methods: {
     getData() {
@@ -266,18 +248,19 @@ export default {
           this.handleError(error);
         });
     },
-    getSpecificData(element_id, loot_type, row_index) {
-      const path = `${basePath}/xss/${element_id}/data/${loot_type}`;
+    getSpecificData(xss_id, loot_type) {
+      const path = `${basePath}/xss/${xss_id}/data/${loot_type}`;
 
       axios
         .get(path)
         .then((response) => {
-          if (loot_type === "fingerprint") {
-            this.data[loot_type][row_index][element_id] = JSON.parse(
-              response.data.data
-            );
-          } else {
-            this.data[loot_type][row_index][element_id] = response.data.data;
+          for (const [i, xss] of this.data.entries()) {
+            if (xss.xss_id === xss_id) {
+              this.data[i].data[loot_type] =
+                loot_type === "fingerprint"
+                  ? JSON.parse(response.data.data)
+                  : response.data.data;
+            }
           }
           this.componentKey += 1;
         })
@@ -285,12 +268,25 @@ export default {
           this.handleError(error);
         });
     },
-    cleanSpecificData(element_id, loot_type, row_index) {
-      this.data[loot_type][row_index][element_id] = "";
+    cleanSpecificData(xss_id, loot_type) {
+      for (const [i, xss] of this.data.entries()) {
+        if (xss.xss_id === xss_id) {
+          this.data[i].data[loot_type] = "";
+        }
+      }
       this.componentKey += 1;
     },
+    filterFunction(item, filter) {
+      if (JSON.stringify(item.tags).includes(filter)) {
+        return true;
+      } else if (JSON.stringify(item.data).includes(filter)) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     cleanup() {
-      this.data = {};
+      this.data = [];
       this.to_delete = 0;
       this.to_delete_type = "";
       this.$emit("get-clients");
@@ -300,8 +296,8 @@ export default {
 </script>
 
 <style>
-.width88 {
-  width: 88%;
+.width75 {
+  width: 75%;
 }
 .invisible {
   display: none;

