@@ -111,10 +111,12 @@
                 element_name == 'session_storage'
               "
             >
-              <code
-                >{{ Object.keys(row.item.data)[0] }} =>
-                {{ Object.values(row.item.data)[0] }}</code
+              <div
+                v-for="(element_key, element_value) in row.item.data"
+                v-bind:key="element_key"
               >
+                <code>{{ element_key }} => {{ element_value }}</code>
+              </div>
             </div>
             <div v-else>
               <p>

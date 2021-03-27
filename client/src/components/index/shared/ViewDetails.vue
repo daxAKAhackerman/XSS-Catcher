@@ -39,7 +39,7 @@
           <div v-highlight>
             <pre
               class="language-http"
-            ><code><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name">{{ header_name }}: {{ header_value }}</div></code></pre>
+            ><code :key="componentKey"><div v-for="(header_value, header_name) in data.headers" v-bind:key="header_name">{{ header_name }}: {{ header_value }}</div></code></pre>
           </div>
         </b-td>
       </b-tr>
@@ -188,7 +188,7 @@ export default {
         });
     },
     getSpecificData(loot_type) {
-      const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
+       const path = `${basePath}/xss/${this.xss_id}/data/${loot_type}`;
 
       axios
         .get(path)
