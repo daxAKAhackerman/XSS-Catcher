@@ -4,7 +4,7 @@ import time
 from app import db
 from app.api import bp
 from app.models import XSS, Client, Settings
-from app.utils import send_mail
+from app.utils import send_mail, send_webhook
 from flask import jsonify, request
 from flask_cors import cross_origin
 
@@ -102,5 +102,11 @@ def catch_xss(flavor, uid):
         except:
             settings.smtp_status = False
             db.session.commit()
+
+    if settings.webhook_url != None:
+        try:
+            send_webhook(xss=xss)
+        except:
+            pass
 
     return jsonify({"status": "OK"}), 200

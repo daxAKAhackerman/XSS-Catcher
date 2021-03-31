@@ -14,6 +14,7 @@ class Client(db.Model):
     name = db.Column(db.String(32), unique=True, nullable=False)
     description = db.Column(db.String(128))
     mail_to = db.Column(db.String(256), nullable=True)
+    webhook_url = db.Column(db.Text, nullable=True)
     xss = db.relationship("XSS", backref="client", lazy="dynamic")
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
@@ -131,6 +132,7 @@ class Settings(db.Model):
     smtp_user = db.Column(db.String(128), nullable=True)
     smtp_pass = db.Column(db.String(128), nullable=True)
     smtp_status = db.Column(db.Boolean, nullable=True)
+    webhook_url = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
         """Returns the settings"""
@@ -142,6 +144,7 @@ class Settings(db.Model):
             "mail_from": self.mail_from,
             "smtp_user": self.smtp_user,
             "smtp_status": self.smtp_status,
+            "webhook_url": self.webhook_url,
         }
         return data
 

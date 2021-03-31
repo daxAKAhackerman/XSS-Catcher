@@ -2,6 +2,7 @@ import smtplib
 import ssl
 from email.mime.text import MIMEText
 
+import requests
 from app.models import Settings
 
 
@@ -70,3 +71,18 @@ def send_mail(xss=None, receiver=None):
                 server.starttls()
 
             server.sendmail(sender, receiver, msg.as_string())
+
+
+def send_webhook(xss=None, receiver=None):
+
+    settings = Settings.query.first()
+
+    if xss:
+        receiver = xss.client.webhook_url if xss.client.webhook_url else settings.webhook_url
+
+        requests.post(url=receiver, json={"text": f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}! Go check it out!"})
+
+    elif receiver:
+        requests.post(
+            url=receiver, json={"text": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}
+        )

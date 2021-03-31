@@ -2,7 +2,7 @@ from app import db
 from app.api import bp
 from app.decorators import permissions
 from app.models import Settings
-from app.utils import send_mail
+from app.utils import send_mail, send_webhook
 from app.validators import check_length, is_email
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
@@ -110,6 +110,11 @@ def settings_post():
         settings.smtp_pass = None
         settings.smtp_status = None
 
+    if "webhook_url" in data.keys():
+        settings.webhook_url = data["webhook_url"]
+    else:
+        settings.webhook_url = None
+
     db.session.commit()
 
     return jsonify({"status": "OK", "detail": "Configuration saved successfuly"}), 200
@@ -147,3 +152,19 @@ def smtp_test_post():
             )
     else:
         return jsonify({"status": "error", "detail": "Invalid recipient"}), 400
+
+
+@bp.route("/settings/webhook_test", methods=["POST"])
+@jwt_required()
+@permissions(all_of=["admin"])
+def webhook_test_post():
+    data = request.get_json()
+
+    if "webhook_url" not in data.keys():
+        return jsonify({"status": "error", "detail": "Missing webhook url"}), 400
+
+    try:
+        send_webhook(data["webhook_url"])
+        return jsonify({"status": "OK", "detail": "SMTP configuration test successful"}), 200
+    except:
+        return jsonify({"status": "error", "detail": "Could not send test email"}), 400
