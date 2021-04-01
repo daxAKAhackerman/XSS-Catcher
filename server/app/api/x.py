@@ -94,7 +94,7 @@ def catch_xss(flavor, uid):
 
     settings = Settings.query.first()
 
-    if xss.client.mail_to != None and settings.smtp_host != None:
+    if (xss.client.mail_to != None or settings.mail_to != None) and settings.smtp_host != None:
         try:
             send_mail(xss=xss)
             settings.smtp_status = True
@@ -103,7 +103,7 @@ def catch_xss(flavor, uid):
             settings.smtp_status = False
             db.session.commit()
 
-    if settings.webhook_url != None:
+    if settings.webhook_url != None or xss.client.webhook_url != None:
         try:
             send_webhook(xss=xss)
         except:

@@ -4,7 +4,7 @@ from app import db
 from app.api import bp
 from app.decorators import permissions
 from app.models import XSS, Client, User
-from app.validators import check_length, is_email, not_empty
+from app.validators import check_length, is_email, is_url, not_empty
 from flask import jsonify, request
 from flask_jwt_extended import get_current_user, jwt_required
 
@@ -89,6 +89,12 @@ def client_post(client_id):
                 client.mail_to = data["mail_to"]
             else:
                 return jsonify({"status": "error", "detail": "Invalid mail recipient"}), 400
+
+    if "webhook_url" in data.keys():
+        if is_url(data["webhook_url"]):
+            client.webhook_url = data["webhook_url"]
+        else:
+            return jsonify({"status": "error", "detail": "Webhook URL format is invalid"}), 400
 
     db.session.commit()
 

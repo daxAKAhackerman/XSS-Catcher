@@ -26,7 +26,7 @@ def send_mail(xss=None, receiver=None):
     sender = settings.mail_from
 
     if xss:
-        receiver = xss.client.mail_to
+        receiver = xss.client.mail_to if xss.client.mail_to else settings.mail_to
 
         msg = MIMEText("XSS Catcher just caught a new {} XSS for client {}! Go check it out!".format(xss.xss_type, xss.client.name))
 

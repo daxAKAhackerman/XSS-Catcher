@@ -3,7 +3,7 @@ from app.api import bp
 from app.decorators import permissions
 from app.models import Settings
 from app.utils import send_mail, send_webhook
-from app.validators import check_length, is_email
+from app.validators import check_length, is_email, is_url
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 
@@ -73,6 +73,12 @@ def settings_post():
             else:
                 return jsonify({"status": "error", "detail": "Missing sender address"}), 400
 
+            if "mail_to" in data.keys():
+                if is_email(data["mail_from"]):
+                    settings.mail_to = data["mail_to"]
+                else:
+                    return jsonify({"status": "error", "detail": "Recipient email address format is invalid"}), 400
+
             if "smtp_user" in data.keys():
 
                 if check_length(data["smtp_user"], 128):
@@ -111,7 +117,11 @@ def settings_post():
         settings.smtp_status = None
 
     if "webhook_url" in data.keys():
-        settings.webhook_url = data["webhook_url"]
+        if is_url(data["webhook_url"]):
+            settings.webhook_url = data["webhook_url"]
+        else:
+            return jsonify({"status": "error", "detail": "Webhook URL format is invalid"}), 400
+
     else:
         settings.webhook_url = None
 
@@ -164,7 +174,7 @@ def webhook_test_post():
         return jsonify({"status": "error", "detail": "Missing webhook url"}), 400
 
     try:
-        send_webhook(data["webhook_url"])
-        return jsonify({"status": "OK", "detail": "SMTP configuration test successful"}), 200
+        send_webhook(receiver=data["webhook_url"])
+        return jsonify({"status": "OK", "detail": "Webhook configuration test successful"}), 200
     except:
-        return jsonify({"status": "error", "detail": "Could not send test email"}), 400
+        return jsonify({"status": "error", "detail": "Could not send test webhook"}), 400
