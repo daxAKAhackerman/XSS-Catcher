@@ -13,7 +13,15 @@ from .functions import *
 def test_patch_settings(client):
     access_header, _ = login_get_headers(client, "admin", "xss")
     patch_settings(
-        client, access_header, smtp_host="127.0.0.1", smtp_port=465, ssl_tls=True, mail_from="xsscatcher@hackerman.ca", smtp_user="admin", smtp_pass="admin"
+        client,
+        access_header,
+        smtp_host="127.0.0.1",
+        smtp_port=465,
+        ssl_tls=True,
+        mail_from="xsscatcher@hackerman.ca",
+        smtp_user="admin",
+        smtp_pass="admin",
+        mail_to="dax@hackerman.ca",
     )
     settings = Settings.query.first()
     assert settings.smtp_host == "127.0.0.1"
@@ -27,6 +35,8 @@ def test_patch_settings(client):
     assert b"Missing SMTP port" in rv.data
     rv = patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=465, starttls=True, ssl_tls=True)
     assert b"Cannot use STARTTLS and SSL/TLS at the same time" in rv.data
+    rv = patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=587, starttls=True, mail_from="xsscatcher@hackerman.ca", mail_to="test")
+    assert b"Recipient email address format is invalid" in rv.data
     patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=587, starttls=True, mail_from="xsscatcher@hackerman.ca")
     settings = Settings.query.first()
     assert settings.starttls == True
@@ -46,7 +56,13 @@ def test_patch_settings(client):
     assert settings.smtp_port == None
     patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca")
     patch_settings(client, access_header)
+    settings = Settings.query.first()
     assert settings.smtp_port == None
+    rv = patch_settings(client, access_header, webhook_url="abc")
+    assert b"Webhook URL format is invalid" in rv.data
+    patch_settings(client, access_header, webhook_url="http://localhost/test")
+    settings = Settings.query.first()
+    assert settings.webhook_url == "http://localhost/test"
 
 
 def test_get_settings(client):
@@ -63,9 +79,17 @@ def test_send_mail(client):
     rv = send_test_mail(client, access_header, mail_to="test")
     assert b"Invalid recipient" in rv.data
     rv = send_test_mail(client, access_header, mail_to="dax@hackerman.ca")
-    assert b"Could not send test email" in rv.data
+    assert b"Connection refused" in rv.data
     patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=587, ssl_tls=True, mail_from="xsscatcher@hackerman.ca")
     rv = send_test_mail(client, access_header, mail_to="dax@hackerman.ca")
-    assert b"Could not send test email" in rv.data
+    assert b"Connection refused" in rv.data
     with pytest.raises(MissingDataError):
         send_mail()
+
+
+def test_send_webook(client):
+    access_header, _ = login_get_headers(client, "admin", "xss")
+    rv = send_test_webhook(client, access_header)
+    assert b"Missing webhook url" in rv.data
+    rv = send_test_webhook(client, access_header, webhook_url="http://localhost:54321")
+    assert b"Could not send test webhook" in rv.data

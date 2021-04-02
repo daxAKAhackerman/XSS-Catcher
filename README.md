@@ -22,8 +22,8 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 ## Features
 
 -   Generates simple customizable XSS payloads
--   Sends email alerts when a new XSS is caught
--   The destination email is configured per client to better fit an environment where different pentesters don't necessarily work on the same tests
+-   Sends email alerts or webhooks (in Slack format) when a new XSS is caught
+-   The destination email or webhook can be configured globally and per client
 -   Separates the gathered data by clients
 -   Multi-user with administrative and low privilege users
 -   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.

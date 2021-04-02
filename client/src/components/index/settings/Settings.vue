@@ -4,7 +4,7 @@
     id="settings-modal"
     title="Settings"
     hide-footer
-    size="md"
+    size="lg"
     @show="getSettings()"
     @hide="cleanup()"
   >
@@ -52,7 +52,7 @@
 
       <b-form-group
         id="input-group-mail_to"
-        label="Default mail-to: "
+        label="Default recipient: "
         label-cols="3"
         label-for="input-field-mail_to"
       >
@@ -170,11 +170,11 @@
       </b-form-group>
     </b-form>
     <hr />
-    <h3>Default webhook settings</h3>
+    <h3>Webhook settings</h3>
     <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-webhook"
-        label="Webhook URL: "
+        label="Default webhook URL: "
         label-cols="3"
         label-for="input-field-webhook"
         ><b-input-group>

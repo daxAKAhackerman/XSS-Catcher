@@ -89,12 +89,16 @@ def client_post(client_id):
                 client.mail_to = data["mail_to"]
             else:
                 return jsonify({"status": "error", "detail": "Invalid mail recipient"}), 400
+    else:
+        client.mail_to = None
 
     if "webhook_url" in data.keys():
         if is_url(data["webhook_url"]):
             client.webhook_url = data["webhook_url"]
         else:
             return jsonify({"status": "error", "detail": "Webhook URL format is invalid"}), 400
+    else:
+        client.webhook_url = None
 
     db.session.commit()
 

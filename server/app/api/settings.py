@@ -56,12 +56,12 @@ def settings_post():
 
             if "starttls" in data.keys():
                 settings.starttls = True
+            else:
+                settings.starttls = False
 
             if "ssl_tls" in data.keys():
                 settings.ssl_tls = True
-
-            if "starttls" not in data.keys() and "ssl_tls" not in data.keys():
-                settings.starttls = False
+            else:
                 settings.ssl_tls = False
 
             if "mail_from" in data.keys():
@@ -74,10 +74,12 @@ def settings_post():
                 return jsonify({"status": "error", "detail": "Missing sender address"}), 400
 
             if "mail_to" in data.keys():
-                if is_email(data["mail_from"]):
+                if is_email(data["mail_to"]):
                     settings.mail_to = data["mail_to"]
                 else:
                     return jsonify({"status": "error", "detail": "Recipient email address format is invalid"}), 400
+            else:
+                settings.mail_to = None
 
             if "smtp_user" in data.keys():
 
@@ -102,6 +104,7 @@ def settings_post():
             settings.starttls = False
             settings.ssl_tls = False
             settings.mail_from = None
+            settings.mail_to = None
             settings.smtp_user = None
             settings.smtp_pass = None
             settings.smtp_status = None
@@ -112,6 +115,7 @@ def settings_post():
         settings.starttls = False
         settings.ssl_tls = False
         settings.mail_from = None
+        settings.mail_to = None
         settings.smtp_user = None
         settings.smtp_pass = None
         settings.smtp_status = None
@@ -148,14 +152,14 @@ def smtp_test_post():
             settings.smtp_status = True
             db.session.commit()
             return jsonify({"status": "OK", "detail": "SMTP configuration test successful"}), 200
-        except:
+        except Exception as e:
             settings.smtp_status = False
             db.session.commit()
             return (
                 jsonify(
                     {
                         "status": "error",
-                        "detail": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. ",
+                        "detail": str(e),
                     }
                 ),
                 400,

@@ -74,6 +74,10 @@ def send_test_mail(client, headers, **kwargs):
     return client.post("/api/settings/smtp_test", data=json.dumps(kwargs), content_type="application/json", headers=headers)
 
 
+def send_test_webhook(client, headers, **kwargs):
+    return client.post("/api/settings/webhook_test", data=json.dumps(kwargs), content_type="application/json", headers=headers)
+
+
 # users
 
 
