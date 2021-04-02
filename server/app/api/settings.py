@@ -152,14 +152,14 @@ def smtp_test_post():
             settings.smtp_status = True
             db.session.commit()
             return jsonify({"status": "OK", "detail": "SMTP configuration test successful"}), 200
-        except Exception as e:
+        except:
             settings.smtp_status = False
             db.session.commit()
             return (
                 jsonify(
                     {
                         "status": "error",
-                        "detail": str(e),
+                        "detail": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. ",
                     }
                 ),
                 400,

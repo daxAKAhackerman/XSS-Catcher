@@ -79,10 +79,10 @@ def test_send_mail(client):
     rv = send_test_mail(client, access_header, mail_to="test")
     assert b"Invalid recipient" in rv.data
     rv = send_test_mail(client, access_header, mail_to="dax@hackerman.ca")
-    assert b"Connection refused" in rv.data
+    assert b"Could not send test email" in rv.data
     patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=587, ssl_tls=True, mail_from="xsscatcher@hackerman.ca")
     rv = send_test_mail(client, access_header, mail_to="dax@hackerman.ca")
-    assert b"Connection refused" in rv.data
+    assert b"Could not send test email" in rv.data
     with pytest.raises(MissingDataError):
         send_mail()
 
