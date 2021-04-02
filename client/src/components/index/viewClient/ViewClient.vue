@@ -69,6 +69,26 @@
       </b-form-group>
 
       <b-form-group
+        id="input-group-webhook"
+        label="Webhook URL:"
+        label-cols="3"
+        label-for="input-field-webhook"
+      >
+        <b-form-input
+          @keyup.enter="patchClient"
+          v-if="owner_id === user_id || is_admin"
+          id="input-field-webhook"
+          v-model="client.webhook_url"
+        ></b-form-input>
+        <b-form-input
+          v-else
+          readonly
+          id="input-field-webhook"
+          v-model="client.webhook_url"
+        ></b-form-input>
+      </b-form-group>
+
+      <b-form-group
         id="input-group-owner"
         label="Owner:"
         label-cols="3"
@@ -160,6 +180,10 @@ export default {
 
       if (this.client.mail_to !== "" && this.client.mail_to !== null) {
         payload.mail_to = this.client.mail_to;
+      }
+
+      if (this.client.webhook_url !== "" && this.client.webhook_url !== null) {
+        payload.webhook_url = this.client.webhook_url;
       }
 
       axios

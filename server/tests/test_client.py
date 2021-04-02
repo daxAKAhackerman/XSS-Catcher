@@ -32,7 +32,7 @@ def test_edit_client(client):
     access_header, _ = login_get_headers(client, "admin", "xss")
     create_client(client, access_header, name="name1", description="desc1")
     create_client(client, access_header, name="name3", description="desc3")
-    edit_client(client, access_header, 1, name="name2", description="desc2", owner=1, mail_to="samdeg555@gmail.com")
+    edit_client(client, access_header, 1, name="name2", description="desc2", owner=1, mail_to="samdeg555@gmail.com", webhook_url="http://localhost/test")
     client1 = Client.query.filter_by(id=1).first()
     assert client1.name == "name2"
     assert client1.description == "desc2"
@@ -49,6 +49,8 @@ def test_edit_client(client):
     assert client1.mail_to is None
     rv = edit_client(client, access_header, 1, mail_to="abc")
     assert b"Invalid mail recipient" in rv.data
+    rv = edit_client(client, access_header, 1, webhook_url="abc")
+    assert b"Webhook URL format is invalid" in rv.data
 
 
 def test_delete_client(client):

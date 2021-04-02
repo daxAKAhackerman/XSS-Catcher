@@ -22,8 +22,8 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 ## Features
 
 -   Generates simple customizable XSS payloads
--   Sends email alerts when a new XSS is caught
--   The destination email is configured per client to better fit an environment where different pentesters don't necessarily work on the same tests
+-   Sends email alerts or webhooks (in Slack format) when a new XSS is caught
+-   The destination email or webhook can be configured globally and per client
 -   Separates the gathered data by clients
 -   Multi-user with administrative and low privilege users
 -   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
@@ -35,7 +35,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 
 ## Installation
 
-To clone and run this application, you'll need [Git](https://git-scm.com), [Docker](https://docs.docker.com/engine/) and [Docker Compose](https://docs.docker.com/compose/). From your command line:
+To clone and run this application, you'll need [Git](https://git-scm.com), [Docker](https://docs.docker.com/engine/), [Docker Compose](https://docs.docker.com/compose/) and [make](https://www.gnu.org/software/make/). From your command line:
 
 ```bash
 # Clone this repository
@@ -43,9 +43,6 @@ $ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 
 # Go into the repository
 $ cd XSS-Catcher
-
-# If it is not already installed, install make
-$ apt install make
 
 # Deploy the application. Also, run this once if you are migrating from v1.0.0
 $ make deploy

@@ -49,7 +49,7 @@ def test_new_xss(client):
     rv = get_x(client, access_header, "r", "AAAAA")
     assert rv._status_code == 200
     assert XSS.query.count() == 3
-    patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca")
+    patch_settings(client, access_header, smtp_host="127.0.0.1", smtp_port=25, mail_from="xsscatcher@hackerman.ca", webhook_url="http://127.0.0.1:54321/test")
     edit_client(client, access_header, 1, mail_to="dax@hackerman.ca")
     get_x(client, access_header, "s", client_obj.uid)
     settings = Settings.query.first()

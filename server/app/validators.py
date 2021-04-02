@@ -34,3 +34,7 @@ def is_password(password1):
         return True
     else:
         return False
+
+
+def is_url(url):
+    return bool(re.match(r"^https?://.+$", url))

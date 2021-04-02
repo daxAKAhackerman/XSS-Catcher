@@ -2,8 +2,8 @@ from app import db
 from app.api import bp
 from app.decorators import permissions
 from app.models import Settings
-from app.utils import send_mail
-from app.validators import check_length, is_email
+from app.utils import send_mail, send_webhook
+from app.validators import check_length, is_email, is_url
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 
@@ -56,12 +56,12 @@ def settings_post():
 
             if "starttls" in data.keys():
                 settings.starttls = True
+            else:
+                settings.starttls = False
 
             if "ssl_tls" in data.keys():
                 settings.ssl_tls = True
-
-            if "starttls" not in data.keys() and "ssl_tls" not in data.keys():
-                settings.starttls = False
+            else:
                 settings.ssl_tls = False
 
             if "mail_from" in data.keys():
@@ -72,6 +72,14 @@ def settings_post():
 
             else:
                 return jsonify({"status": "error", "detail": "Missing sender address"}), 400
+
+            if "mail_to" in data.keys():
+                if is_email(data["mail_to"]):
+                    settings.mail_to = data["mail_to"]
+                else:
+                    return jsonify({"status": "error", "detail": "Recipient email address format is invalid"}), 400
+            else:
+                settings.mail_to = None
 
             if "smtp_user" in data.keys():
 
@@ -96,6 +104,7 @@ def settings_post():
             settings.starttls = False
             settings.ssl_tls = False
             settings.mail_from = None
+            settings.mail_to = None
             settings.smtp_user = None
             settings.smtp_pass = None
             settings.smtp_status = None
@@ -106,9 +115,19 @@ def settings_post():
         settings.starttls = False
         settings.ssl_tls = False
         settings.mail_from = None
+        settings.mail_to = None
         settings.smtp_user = None
         settings.smtp_pass = None
         settings.smtp_status = None
+
+    if "webhook_url" in data.keys():
+        if is_url(data["webhook_url"]):
+            settings.webhook_url = data["webhook_url"]
+        else:
+            return jsonify({"status": "error", "detail": "Webhook URL format is invalid"}), 400
+
+    else:
+        settings.webhook_url = None
 
     db.session.commit()
 
@@ -147,3 +166,19 @@ def smtp_test_post():
             )
     else:
         return jsonify({"status": "error", "detail": "Invalid recipient"}), 400
+
+
+@bp.route("/settings/webhook_test", methods=["POST"])
+@jwt_required()
+@permissions(all_of=["admin"])
+def webhook_test_post():
+    data = request.get_json()
+
+    if "webhook_url" not in data.keys():
+        return jsonify({"status": "error", "detail": "Missing webhook url"}), 400
+
+    try:
+        send_webhook(receiver=data["webhook_url"])
+        return jsonify({"status": "OK", "detail": "Webhook configuration test successful"}), 200
+    except:
+        return jsonify({"status": "error", "detail": "Could not send test webhook"}), 400

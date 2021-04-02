@@ -14,6 +14,7 @@ class Client(db.Model):
     name = db.Column(db.String(32), unique=True, nullable=False)
     description = db.Column(db.String(128))
     mail_to = db.Column(db.String(256), nullable=True)
+    webhook_url = db.Column(db.Text, nullable=True)
     xss = db.relationship("XSS", backref="client", lazy="dynamic")
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
@@ -40,7 +41,7 @@ class Client(db.Model):
             owner = User.query.filter_by(id=self.owner_id).first().username
         if owner == None:
             owner = "Nobody"
-        data = {"owner": owner, "id": self.id, "name": self.name, "description": self.description, "mail_to": self.mail_to}
+        data = {"owner": owner, "id": self.id, "name": self.name, "description": self.description, "mail_to": self.mail_to, "webhook_url": self.webhook_url}
         return data
 
     def gen_uid(self):
@@ -131,6 +132,8 @@ class Settings(db.Model):
     smtp_user = db.Column(db.String(128), nullable=True)
     smtp_pass = db.Column(db.String(128), nullable=True)
     smtp_status = db.Column(db.Boolean, nullable=True)
+    mail_to = db.Column(db.Text, nullable=True)
+    webhook_url = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
         """Returns the settings"""
@@ -140,8 +143,10 @@ class Settings(db.Model):
             "starttls": self.starttls,
             "ssl_tls": self.ssl_tls,
             "mail_from": self.mail_from,
+            "mail_to": self.mail_to,
             "smtp_user": self.smtp_user,
             "smtp_status": self.smtp_status,
+            "webhook_url": self.webhook_url,
         }
         return data
 

@@ -4,12 +4,11 @@
     id="settings-modal"
     title="Settings"
     hide-footer
-    size="md"
+    size="lg"
     @show="getSettings()"
     @hide="cleanup()"
   >
     <h3>SMTP settings</h3>
-    <hr />
     <b-form v-on:submit.prevent>
       <b-form-group
         id="input-group-host"
@@ -48,6 +47,19 @@
           @keyup.enter="patchSettings"
           id="input-field-mail_from"
           v-model="settings.mail_from"
+        ></b-form-input>
+      </b-form-group>
+
+      <b-form-group
+        id="input-group-mail_to"
+        label="Default recipient: "
+        label-cols="3"
+        label-for="input-field-mail_to"
+      >
+        <b-form-input
+          @keyup.enter="patchSettings"
+          id="input-field-mail_to"
+          v-model="settings.mail_to"
         ></b-form-input>
       </b-form-group>
 
@@ -157,6 +169,28 @@
         </b-input-group>
       </b-form-group>
     </b-form>
+    <hr />
+    <h3>Webhook settings</h3>
+    <b-form v-on:submit.prevent>
+      <b-form-group
+        id="input-group-webhook"
+        label="Default webhook URL: "
+        label-cols="3"
+        label-for="input-field-webhook"
+        ><b-input-group>
+          <b-form-input
+            @keyup.enter="patchSettings"
+            id="input-field-webhook"
+            v-model="settings.webhook_url"
+          ></b-form-input>
+          <b-input-group-append>
+            <b-button @click="testWebhook" variant="outline-warning"
+              >Test</b-button
+            >
+          </b-input-group-append>
+        </b-input-group>
+      </b-form-group>
+    </b-form>
     <div class="text-right">
       <b-button @click="patchSettings()" variant="outline-info">Save</b-button>
       <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
@@ -219,6 +253,18 @@ export default {
           payload.starttls = 1;
         }
       }
+
+      if (
+        this.settings.webhook_url !== "" &&
+        this.settings.webhook_url !== null
+      ) {
+        payload.webhook_url = this.settings.webhook_url;
+      }
+
+      if (this.settings.mail_to !== "" && this.settings.mail_to !== null) {
+        payload.mail_to = this.settings.mail_to;
+      }
+
       axios
         .patch(path, payload)
         .then((response) => {
@@ -242,6 +288,22 @@ export default {
         .then((response) => {
           this.makeToast(response.data.detail, "success", response.data.status);
           this.getSettings();
+        })
+        .catch((error) => {
+          this.handleError(error);
+        });
+    },
+    testWebhook() {
+      const path = `${basePath}/settings/webhook_test`;
+
+      const payload = {
+        webhook_url: this.settings.webhook_url,
+      };
+
+      axios
+        .post(path, payload)
+        .then((response) => {
+          this.makeToast(response.data.detail, "success", response.data.status);
         })
         .catch((error) => {
           this.handleError(error);
