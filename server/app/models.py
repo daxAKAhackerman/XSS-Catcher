@@ -96,7 +96,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(128), unique=True, nullable=False)
-    password_hash = db.Column(db.String(95), nullable=False)
+    password_hash = db.Column(db.Text, nullable=False)
     first_login = db.Column(db.Boolean, nullable=False, default=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     client = db.relationship("Client", backref="owner", lazy="dynamic")

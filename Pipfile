@@ -8,17 +8,18 @@ psycopg2-binary = "==2.8.6"
 waitress = "==1.4.3"
 Flask = "==1.1.2"
 Flask-Cors = "==3.0.10"
-Flask-Migrate = "==2.7.0"
+Flask-Migrate = "==3.0.0"
 Flask-SQLAlchemy = "==2.5.1"
 Flask-JWT-Extended = "==4.0.2"
 requests = "==2.25.1"
 
 [dev-packages]
-black = "==20.8b1"
+black = "==21.5b1"
 isort = "*"
 pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
+pipenv = "*"
 
 [requires]
 python_version = "3.8"
