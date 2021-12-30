@@ -3,3 +3,4 @@
 cov_html/
 .env
 .vscode
+.db_password

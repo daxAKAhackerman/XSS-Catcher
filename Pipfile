@@ -14,7 +14,7 @@ Flask-JWT-Extended = "==4.0.2"
 requests = "==2.25.1"
 
 [dev-packages]
-black = "==21.5b1"
+black = "*"
 isort = "*"
 pre-commit = "*"
 pytest = "*"

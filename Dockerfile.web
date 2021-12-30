@@ -1,0 +1,13 @@
+FROM node:16.13.1-alpine3.14 as build
+
+WORKDIR /build
+
+COPY ./client /build
+
+RUN npm ci
+
+RUN npm run build
+
+FROM nginx:1.21.5-alpine
+
+COPY --from=build /build/dist /usr/share/nginx/html
