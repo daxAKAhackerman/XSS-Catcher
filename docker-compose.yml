@@ -5,7 +5,7 @@ secrets:
     file: ./.db_password
 
 services:
-  database:
+  db:
     image: postgres:14.1-alpine3.15
     restart: unless-stopped
     secrets:
@@ -28,18 +28,18 @@ services:
       POSTGRES_DB: xss
       POSTGRES_USER: user
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
-      POSTGRES_HOSTNAME: database
+      POSTGRES_HOSTNAME: db
     depends_on:
-      - database
-    command: ["./wait-for-it.sh", "-t", "0", "database:5432", "--", "./startup.sh"]
+      - db
+    command: ["./wait-for-it.sh", "-t", "0", "db:5432", "--", "./startup.sh"]
 
-  web:
+  frontend:
     build:
       context: "."
-      dockerfile: Dockerfile.web
+      dockerfile: Dockerfile.frontend
     restart: unless-stopped
     ports:
-      - 8080:80
+      - 8888:80
     volumes:
       - ./default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
