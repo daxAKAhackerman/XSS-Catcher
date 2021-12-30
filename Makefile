@@ -1,13 +1,13 @@
 SHELL := /usr/bin/env bash
-POSTGRES_USER = user
-POSTGRES_DB = xss
 POSTGRES_PASSWORD := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)\n
 CLIENT_DIR=client
+DB_PASSWORD_FILE=.db_password
 
 install:
 	@python3 -m pip install pipenv -U
 	@pipenv install --dev
 	@pipenv run pre-commit install
+	@npm install --prefix $(CLIENT_DIR)
 
 lint:
 	@npm run --prefix $(CLIENT_DIR) lint
@@ -20,24 +20,28 @@ test:
 test-coverage-report:
 	@pipenv run pytest -v --cov=app --cov-report html:cov_html server/tests
 
+run-web-app:
+	@npm --prefix client run serve
+
+run-backend-server: lint
+	@cd server && FLASK_ENV=development pipenv run flask run
+
 generate-secrets:
-ifeq ($(wildcard ./.env),)
-	@echo POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) >> .env
-	@echo POSTGRES_USER=$(POSTGRES_USER) >> .env
-	@echo POSTGRES_DB=$(POSTGRES_DB) >> .env
+ifeq ($(wildcard ./$(DB_PASSWORD_FILE)),)
+ifneq ($(wildcard ./.env),)
+	@grep POSTGRES_PASSWORD .env | awk -F '=' '{print $2}' > $(DB_PASSWORD_FILE)
 else
-	@echo "[-] Docker environment variables are already set"
+	@echo $(POSTGRES_PASSWORD) > .db_password
+endif
+else
+	@echo "[-] Database password are already set"
 endif
 
-deploy: generate-secrets
+update: generate-secrets
 	@docker-compose build
 	@docker-compose up -d
 
-update:
-	@docker-compose build
-	@docker-compose up -d
-
-start:
+start: generate-secrets
 	@docker-compose up -d
 
 stop:

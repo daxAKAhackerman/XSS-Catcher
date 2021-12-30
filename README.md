@@ -44,8 +44,8 @@ $ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 # Go into the repository
 $ cd XSS-Catcher
 
-# Deploy the application. Also, run this once if you are migrating from v1.0.0
-$ make deploy
+# Start the application
+$ make start
 ```
 
 ## Update
@@ -86,11 +86,7 @@ $ make stop
 
 In order to avoid JavaScript mixed content errors when the XSS payload is triggered, it is highly recommended to put XSS Catcher behind a reverse proxy providing valid TLS certificates.
 
-### Database looks empty after migrating from v1.0.0 to v1.1.0 and up
-
-Since v1.1.0 introduced the usage of randomized database passwords, be sure to run `make deploy` after pulling the new version. If you don't, your application will fallback to a local SQLite database, which is empty by default.
-
-### I accidentally deleted the `.env` file that contained my database password
+### I accidentally deleted the `.db_password` file that contained my database password
 
 You can set a new database password by following these steps:
 
@@ -108,10 +104,8 @@ $ \password user
 $ exit
 $ exit
 
-# Create a new file in the XSS Catcher directory named ".env" with the following content
+# Create a new file in the XSS Catcher directory named ".db_password" with the following content
 POSTGRES_PASSWORD=YOUR_NEW_PASSWORD
-POSTGRES_USER=user
-POSTGRES_DB=xss
 
 # Stop the application and start it again
 $ make stop
@@ -137,6 +131,7 @@ Usage of this tool for attacking targets without prior mutual consent is illegal
 
 ## You may also like...
 
+-   [Simple One Time Secret](https://github.com/daxAKAhackerman/simple-one-time-secret) - Generate single use, expiring links to share sensitive information
 -   [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
 
 ---

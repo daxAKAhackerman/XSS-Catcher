@@ -1,24 +1,13 @@
-FROM ubuntu:latest
+FROM node:16.13.1-alpine3.14 as build
 
-ENV DEBIAN_FRONTEND noninteractive
+WORKDIR /build
 
-RUN apt-get update && apt-get -y install curl software-properties-common && curl -sL https://deb.nodesource.com/setup_12.x | bash -
+COPY ./client /build
 
-RUN apt-get install -y apache2 nodejs
+RUN npm ci
 
-RUN apt-get clean && apt-get autoremove --purge && rm -rf /var/lib/apt/lists/*
-
-COPY ./client /var/www/html/client
-WORKDIR /var/www/html/client
-RUN npm install
 RUN npm run build
 
-COPY ./vhost.conf /etc/apache2/sites-available/000-default.conf
+FROM nginx:1.21.5-alpine
 
-RUN a2enmod headers
-RUN a2enmod proxy
-RUN a2enmod proxy_http
-RUN a2enmod proxy_http2
-RUN a2enmod setenvif
-
-EXPOSE 80
+COPY --from=build /build/dist /usr/share/nginx/html
