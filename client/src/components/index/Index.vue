@@ -136,7 +136,7 @@ export default {
           sessionStorage.removeItem("access_token");
           sessionStorage.removeItem("refresh_token");
           this.$router.push({ name: "Login" });
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
         })
         .catch((error) => {
           this.handleError(error);
@@ -204,7 +204,7 @@ export default {
             .then((response) => {
               sessionStorage.setItem(
                 "access_token",
-                response.data.detail.access_token
+                response.data.access_token
               );
               return axios(originalRequest);
             });

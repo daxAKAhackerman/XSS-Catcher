@@ -38,18 +38,6 @@ export default {
     };
   },
   methods: {
-    handleError(error) {
-      if (error.response.status === 422) {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
-      } else {
-        this.makeToast(
-          error.response.data.detail,
-          "danger",
-          error.response.data.status
-        );
-      }
-    },
     loginProcess() {
       const path = `${basePath}/user/current`;
       axiosLogin

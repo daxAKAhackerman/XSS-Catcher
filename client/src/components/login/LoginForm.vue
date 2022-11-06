@@ -59,24 +59,14 @@ export default {
       axiosLogin
         .post(path, payload)
         .then((response) => {
-          sessionStorage.setItem(
-            "access_token",
-            response.data.detail.access_token
-          );
-          sessionStorage.setItem(
-            "refresh_token",
-            response.data.detail.refresh_token
-          );
-          this.makeToast(
-            "Logged in successfully",
-            "success",
-            response.data.status
-          );
+          sessionStorage.setItem("access_token", response.data.access_token);
+          sessionStorage.setItem("refresh_token", response.data.refresh_token);
+          this.makeToast("Logged in successfully", "success");
           this.$emit("login-process");
         })
         .catch((error) => {
           this.form.password = "";
-          this.$emit("handle-error", error);
+          this.handleError(error);
         });
     },
   },

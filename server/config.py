@@ -10,8 +10,8 @@ else:
     DATABASE_URL = "sqlite:///" + os.path.join(basedir, "app.db")
 
 
-class Config(object):
-    SECRET_KEY = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
+class Config:
+    SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV" if os.getenv("FLASK_DEBUG") else "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_ACCESS_TOKEN_EXPIRES = 300
