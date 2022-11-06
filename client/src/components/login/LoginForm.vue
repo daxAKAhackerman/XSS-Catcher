@@ -61,22 +61,21 @@ export default {
         .then((response) => {
           sessionStorage.setItem(
             "access_token",
-            response.data.detail.access_token
+            response.data.access_token
           );
           sessionStorage.setItem(
             "refresh_token",
-            response.data.detail.refresh_token
+            response.data.refresh_token
           );
           this.makeToast(
             "Logged in successfully",
-            "success",
-            response.data.status
+            "success"
           );
           this.$emit("login-process");
         })
         .catch((error) => {
           this.form.password = "";
-          this.$emit("handle-error", error);
+          this.handleError(error);
         });
     },
   },

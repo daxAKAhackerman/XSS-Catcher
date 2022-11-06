@@ -1,4 +1,4 @@
-FROM node:16.13.1-alpine3.14 as build
+FROM node:16.18-alpine3.15 as build
 
 WORKDIR /build
 
@@ -8,6 +8,6 @@ RUN npm ci
 
 RUN npm run build
 
-FROM nginx:1.21.5-alpine
+FROM nginx:1.23-alpine
 
 COPY --from=build /build/dist /usr/share/nginx/html
