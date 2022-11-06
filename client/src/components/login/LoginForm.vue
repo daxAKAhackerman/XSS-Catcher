@@ -59,18 +59,9 @@ export default {
       axiosLogin
         .post(path, payload)
         .then((response) => {
-          sessionStorage.setItem(
-            "access_token",
-            response.data.access_token
-          );
-          sessionStorage.setItem(
-            "refresh_token",
-            response.data.refresh_token
-          );
-          this.makeToast(
-            "Logged in successfully",
-            "success"
-          );
+          sessionStorage.setItem("access_token", response.data.access_token);
+          sessionStorage.setItem("refresh_token", response.data.refresh_token);
+          this.makeToast("Logged in successfully", "success");
           this.$emit("login-process");
         })
         .catch((error) => {

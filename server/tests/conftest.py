@@ -14,7 +14,6 @@ class TestConfig:
 
 @pytest.fixture()
 def app():
-
     app = create_app(config_class=TestConfig)
     with app.app_context():
         db.create_all()
