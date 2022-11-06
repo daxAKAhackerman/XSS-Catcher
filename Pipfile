@@ -10,8 +10,8 @@ Flask-JWT-Extended = "==4.4.4"
 Flask-Migrate = "==3.1.0"
 Flask-SQLAlchemy = "==3.0.2"
 requests = "==2.28.1"
-flask-pydantic = "*"
-waitress = "*"
+Flask-Pydantic = "==0.11.0"
+waitress = "==2.1.2"
 
 [dev-packages]
 black = "*"
