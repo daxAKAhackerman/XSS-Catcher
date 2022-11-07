@@ -1,55 +1,42 @@
-import json
-
 from app import db
 from app.api import bp
+from app.api.models import ClientPostModel
 from app.decorators import permissions
 from app.models import XSS, Client, User
 from app.validators import check_length, is_email, is_url, not_empty
 from flask import jsonify, request
 from flask_jwt_extended import get_current_user, jwt_required
+from flask_pydantic import validate
 
 
 @bp.route("/client", methods=["POST"])
 @jwt_required()
-def client_put():
-    """Creates a new client"""
-    current_user = get_current_user()
+@validate()
+def client_post(body: ClientPostModel):
+    current_user: User = get_current_user()
 
-    data = request.get_json()
+    if db.session.query(Client).filter_by(name=body.name).count() > 0:
+        return {"msg": "Client already exists"}, 400
 
-    if "name" not in data.keys() or "description" not in data.keys():
-        return jsonify({"status": "error", "detail": "Missing name or description"}), 400
-
-    if Client.query.filter_by(name=data["name"]).first() != None:
-        return jsonify({"status": "error", "detail": "Client already exists"}), 400
-
-    if not_empty(data["name"]) and check_length(data["name"], 32) and check_length(data["description"], 128):
-
-        new_client = Client(name=data["name"], description=data["description"], owner_id=current_user.id)
-
-        new_client.gen_uid()
-
-        db.session.add(new_client)
-
-        db.session.commit()
-        return jsonify({"status": "OK", "detail": "New client {} created successfuly".format(new_client.name)}), 201
-    else:
-        return jsonify({"status": "error", "detail": "Invalid data (name empty or too long or description too long)"}), 400
+    new_client = Client(name=body.name, description=body.description, owner_id=current_user.id)
+    new_client.gen_uid()
+    db.session.add(new_client)
+    db.session.commit()
+    return {"msg": f"New client {new_client.name} created successfuly"}, 201
 
 
 @bp.route("/client/<int:client_id>", methods=["GET"])
 @jwt_required()
 def client_get(client_id):
-    """Gets a client's infos"""
-    client = Client.query.filter_by(id=client_id).first_or_404()
+    client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
 
-    return jsonify(client.to_dict_client()), 200
+    return client.to_dict_client()
 
 
 @bp.route("/client/<int:client_id>", methods=["PATCH"])
 @jwt_required()
 @permissions(one_of=["admin", "owner"])
-def client_post(client_id):
+def client_patch(client_id):
     """Edits a client"""
     data = request.get_json()
 
