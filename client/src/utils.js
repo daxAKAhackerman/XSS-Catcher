@@ -17,7 +17,7 @@ export const handleError = function(error) {
         if (error.response.data.validation_error) {
             content = `${error.response.data.validation_error.body_params[0].loc[0]}: ${error.response.data.validation_error.body_params[0].msg}`;
         } else {
-            content = error.response.data.detail || error.response.data.msg || error.response.data.validation_error.body_params[0].msg;
+            content = error.response.data.detail || error.response.data.msg;
         }
 
         const title = error.response.data.status || "Notification";
