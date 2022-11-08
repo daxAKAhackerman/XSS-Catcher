@@ -28,5 +28,5 @@ def app():
 
 
 @pytest.fixture()
-def client(app: Flask):
+def client_tester(app: Flask):
     return app.test_client()

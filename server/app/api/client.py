@@ -49,8 +49,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
         client.description = body.description
 
     if body.owner is not None:
-        user: User = db.session.query(User).filter_by(id=body.owner).first()
-        if user is None:
+        if db.session.query(User).filter_by(id=body.owner).first() is None:
             return {"msg": "This user does not exist"}, 400
         client.owner_id = body.owner
 
@@ -87,6 +86,4 @@ def client_delete(client_id: int):
 @jwt_required()
 def client_get_all():
     clients: List[Client] = db.session.query(Client).order_by(Client.id.desc()).all()
-    client_list = [client.to_dict_clients() for client in clients]
-
-    return client_list
+    return [client.to_dict_clients() for client in clients]
