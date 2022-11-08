@@ -3,6 +3,7 @@ import os
 import pytest
 from app import create_app, db
 from app.models import init_app
+from flask import Flask
 
 
 class TestConfig:
@@ -27,5 +28,5 @@ def app():
 
 
 @pytest.fixture()
-def client(app):
+def client_tester(app: Flask):
     return app.test_client()

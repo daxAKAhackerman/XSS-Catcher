@@ -178,18 +178,18 @@ export default {
         owner: owner,
       };
 
-      if (this.client.mail_to !== "" && this.client.mail_to !== null) {
+      if (this.client.mail_to !== null) {
         payload.mail_to = this.client.mail_to;
       }
 
-      if (this.client.webhook_url !== "" && this.client.webhook_url !== null) {
+      if (this.client.webhook_url !== null) {
         payload.webhook_url = this.client.webhook_url;
       }
 
       axios
         .patch(path, payload)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.cleanup();
         })
         .catch((error) => {

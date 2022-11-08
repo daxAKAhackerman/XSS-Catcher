@@ -13,7 +13,13 @@ export const handleError = function(error) {
         sessionStorage.removeItem("refresh_token");
         this.$router.push({ name: "Login" });
     } else {
-        const content = error.response.data.detail || error.response.data.msg;
+        let content = "";
+        if (error.response.data.validation_error) {
+            content = `${error.response.data.validation_error.body_params[0].loc[0]}: ${error.response.data.validation_error.body_params[0].msg}`;
+        } else {
+            content = error.response.data.detail || error.response.data.msg;
+        }
+
         const title = error.response.data.status || "Notification";
 
         this.makeToast(content, "danger", title);
