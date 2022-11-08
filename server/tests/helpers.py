@@ -1,5 +1,5 @@
 from app import db
-from app.models import Client
+from app.models import Client, User
 from flask.testing import FlaskClient
 
 
@@ -12,4 +12,11 @@ def create_client(name: str, owner_id: int = 1):
     new_client = Client(name=name, description="", owner_id=owner_id)
     new_client.gen_uid()
     db.session.add(new_client)
+    db.session.commit()
+
+
+def create_user(username: str, password: str = "test"):
+    user = User(username=username)
+    user.set_password(password)
+    db.session.add(user)
     db.session.commit()
