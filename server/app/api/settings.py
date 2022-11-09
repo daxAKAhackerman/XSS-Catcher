@@ -26,98 +26,104 @@ def settings_get():
 def settings_patch(body: SettingsPatchModel):
     settings: Settings = db.session.query(Settings).first()
 
-    if "smtp_host" in data.keys():
-
-        if data["smtp_host"] != "":
-
-            if check_length(data["smtp_host"], 256):
-                settings.smtp_host = data["smtp_host"]
-            else:
-                return jsonify({"status": "error", "detail": "Server address too long"}), 400
-
-            if "smtp_port" in data.keys():
-
-                try:
-                    smtp_port = int(data["smtp_port"])
-                except ValueError:
-                    return jsonify({"status": "error", "detail": "Port is invalid"}), 400
-
-                if smtp_port <= 65535 and smtp_port >= 0:
-                    settings.smtp_port = int(data["smtp_port"])
-                else:
-                    return jsonify({"status": "error", "detail": "Port is invalid"}), 400
-
-            else:
-                return jsonify({"status": "error", "detail": "Missing SMTP port"}), 400
-
-            if "starttls" in data.keys() and "ssl_tls" in data.keys():
-                return jsonify({"status": "error", "detail": "Cannot use STARTTLS and SSL/TLS at the same time"}), 400
-
-            if "starttls" in data.keys():
-                settings.starttls = True
-            else:
-                settings.starttls = False
-
-            if "ssl_tls" in data.keys():
-                settings.ssl_tls = True
-            else:
-                settings.ssl_tls = False
-
-            if "mail_from" in data.keys():
-                if is_email(data["mail_from"]) and check_length(data["mail_from"], 256):
-                    settings.mail_from = data["mail_from"]
-                else:
-                    return jsonify({"status": "error", "detail": "Email address format is invalid"}), 400
-
-            else:
-                return jsonify({"status": "error", "detail": "Missing sender address"}), 400
-
-            if "mail_to" in data.keys():
-                if is_email(data["mail_to"]):
-                    settings.mail_to = data["mail_to"]
-                else:
-                    return jsonify({"status": "error", "detail": "Recipient email address format is invalid"}), 400
-            else:
-                settings.mail_to = None
-
-            if "smtp_user" in data.keys():
-
-                if check_length(data["smtp_user"], 128):
-                    settings.smtp_user = data["smtp_user"]
-                else:
-                    return jsonify({"status": "error", "detail": "SMTP username too long"}), 400
-
-                if "smtp_pass" in data.keys():
-                    if check_length(data["smtp_pass"], 128):
-                        settings.smtp_pass = data["smtp_pass"]
-                    else:
-                        return jsonify({"status": "error", "detail": "SMTP password too long"}), 400
-
-            else:
-                settings.smtp_user = None
-                settings.smtp_pass = None
-
-        else:
+    if body.smtp_host is not None:
+        if body.smtp_host == "":
             settings.smtp_host = None
-            settings.smtp_port = None
-            settings.starttls = False
-            settings.ssl_tls = False
-            settings.mail_from = None
-            settings.mail_to = None
-            settings.smtp_user = None
-            settings.smtp_pass = None
-            settings.smtp_status = None
+        else:
+            settings.smtp_host = body.smtp_host
 
-    else:
-        settings.smtp_host = None
-        settings.smtp_port = None
-        settings.starttls = False
-        settings.ssl_tls = False
-        settings.mail_from = None
-        settings.mail_to = None
-        settings.smtp_user = None
-        settings.smtp_pass = None
-        settings.smtp_status = None
+    # if "smtp_host" in data.keys():
+
+    #     if data["smtp_host"] != "":
+
+    #         if check_length(data["smtp_host"], 256):
+    #             settings.smtp_host = data["smtp_host"]
+    #         else:
+    #             return jsonify({"status": "error", "detail": "Server address too long"}), 400
+
+    #         if "smtp_port" in data.keys():
+
+    #             try:
+    #                 smtp_port = int(data["smtp_port"])
+    #             except ValueError:
+    #                 return jsonify({"status": "error", "detail": "Port is invalid"}), 400
+
+    #             if smtp_port <= 65535 and smtp_port >= 0:
+    #                 settings.smtp_port = int(data["smtp_port"])
+    #             else:
+    #                 return jsonify({"status": "error", "detail": "Port is invalid"}), 400
+
+    #         else:
+    #             return jsonify({"status": "error", "detail": "Missing SMTP port"}), 400
+
+    #         if "starttls" in data.keys() and "ssl_tls" in data.keys():
+    #             return jsonify({"status": "error", "detail": "Cannot use STARTTLS and SSL/TLS at the same time"}), 400
+
+    #         if "starttls" in data.keys():
+    #             settings.starttls = True
+    #         else:
+    #             settings.starttls = False
+
+    #         if "ssl_tls" in data.keys():
+    #             settings.ssl_tls = True
+    #         else:
+    #             settings.ssl_tls = False
+
+    #         if "mail_from" in data.keys():
+    #             if is_email(data["mail_from"]) and check_length(data["mail_from"], 256):
+    #                 settings.mail_from = data["mail_from"]
+    #             else:
+    #                 return jsonify({"status": "error", "detail": "Email address format is invalid"}), 400
+
+    #         else:
+    #             return jsonify({"status": "error", "detail": "Missing sender address"}), 400
+
+    #         if "mail_to" in data.keys():
+    #             if is_email(data["mail_to"]):
+    #                 settings.mail_to = data["mail_to"]
+    #             else:
+    #                 return jsonify({"status": "error", "detail": "Recipient email address format is invalid"}), 400
+    #         else:
+    #             settings.mail_to = None
+
+    #         if "smtp_user" in data.keys():
+
+    #             if check_length(data["smtp_user"], 128):
+    #                 settings.smtp_user = data["smtp_user"]
+    #             else:
+    #                 return jsonify({"status": "error", "detail": "SMTP username too long"}), 400
+
+    #             if "smtp_pass" in data.keys():
+    #                 if check_length(data["smtp_pass"], 128):
+    #                     settings.smtp_pass = data["smtp_pass"]
+    #                 else:
+    #                     return jsonify({"status": "error", "detail": "SMTP password too long"}), 400
+
+    #         else:
+    #             settings.smtp_user = None
+    #             settings.smtp_pass = None
+
+    #     else:
+    #         settings.smtp_host = None
+    #         settings.smtp_port = None
+    #         settings.starttls = False
+    #         settings.ssl_tls = False
+    #         settings.mail_from = None
+    #         settings.mail_to = None
+    #         settings.smtp_user = None
+    #         settings.smtp_pass = None
+    #         settings.smtp_status = None
+
+    # else:
+    #     settings.smtp_host = None
+    #     settings.smtp_port = None
+    #     settings.starttls = False
+    #     settings.ssl_tls = False
+    #     settings.mail_from = None
+    #     settings.mail_to = None
+    #     settings.smtp_user = None
+    #     settings.smtp_pass = None
+    #     settings.smtp_status = None
 
     if "webhook_url" in data.keys():
         if is_url(data["webhook_url"]):
