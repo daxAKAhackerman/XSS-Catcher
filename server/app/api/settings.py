@@ -1,31 +1,30 @@
 from app import db
 from app.api import bp
+from app.api.models import SettingsPatchModel
 from app.decorators import permissions
 from app.models import Settings
 from app.utils import send_mail, send_webhook
 from app.validators import check_length, is_email, is_url
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
+from flask_pydantic import validate
 
 
 @bp.route("/settings", methods=["GET"])
 @jwt_required()
 @permissions(all_of=["admin"])
 def settings_get():
+    settings: Settings = db.session.query(Settings).first()
 
-    settings = Settings.query.first()
-
-    return jsonify(settings.to_dict()), 200
+    return settings.to_dict()
 
 
 @bp.route("/settings", methods=["PATCH"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def settings_post():
-
-    data = request.get_json()
-
-    settings = Settings.query.first()
+@validate()
+def settings_patch(body: SettingsPatchModel):
+    settings: Settings = db.session.query(Settings).first()
 
     if "smtp_host" in data.keys():
 
