@@ -228,47 +228,41 @@ export default {
 
       const payload = {};
 
-      if (this.settings.smtp_host !== "" && this.settings.smtp_host !== null) {
-        payload.mail_from = this.settings.mail_from;
-        payload.smtp_host = this.settings.smtp_host;
-        payload.smtp_port = this.settings.smtp_port;
-
-        if (
-          this.settings.smtp_user !== "" &&
-          this.settings.smtp_user !== null
-        ) {
-          payload.smtp_user = this.settings.smtp_user;
-        }
-
-        if (
-          this.settings.smtp_pass !== undefined &&
-          this.settings.smtp_pass !== null
-        ) {
-          payload.smtp_pass = this.settings.smtp_pass;
-        }
-
-        if (this.settings.ssl_tls) {
-          payload.ssl_tls = 1;
-        } else if (this.settings.starttls) {
-          payload.starttls = 1;
-        }
+      if (this.settings.smtp_host !== null) {
+        payload.smtp_host = this.settings.smtp_host
       }
 
-      if (
-        this.settings.webhook_url !== "" &&
-        this.settings.webhook_url !== null
-      ) {
-        payload.webhook_url = this.settings.webhook_url;
+      if (this.settings.smtp_port !== null) {
+        payload.smtp_port = this.settings.smtp_port
       }
 
-      if (this.settings.mail_to !== "" && this.settings.mail_to !== null) {
-        payload.mail_to = this.settings.mail_to;
+      if (this.settings.mail_from !== null) {
+        payload.mail_from = this.settings.mail_from
       }
+
+      if (this.settings.mail_to !== null) {
+        payload.mail_to = this.settings.mail_to
+      }
+
+      if (this.settings.smtp_user !== null) {
+        payload.smtp_user = this.settings.smtp_user
+      }
+
+      if (this.settings.smtp_pass !== null) {
+        payload.smtp_pass = this.settings.smtp_pass
+      }
+
+      if (this.settings.webhook_url !== null) {
+        payload.webhook_url = this.settings.webhook_url
+      }
+
+      payload.starttls = this.settings.starttls
+      payload.ssl_tls = this.settings.ssl_tls
 
       axios
         .patch(path, payload)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.getSettings();
         })
         .catch((error) => {

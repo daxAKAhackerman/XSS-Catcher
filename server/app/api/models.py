@@ -26,13 +26,8 @@ class SettingsPatchModel(BaseModel):
     smtp_port: Optional[int] = Field(gt=0, lt=65536)
     starttls: Optional[bool]
     ssl_tls: Optional[bool]
-    mail_from: Union[EmailStr, None, Literal[""]]
+    mail_from: Optional[EmailStr]
     mail_to: Union[EmailStr, None, Literal[""]]
     smtp_user: Optional[str] = Field(max_length=128)
     smtp_pass: Optional[str] = Field(max_length=128)
     webhook_url: Union[AnyHttpUrl, None, Literal[""]]
-
-    @validator("ssl_tls")
-    def mutually_exclusive_ssl_params(cls, v, values, **kwargs):
-        if values["starttls"]:
-            raise ValueError("ssl_tls and starttls are mutually exclusive")
