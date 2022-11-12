@@ -4,7 +4,6 @@ from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPos
 from app.decorators import permissions
 from app.models import Settings
 from app.utils import logger, send_mail, send_webhook
-from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
 
@@ -80,11 +79,11 @@ def settings_patch(body: SettingsPatchModel):
     if settings.smtp_host and not settings.smtp_port:
         return {"msg": "Missing SMTP port"}, 400
 
-    if settings.starttls and settings.ssl_tls:
-        return {"msg": "Cannot use STARTTLS and SSL/TLS at the same time"}, 400
-
     if settings.smtp_host and not settings.mail_from:
         return {"msg": "Missing sender address"}, 400
+
+    if settings.starttls and settings.ssl_tls:
+        return {"msg": "Cannot use STARTTLS and SSL/TLS at the same time"}, 400
 
     db.session.commit()
 
