@@ -1,9 +1,13 @@
+import logging
 import smtplib
 import ssl
 from email.mime.text import MIMEText
 
 import requests
 from app.models import Settings
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 class Error(Exception):

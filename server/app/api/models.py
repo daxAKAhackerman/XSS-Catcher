@@ -1,6 +1,6 @@
 from typing import Literal, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field
+from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field, validator
 
 
 class LoginModel(BaseModel):
@@ -19,3 +19,23 @@ class ClientPatchModel(BaseModel):
     owner: Optional[int]
     mail_to: Union[EmailStr, None, Literal[""]]
     webhook_url: Union[AnyHttpUrl, None, Literal[""]]
+
+
+class SettingsPatchModel(BaseModel):
+    smtp_host: Optional[str] = Field(max_length=256)
+    smtp_port: Optional[int] = Field(gt=0, lt=65536)
+    starttls: Optional[bool]
+    ssl_tls: Optional[bool]
+    mail_from: Optional[EmailStr]
+    mail_to: Union[EmailStr, None, Literal[""]]
+    smtp_user: Optional[str] = Field(max_length=128)
+    smtp_pass: Optional[str] = Field(max_length=128)
+    webhook_url: Union[AnyHttpUrl, None, Literal[""]]
+
+
+class SmtpTestPostModel(BaseModel):
+    mail_to: EmailStr
+
+
+class WebhookTestPostModel(BaseModel):
+    webhook_url: AnyHttpUrl
