@@ -1,10 +1,9 @@
 from app import db
 from app.api import bp
-from app.api.models import SettingsPatchModel
+from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.decorators import permissions
 from app.models import Settings
-from app.utils import send_mail, send_webhook
-from app.validators import check_length, is_email
+from app.utils import logger, send_mail, send_webhook
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
@@ -95,48 +94,30 @@ def settings_patch(body: SettingsPatchModel):
 @bp.route("/settings/smtp_test", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def smtp_test_post():
-    data = request.get_json()
+@validate()
+def smtp_test_post(body: SmtpTestPostModel):
+    settings: Settings = db.session.query(Settings).first()
 
-    settings = Settings.query.first()
-
-    if "mail_to" not in data.keys():
-        return jsonify({"status": "error", "detail": "Missing recipient"}), 400
-
-    if is_email(data["mail_to"]) and check_length(data["mail_to"], 256):
-
-        try:
-            send_mail(receiver=data["mail_to"])
-            settings.smtp_status = True
-            db.session.commit()
-            return jsonify({"status": "OK", "detail": "SMTP configuration test successful"}), 200
-        except:
-            settings.smtp_status = False
-            db.session.commit()
-            return (
-                jsonify(
-                    {
-                        "status": "error",
-                        "detail": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. ",
-                    }
-                ),
-                400,
-            )
-    else:
-        return jsonify({"status": "error", "detail": "Invalid recipient"}), 400
+    try:
+        send_mail(receiver=body.mail_to)
+        settings.smtp_status = True
+        db.session.commit()
+        return {"msg": "SMTP configuration test successful"}
+    except Exception as e:
+        logger.error(e)
+        settings.smtp_status = False
+        db.session.commit()
+        return {"msg": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. "}, 400
 
 
 @bp.route("/settings/webhook_test", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def webhook_test_post():
-    data = request.get_json()
-
-    if "webhook_url" not in data.keys():
-        return jsonify({"status": "error", "detail": "Missing webhook url"}), 400
-
+@validate()
+def webhook_test_post(body: WebhookTestPostModel):
     try:
-        send_webhook(receiver=data["webhook_url"])
-        return jsonify({"status": "OK", "detail": "Webhook configuration test successful"}), 200
-    except:
-        return jsonify({"status": "error", "detail": "Could not send test webhook"}), 400
+        send_webhook(receiver=body.webhook_url)
+        return {"msg": "Webhook configuration test successful"}
+    except Exception as e:
+        logger.error(e)
+        return {"msg": "Could not send test webhook"}, 400

@@ -1,3 +1,5 @@
+from unittest import mock
+
 from app import db
 from app.models import Settings
 from flask.testing import FlaskClient
@@ -147,3 +149,43 @@ def test__settings_patch__given_webhook_url__when_empty_string__then_field_set_t
         headers={"Authorization": f"Bearer {access_token}"},
     )
     assert settings.webhook_url is None
+
+
+@mock.patch("app.api.settings.send_mail")
+def test__smtp_test_post__given_mail_to__then_configuration_successfully_tested(send_mail_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
+    settings: Settings = db.session.query(Settings).first()
+    send_mail_mocker.assert_called_once_with(receiver="test@example.com")
+    assert settings.smtp_status == True
+    assert response.json == {"msg": "SMTP configuration test successful"}
+    assert response.status_code == 200
+
+
+@mock.patch("app.api.settings.send_mail", side_effect=ValueError)
+def test__smtp_test_post__given_mail_to__when_send_mail_fails__then_configuration_test_fails(send_mail_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
+    settings: Settings = db.session.query(Settings).first()
+    assert settings.smtp_status == False
+    assert response.json == {"msg": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. "}
+    assert response.status_code == 400
+
+
+@mock.patch("app.api.settings.send_webhook")
+def test__webhook_test_post__given_webhook_url__then_test_successful(send_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/settings/webhook_test", json={"webhook_url": "https://test.com"}, headers={"Authorization": f"Bearer {access_token}"})
+    send_webhook_mocker.assert_called_once_with(receiver="https://test.com")
+    assert response.json == {"msg": "Webhook configuration test successful"}
+    assert response.status_code == 200
+
+
+@mock.patch("app.api.settings.send_webhook", side_effect=ValueError)
+def test__webhook_test_post__given_webhook_url__when_bad_url__then_test_fails(send_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post(
+        "/api/settings/webhook_test", json={"webhook_url": "https://donotexist.com"}, headers={"Authorization": f"Bearer {access_token}"}
+    )
+    assert response.json == {"msg": "Could not send test webhook"}
+    assert response.status_code == 400

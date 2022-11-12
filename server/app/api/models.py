@@ -31,3 +31,11 @@ class SettingsPatchModel(BaseModel):
     smtp_user: Optional[str] = Field(max_length=128)
     smtp_pass: Optional[str] = Field(max_length=128)
     webhook_url: Union[AnyHttpUrl, None, Literal[""]]
+
+
+class SmtpTestPostModel(BaseModel):
+    mail_to: EmailStr
+
+
+class WebhookTestPostModel(BaseModel):
+    webhook_url: AnyHttpUrl
