@@ -1,40 +1,30 @@
 from app import db
 from app.api import bp
+from app.api.models import RegisterModel
 from app.decorators import permissions
 from app.models import User
-from app.validators import check_length, is_password, not_empty
+from app.validators import is_password
 from flask import jsonify, request
 from flask_jwt_extended import get_current_user, jwt_required
+from flask_pydantic import validate
 
 
 @bp.route("/user", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def register():
-    """Creates a new user"""
-    data = request.get_json()
+@validate()
+def register(body: RegisterModel):
+    if db.session.query(User).filter_by(username=body.username).first() != None:
+        return {"msg": "This user already exists"}, 400
 
-    if "username" not in data.keys():
-
-        return jsonify({"status": "error", "detail": "Missing username"}), 400
-
-    if not (not_empty(data["username"]) and check_length(data["username"], 128)):
-        return jsonify({"status": "error", "detail": "Invalid username (too long or empty)"}), 400
-
-    if User.query.filter_by(username=data["username"]).first() != None:
-        return jsonify({"status": "error", "detail": "This user already exists"}), 400
-
-    user = User(username=data["username"])
-
+    user = User(username=body.username)
     password = user.generate_password()
-
     user.set_password(password)
 
     db.session.add(user)
-
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": password}), 200
+    return {"password": password}
 
 
 @bp.route("/user/password", methods=["POST"])

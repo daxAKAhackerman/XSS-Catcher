@@ -1,6 +1,6 @@
 from typing import Literal, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field, validator
+from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field
 
 
 class LoginModel(BaseModel):
@@ -39,3 +39,7 @@ class SmtpTestPostModel(BaseModel):
 
 class WebhookTestPostModel(BaseModel):
     webhook_url: AnyHttpUrl
+
+
+class RegisterModel(BaseModel):
+    username: str = Field(..., min_length=1, max_length=128)
