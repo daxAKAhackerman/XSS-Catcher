@@ -1,9 +1,8 @@
 from app import db
 from app.api import bp
-from app.api.models import RegisterModel
+from app.api.models import ChangePasswordModel, RegisterModel
 from app.decorators import permissions
 from app.models import User
-from app.validators import is_password
 from flask import jsonify, request
 from flask_jwt_extended import get_current_user, jwt_required
 from flask_pydantic import validate
@@ -14,7 +13,7 @@ from flask_pydantic import validate
 @permissions(all_of=["admin"])
 @validate()
 def register(body: RegisterModel):
-    if db.session.query(User).filter_by(username=body.username).first() != None:
+    if db.session.query(User).filter_by(username=body.username).first() is not None:
         return {"msg": "This user already exists"}, 400
 
     user = User(username=body.username)
@@ -29,32 +28,18 @@ def register(body: RegisterModel):
 
 @bp.route("/user/password", methods=["POST"])
 @jwt_required()
-def change_password():
-    """Change the current user's password"""
-    current_user = get_current_user()
+@validate()
+def change_password(body: ChangePasswordModel):
+    current_user: User = get_current_user()
 
-    data = request.get_json()
+    if not current_user.check_password(body.old_password):
+        return {"msg": "Old password is incorrect"}, 400
 
-    if ("password1" not in data.keys()) or ("password2" not in data.keys()) or ("old_password" not in data.keys()):
-        return jsonify({"status": "error", "detail": "Missing data (password1, password2 or old_password)"}), 400
-
-    if not is_password(data["password1"]):
-        return (
-            jsonify({"status": "error", "detail": "Password must be at least 8 characters and contain a uppercase letter, a lowercase letter and a number"}),
-            400,
-        )
-
-    if data["password1"] != data["password2"]:
-        return jsonify({"status": "error", "detail": "Passwords don't match"}), 400
-
-    if not current_user.check_password(data["old_password"]):
-        return jsonify({"status": "error", "detail": "Old password is incorrect"}), 400
-
-    current_user.set_password(data["password1"])
+    current_user.set_password(body.password1)
     current_user.first_login = False
 
     db.session.commit()
-    return jsonify({"status": "OK", "detail": "Password changed successfuly"}), 200
+    return {"msg": "Password changed successfuly"}
 
 
 @bp.route("/user/<id>/password", methods=["POST"])
