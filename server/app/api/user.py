@@ -42,51 +42,46 @@ def change_password(body: ChangePasswordModel):
     return {"msg": "Password changed successfuly"}
 
 
-@bp.route("/user/<id>/password", methods=["POST"])
+@bp.route("/user/<int:id>/password", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def reset_password(id):
-    """Resets a user's password"""
-    user = User.query.filter_by(id=id).first_or_404()
+def reset_password(id: int):
+    user: User = db.session.query(User).filter_by(id=id).first_or_404()
 
     password = user.generate_password()
-
     user.set_password(password)
-
     user.first_login = True
 
     db.session.commit()
-    return jsonify({"status": "OK", "detail": password}), 200
+    return {"password": password}
 
 
 @bp.route("/user/current", methods=["GET"])
 @jwt_required()
 def user_get():
-    """Get the current user"""
-    current_user = get_current_user()
+    current_user: User = get_current_user()
 
-    return jsonify(current_user.to_dict()), 200
+    return current_user.to_dict()
 
 
-@bp.route("/user/<user_id>", methods=["DELETE"])
+@bp.route("/user/<int:user_id>", methods=["DELETE"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def user_delete(user_id):
-    """Deletes a user"""
-    current_user = get_current_user()
+def user_delete(user_id: int):
+    current_user: User = get_current_user()
 
-    if len(User.query.all()) <= 1:
-        return jsonify({"status": "error", "detail": "Can't delete the only user"}), 400
+    if db.session.query(User).count() <= 1:
+        return {"msg": "Can't delete the only user"}, 400
 
-    if current_user.id == int(user_id):
-        return jsonify({"status": "error", "detail": "Can't delete yourself"}), 400
+    if current_user.id == user_id:
+        return {"msg": "Can't delete yourself"}, 400
 
-    user = User.query.filter_by(id=user_id).first_or_404()
+    user: User = db.session.query(User).filter_by(id=user_id).first_or_404()
 
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": "User {} deleted successfuly".format(user.username)}), 200
+    return {"msg": f"User {user.username} deleted successfuly"}
 
 
 @bp.route("/user/<user_id>", methods=["PATCH"])

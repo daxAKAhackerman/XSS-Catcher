@@ -151,7 +151,7 @@ export default {
       axios
         .post(path)
         .then((response) => {
-          this.alert_msg = `New password for user ${username} is: ${response.data.detail}`;
+          this.alert_msg = `New password for user ${username} is: ${response.data.password}`;
           this.show_alert = true;
           this.alert_type = "success";
         })
