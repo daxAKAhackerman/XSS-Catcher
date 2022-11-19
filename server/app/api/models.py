@@ -66,3 +66,7 @@ class ChangePasswordModel(BaseModel):
         if "password1" in values and v != values["password1"]:
             raise ValueError("Passwords don't match")
         return v
+
+
+class UserPatchModel(BaseModel):
+    is_admin: bool

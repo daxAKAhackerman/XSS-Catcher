@@ -77,12 +77,15 @@ def settings_patch(body: SettingsPatchModel):
         settings.smtp_pass = None
 
     if settings.smtp_host and not settings.smtp_port:
+        db.session.remove()
         return {"msg": "Missing SMTP port"}, 400
 
     if settings.smtp_host and not settings.mail_from:
+        db.session.remove()
         return {"msg": "Missing sender address"}, 400
 
     if settings.starttls and settings.ssl_tls:
+        db.session.remove()
         return {"msg": "Cannot use STARTTLS and SSL/TLS at the same time"}, 400
 
     db.session.commit()

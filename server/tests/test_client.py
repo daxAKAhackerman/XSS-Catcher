@@ -8,6 +8,7 @@ def test__client_post__given_client_info__when_client_already_exists__then_400_r
     client = create_client("test")
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/client", json={"name": client.name, "description": ""}, headers={"Authorization": f"Bearer {access_token}"})
+    assert db.session.query(Client).count() == 1
     assert response.json == {"msg": "Client already exists"}
     assert response.status_code == 400
 
@@ -60,6 +61,7 @@ def test__client_patch__given_name__when_name_already_exists__then_400_returned(
     client2 = create_client("test2")
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch(f"/api/client/{client1.id}", json={"name": client2.name}, headers={"Authorization": f"Bearer {access_token}"})
+    assert client1.name == "test"
     assert response.json == {"msg": "Another client already uses this name"}
     assert response.status_code == 400
 
@@ -68,6 +70,7 @@ def test__client_patch__given_owner__when_owner_does_not_exist__then_400_returne
     client = create_client("test")
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch(f"/api/client/{client.id}", json={"owner": 2}, headers={"Authorization": f"Bearer {access_token}"})
+    assert client.owner_id == 1
     assert response.json == {"msg": "This user does not exist"}
     assert response.status_code == 400
 

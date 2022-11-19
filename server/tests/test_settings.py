@@ -26,6 +26,8 @@ def test__settings_get__given_request__then_settings_returned(client_tester: Fla
 def test__settings_patch__given_smtp_host__when_smtp_port_missing__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1"}, headers={"Authorization": f"Bearer {access_token}"})
+    settings: Settings = db.session.query(Settings).first()
+    assert settings.smtp_host == None
     assert response.json == {"msg": "Missing SMTP port"}
     assert response.status_code == 400
 
@@ -37,6 +39,9 @@ def test__settings_patch__given_both_starttls_and_ssl_tls__then_400_returned(cli
         json={"starttls": True, "ssl_tls": True, "smtp_host": "127.0.0.1", "smtp_port": 465, "mail_from": "test@example.com"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
+    settings: Settings = db.session.query(Settings).first()
+    assert settings.starttls is False
+    assert settings.ssl_tls is False
     assert response.json == {"msg": "Cannot use STARTTLS and SSL/TLS at the same time"}
     assert response.status_code == 400
 
@@ -44,6 +49,8 @@ def test__settings_patch__given_both_starttls_and_ssl_tls__then_400_returned(cli
 def test__settings_patch__given_smtp_host__when_mail_from_missing__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1", "smtp_port": 465}, headers={"Authorization": f"Bearer {access_token}"})
+    settings: Settings = db.session.query(Settings).first()
+    assert settings.smtp_host == None
     assert response.json == {"msg": "Missing sender address"}
     assert response.status_code == 400
 
@@ -142,13 +149,26 @@ def test__settings_patch__given_smtp_user__when_empty_string__then_field_set_to_
 
 def test__settings_patch__given_webhook_url__when_empty_string__then_field_set_to_none(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
-    settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com", webhook_url="http://127.0.0.1")
+    settings: Settings = set_settings(webhook_url="http://127.0.0.1")
     response = client_tester.patch(
         "/api/settings",
         json={"webhook_url": ""},
         headers={"Authorization": f"Bearer {access_token}"},
     )
     assert settings.webhook_url is None
+
+
+def test__settings_patch__given_empty_smtp_host__then_smtp_configuration_reset(client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
+    response = client_tester.patch(
+        "/api/settings",
+        json={"smtp_host": ""},
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert settings.smtp_host is None
+    assert settings.smtp_port is None
+    assert settings.mail_from is None
 
 
 @mock.patch("app.api.settings.send_mail")
