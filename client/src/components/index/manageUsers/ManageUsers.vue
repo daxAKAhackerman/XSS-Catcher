@@ -28,7 +28,7 @@
               v-if="user.is_admin"
               v-b-tooltip.hover
               title="Demote user"
-              @click="promoteUser(0, user.id)"
+              @click="promoteUser(false, user.id)"
               type="button"
               variant="outline-danger"
             >
@@ -40,7 +40,7 @@
               v-else
               v-b-tooltip.hover
               title="Promote user"
-              @click="promoteUser(1, user.id)"
+              @click="promoteUser(true, user.id)"
               type="button"
               variant="outline-success"
             >
@@ -138,7 +138,7 @@ export default {
       axios
         .patch(path, payload)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.getUsers();
         })
         .catch((error) => {
@@ -151,7 +151,7 @@ export default {
       axios
         .post(path)
         .then((response) => {
-          this.alert_msg = `New password for user ${username} is: ${response.data.detail}`;
+          this.alert_msg = `New password for user ${username} is: ${response.data.password}`;
           this.show_alert = true;
           this.alert_type = "success";
         })

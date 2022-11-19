@@ -42,6 +42,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
 
     if body.name is not None:
         if body.name != client.name and db.session.query(Client).filter_by(name=body.name).first() is not None:
+            db.session.remove()
             return {"msg": "Another client already uses this name"}, 400
         client.name = body.name
 
@@ -50,6 +51,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
 
     if body.owner is not None:
         if db.session.query(User).filter_by(id=body.owner).first() is None:
+            db.session.remove()
             return {"msg": "This user does not exist"}, 400
         client.owner_id = body.owner
 

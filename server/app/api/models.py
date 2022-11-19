@@ -1,3 +1,4 @@
+import re
 from typing import Literal, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field, validator
@@ -39,3 +40,33 @@ class SmtpTestPostModel(BaseModel):
 
 class WebhookTestPostModel(BaseModel):
     webhook_url: AnyHttpUrl
+
+
+class RegisterModel(BaseModel):
+    username: str = Field(..., min_length=1, max_length=128)
+
+
+class ChangePasswordModel(BaseModel):
+    password1: str = Field(..., min_length=8)
+    password2: str
+    old_password: str
+
+    @validator("password1")
+    def password_complexity(cls, v, values, **kwargs):
+        if not re.search(r"\d", v):
+            raise ValueError("password must contain a number")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("password must contain a lower case letter")
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("password must contain an upper case letter")
+        return v
+
+    @validator("password2")
+    def password_match(cls, v, values, **kwargs):
+        if "password1" in values and v != values["password1"]:
+            raise ValueError("passwords don't match")
+        return v
+
+
+class UserPatchModel(BaseModel):
+    is_admin: bool

@@ -31,7 +31,7 @@
 
     <ViewPassword
       :username="username"
-      :password="data.detail"
+      :password="data.password"
       @cleanup="cleanup()"
     />
   </b-modal>

@@ -1,153 +1,111 @@
+from typing import List
+
 from app import db
 from app.api import bp
+from app.api.models import ChangePasswordModel, RegisterModel, UserPatchModel
 from app.decorators import permissions
 from app.models import User
-from app.validators import check_length, is_password, not_empty
-from flask import jsonify, request
 from flask_jwt_extended import get_current_user, jwt_required
+from flask_pydantic import validate
 
 
 @bp.route("/user", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def register():
-    """Creates a new user"""
-    data = request.get_json()
+@validate()
+def register(body: RegisterModel):
+    if db.session.query(User).filter_by(username=body.username).first() is not None:
+        return {"msg": "This user already exists"}, 400
 
-    if "username" not in data.keys():
-
-        return jsonify({"status": "error", "detail": "Missing username"}), 400
-
-    if not (not_empty(data["username"]) and check_length(data["username"], 128)):
-        return jsonify({"status": "error", "detail": "Invalid username (too long or empty)"}), 400
-
-    if User.query.filter_by(username=data["username"]).first() != None:
-        return jsonify({"status": "error", "detail": "This user already exists"}), 400
-
-    user = User(username=data["username"])
-
+    user = User(username=body.username)
     password = user.generate_password()
-
     user.set_password(password)
 
     db.session.add(user)
-
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": password}), 200
+    return {"password": password}
 
 
 @bp.route("/user/password", methods=["POST"])
 @jwt_required()
-def change_password():
-    """Change the current user's password"""
-    current_user = get_current_user()
+@validate()
+def change_password(body: ChangePasswordModel):
+    current_user: User = get_current_user()
 
-    data = request.get_json()
+    if not current_user.check_password(body.old_password):
+        return {"msg": "Old password is incorrect"}, 400
 
-    if ("password1" not in data.keys()) or ("password2" not in data.keys()) or ("old_password" not in data.keys()):
-        return jsonify({"status": "error", "detail": "Missing data (password1, password2 or old_password)"}), 400
-
-    if not is_password(data["password1"]):
-        return (
-            jsonify({"status": "error", "detail": "Password must be at least 8 characters and contain a uppercase letter, a lowercase letter and a number"}),
-            400,
-        )
-
-    if data["password1"] != data["password2"]:
-        return jsonify({"status": "error", "detail": "Passwords don't match"}), 400
-
-    if not current_user.check_password(data["old_password"]):
-        return jsonify({"status": "error", "detail": "Old password is incorrect"}), 400
-
-    current_user.set_password(data["password1"])
+    current_user.set_password(body.password1)
     current_user.first_login = False
 
     db.session.commit()
-    return jsonify({"status": "OK", "detail": "Password changed successfuly"}), 200
+    return {"msg": "Password changed successfuly"}
 
 
-@bp.route("/user/<id>/password", methods=["POST"])
+@bp.route("/user/<int:id>/password", methods=["POST"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def reset_password(id):
-    """Resets a user's password"""
-    user = User.query.filter_by(id=id).first_or_404()
+def reset_password(id: int):
+    user: User = db.session.query(User).filter_by(id=id).first_or_404()
 
     password = user.generate_password()
-
     user.set_password(password)
-
     user.first_login = True
 
     db.session.commit()
-    return jsonify({"status": "OK", "detail": password}), 200
+    return {"password": password}
 
 
 @bp.route("/user/current", methods=["GET"])
 @jwt_required()
 def user_get():
-    """Get the current user"""
-    current_user = get_current_user()
+    current_user: User = get_current_user()
 
-    return jsonify(current_user.to_dict()), 200
+    return current_user.to_dict()
 
 
-@bp.route("/user/<user_id>", methods=["DELETE"])
+@bp.route("/user/<int:user_id>", methods=["DELETE"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def user_delete(user_id):
-    """Deletes a user"""
-    current_user = get_current_user()
+def user_delete(user_id: int):
+    current_user: User = get_current_user()
 
-    if len(User.query.all()) <= 1:
-        return jsonify({"status": "error", "detail": "Can't delete the only user"}), 400
+    if db.session.query(User).count() <= 1:
+        return {"msg": "Can't delete the only user"}, 400
 
-    if current_user.id == int(user_id):
-        return jsonify({"status": "error", "detail": "Can't delete yourself"}), 400
+    if current_user.id == user_id:
+        return {"msg": "Can't delete yourself"}, 400
 
-    user = User.query.filter_by(id=user_id).first_or_404()
+    user: User = db.session.query(User).filter_by(id=user_id).first_or_404()
 
     db.session.delete(user)
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": "User {} deleted successfuly".format(user.username)}), 200
+    return {"msg": f"User {user.username} deleted successfuly"}
 
 
-@bp.route("/user/<user_id>", methods=["PATCH"])
+@bp.route("/user/<int:user_id>", methods=["PATCH"])
 @jwt_required()
 @permissions(all_of=["admin"])
-def user_post(user_id):
-    """Modifies a user"""
-    current_user = get_current_user()
+@validate()
+def user_patch(user_id: int, body: UserPatchModel):
+    current_user: User = get_current_user()
 
-    if current_user.id == int(user_id):
-        return jsonify({"status": "error", "detail": "Can't demote yourself"}), 400
+    if current_user.id == user_id:
+        return {"msg": "Can't demote yourself"}, 400
 
-    user = User.query.filter_by(id=user_id).first_or_404()
+    user: User = db.session.query(User).filter_by(id=user_id).first_or_404()
 
-    data = request.get_json()
-
-    if "is_admin" not in data.keys():
-        return jsonify({"status": "error", "detail": "Missing data"}), 400
-
-    if (int(data["is_admin"]) != 1) and (int(data["is_admin"]) != 0):
-        return jsonify({"status": "error", "detail": "Invalid data"}), 400
-
-    user.is_admin = int(data["is_admin"]) == 1
-
+    user.is_admin = body.is_admin
     db.session.commit()
-    return jsonify({"status": "OK", "detail": "User {} modified successfuly".format(user.username)}), 200
+
+    return {"msg": f"User {user.username} modified successfuly"}
 
 
 @bp.route("/user", methods=["GET"])
 @jwt_required()
-def user_all_get():
-    """Gets all users"""
-    users = []
-    data = User.query.all()
+def user_get_all():
+    users: List[User] = db.session.query(User).all()
 
-    for user in data:
-        users.append(user.to_dict())
-
-    return jsonify(users), 200
+    return [user.to_dict() for user in users]
