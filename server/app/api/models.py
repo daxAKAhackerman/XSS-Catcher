@@ -64,7 +64,7 @@ class ChangePasswordModel(BaseModel):
     @validator("password2")
     def password_match(cls, v, values, **kwargs):
         if "password1" in values and v != values["password1"]:
-            raise ValueError("Passwords don't match")
+            raise ValueError("passwords don't match")
         return v
 
 
