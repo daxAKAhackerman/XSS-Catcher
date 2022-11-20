@@ -112,7 +112,7 @@
               "
             >
               <div
-                v-for="(element_key, element_value) in row.item.data"
+                v-for="(element_value, element_key) in row.item.data"
                 v-bind:key="element_key"
               >
                 <code>{{ element_key }} => {{ element_value }}</code>
