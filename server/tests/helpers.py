@@ -10,9 +10,12 @@ def login(client_tester: FlaskClient, username: str, password: str) -> tuple[str
     return response.json["access_token"], response.json["refresh_token"]
 
 
-def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to: str = None) -> Client:
+def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to: str = None, uid: str = None) -> Client:
     client = Client(name=name, description="", owner_id=owner_id, webhook_url=webhook_url, mail_to=mail_to)
-    client.gen_uid()
+    if uid:
+        client.uid = uid
+    else:
+        client.gen_uid()
     db.session.add(client)
     db.session.commit()
     return client

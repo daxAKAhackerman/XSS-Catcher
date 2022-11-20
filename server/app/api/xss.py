@@ -87,7 +87,7 @@ def xss_generate(body: XssGenerateModel):
 
 
 def _generate_collector_payload_body(body: XssGenerateModel, client: Client) -> str:
-    data_to_exclude = DATA_TO_GATHER - set(body.to_gather)
+    data_to_exclude = sorted(DATA_TO_GATHER - set(body.to_gather))
     joined_data_to_exclude = ";".join(data_to_exclude)
     joined_tags = ";".join(body.tags)
     joined_payload_data = ",".join([body.xss_type, client.uid, joined_data_to_exclude, joined_tags])
