@@ -1,7 +1,9 @@
 import re
-from typing import Literal, Optional, Union
+from typing import List, Literal, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field, validator
+
+DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 
 
 class LoginModel(BaseModel):
@@ -70,3 +72,19 @@ class ChangePasswordModel(BaseModel):
 
 class UserPatchModel(BaseModel):
     is_admin: bool
+
+
+class XssGenerateModel(BaseModel):
+    client_id: int
+    url: AnyHttpUrl
+    xss_type: Literal["r", "s"]
+    code_type: Literal["html", "js"]
+    to_gather: List[str]
+    tags: List[str]
+
+    @validator("to_gather")
+    def to_gather_validator(cls, v, values, **kwargs):
+        for value in v:
+            if value not in DATA_TO_GATHER:
+                raise ValueError(f"values in to_gather must be in {DATA_TO_GATHER}")
+        return v
