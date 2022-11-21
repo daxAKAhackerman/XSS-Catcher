@@ -1,7 +1,9 @@
+import json
+import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import Client, Settings, User
+from app.models import XSS, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -36,3 +38,20 @@ def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
     db.session.add(settings)
     db.session.commit()
     return settings
+
+
+def create_xss(
+    headers: Dict[str, str] = {}, ip_addr: str = "127.0.0.1", client_id: int = 1, xss_type: str = "s", data: Dict[str, Any] = {}, tags: List[str] = []
+) -> XSS:
+    xss = XSS(
+        headers=json.dumps(headers),
+        ip_addr=ip_addr,
+        client_id=client_id,
+        xss_type=xss_type,
+        data=json.dumps(data),
+        timestamp=int(time.time()),
+        tags=json.dumps(tags),
+    )
+    db.session.add(xss)
+    db.session.commit()
+    return xss

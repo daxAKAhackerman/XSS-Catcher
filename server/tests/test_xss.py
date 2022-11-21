@@ -1,7 +1,12 @@
+import json
+
+from app import db
 from app.api.models import XssGenerateModel
 from app.api.xss import _generate_collector_payload_body, _generate_js_grabber_payload_elements
+from app.models import XSS
 from flask.testing import FlaskClient
-from tests.helpers import create_client, login
+from freezegun import freeze_time
+from tests.helpers import create_client, create_xss, login
 
 
 def test__xss_generate__given_html_collector__then_payload_returned(client_tester: FlaskClient):
@@ -150,3 +155,90 @@ def test___generate_js_grabber_payload_elements__given_body__when_no_tags__then_
     tags_query_param, joined_and_trimmed_selected_payloads = _generate_js_grabber_payload_elements(body)
     assert tags_query_param == ""
     assert joined_and_trimmed_selected_payloads == 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))'
+
+
+@freeze_time("2000-01-01")
+def test__client_xss_get__given_request__then_xss_returned(client_tester: FlaskClient):
+    xss: XSS = create_xss()
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get(f"/api/xss/{xss.id}", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == {"data": {}, "headers": {}, "id": 1, "ip_addr": "127.0.0.1", "tags": [], "timestamp": 946684800}
+    assert response.status_code == 200
+
+
+def test__xss_delete__given_xss_id__then_xss_deleted(client_tester: FlaskClient):
+    xss: XSS = create_xss()
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.delete(f"/api/xss/{xss.id}", headers={"Authorization": f"Bearer {access_token}"})
+    assert db.session.query(XSS).count() == 0
+    assert response.json == {"msg": "XSS deleted successfuly"}
+    assert response.status_code == 200
+
+
+def test__xss_loot_get__given_xss_id_and_loot_type__then_loot_returned(client_tester: FlaskClient):
+    xss: XSS = create_xss(data={"cookies": {"Cookie1": "Value1"}})
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get(f"/api/xss/{xss.id}/data/cookies", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == {"data": {"Cookie1": "Value1"}}
+    assert response.status_code == 200
+
+
+def test__xss_loot_delete__given_xss_id_and_loot_type__then_loot_deleted(client_tester: FlaskClient):
+    xss: XSS = create_xss(data={"cookies": {"Cookie1": "Value1"}})
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.delete(f"/api/xss/{xss.id}/data/cookies", headers={"Authorization": f"Bearer {access_token}"})
+    assert xss.data == json.dumps({})
+    assert response.json == {"msg": "Data deleted successfuly"}
+    assert response.status_code == 200
+
+
+@freeze_time("2000-01-01")
+def test__client_xss_get_all__given_no_filter__then_all_xss_returned(client_tester: FlaskClient):
+    create_client("test")
+    create_xss(xss_type="stored")
+    create_xss(xss_type="reflected", client_id=2)
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get(f"/api/xss", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == [
+        {"id": 1, "ip_addr": "127.0.0.1", "tags": [], "timestamp": 946684800},
+        {"id": 2, "ip_addr": "127.0.0.1", "tags": [], "timestamp": 946684800},
+    ]
+    assert response.status_code == 200
+
+
+@freeze_time("2000-01-01")
+def test__client_xss_get_all__given_type_and_client_id_filters__then_only_one_xss_returned(client_tester: FlaskClient):
+    create_client("test")
+    create_xss(xss_type="stored", tags=["test"])
+    create_xss(xss_type="reflected")
+    create_xss(xss_type="reflected", client_id=2)
+    create_xss(xss_type="stored", client_id=2)
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get(f"/api/xss?client_id=1&type=stored", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == [{"id": 1, "ip_addr": "127.0.0.1", "tags": ["test"], "timestamp": 946684800}]
+    assert response.status_code == 200
+
+
+def test__client_loot_get__given_no_filter__then_all_loot_returned(client_tester: FlaskClient):
+    create_client("test")
+    create_xss(xss_type="stored", data={"cookies": {"Cookie1": "Value1"}})
+    create_xss(xss_type="reflected", client_id=2, data={"local_storage": {"Key1": "Value1"}})
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get("/api/xss/data", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == [
+        {"data": {"cookies": {"Cookie1": "Value1"}}, "tags": [], "xss_id": 1},
+        {"data": {"local_storage": {"Key1": "Value1"}}, "tags": [], "xss_id": 2},
+    ]
+    assert response.status_code == 200
+
+
+def test__client_loot_get__given_client_id_filter__then_only_one_loot_returned(client_tester: FlaskClient):
+    create_client("test")
+    create_xss(xss_type="stored", data={"cookies": {"Cookie1": "Value1"}})
+    create_xss(xss_type="reflected", client_id=2, data={"local_storage": {"Key1": "Value1"}})
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get("/api/xss/data?client_id=1", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == [
+        {"data": {"cookies": {"Cookie1": "Value1"}}, "tags": [], "xss_id": 1},
+    ]
+    assert response.status_code == 200

@@ -1,10 +1,10 @@
 import base64
 import json
-from typing import Tuple
+from typing import List, Tuple
 
 from app import db
 from app.api import bp
-from app.api.models import DATA_TO_GATHER, XssGenerateModel
+from app.api.models import DATA_TO_GATHER, ClientLootGetModel, ClientXssGetAllModel, XssGenerateModel
 from app.decorators import permissions
 from app.models import XSS, Client
 from flask import jsonify, request
@@ -115,105 +115,85 @@ def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
 @jwt_required()
-def client_xss_get(xss_id):
-    """Gets a single XSS instance"""
-    xss = XSS.query.filter_by(id=xss_id).first_or_404()
+def client_xss_get(xss_id: int):
+    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
-    return jsonify(xss.to_dict()), 200
+    return xss.to_dict()
 
 
 @bp.route("/xss/<int:xss_id>", methods=["DELETE"])
 @jwt_required()
 @permissions(one_of=["admin", "owner"])
-def xss_delete(xss_id):
-    """Deletes an XSS"""
-    xss = XSS.query.filter_by(id=xss_id).first_or_404()
+def xss_delete(xss_id: int):
+    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
     db.session.delete(xss)
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": "XSS deleted successfuly"}), 200
+    return {"msg": "XSS deleted successfuly"}
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @jwt_required()
-def xss_loot_get(xss_id, loot_type):
-    """Gets a specific type of data for an XSS"""
-    xss = XSS.query.filter_by(id=xss_id).first_or_404()
+def xss_loot_get(xss_id: int, loot_type: str):
+    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
-    data = json.loads(xss.data)
+    xss_data = json.loads(xss.data)
 
-    return jsonify({"data": data[loot_type]}), 200
+    return {"data": xss_data[loot_type]}
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @jwt_required()
 @permissions(one_of=["admin", "owner"])
-def xss_loot_delete(xss_id, loot_type):
-    """Deletes a specific type of data for an XSS"""
-    xss = XSS.query.filter_by(id=xss_id).first_or_404()
+def xss_loot_delete(xss_id: int, loot_type: str):
+    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
-    data = json.loads(xss.data)
+    xss_data = json.loads(xss.data)
+    xss_data.pop(loot_type, None)
 
-    data.pop(loot_type, None)
-
-    xss.data = json.dumps(data)
+    xss.data = json.dumps(xss_data)
 
     db.session.commit()
 
-    return jsonify({"status": "OK", "detail": "Data deleted successfuly"}), 200
+    return {"msg": "Data deleted successfuly"}
 
 
 @bp.route("/xss", methods=["GET"])
 @jwt_required()
-def client_xss_all_get():
-    """Gets all XSS based on a filter"""
-
+@validate()
+def client_xss_get_all(query: ClientXssGetAllModel):
     filter_expression = {}
-    parameters = request.args.to_dict()
 
-    if "client_id" in parameters:
-        if not parameters["client_id"].isnumeric():
-            return jsonify({"status": "error", "detail": "Bad client ID"}), 400
-        filter_expression["client_id"] = parameters["client_id"]
-    if "type" in parameters:
-        if parameters["type"] != "reflected" and parameters["type"] != "stored":
-            return jsonify({"status": "error", "detail": "Unknown XSS type"}), 400
-        filter_expression["xss_type"] = parameters["type"]
+    if query.client_id is not None:
+        filter_expression["client_id"] = query.client_id
+    if query.type is not None:
+        filter_expression["xss_type"] = query.type
 
-    xss_list = []
-    xss = XSS.query.filter_by(**filter_expression).all()
+    xss: List[XSS] = db.session.query(XSS).filter_by(**filter_expression).all()
 
-    for hit in xss:
-        xss_list.append(hit.to_dict_short())
+    xss_list = [hit.to_dict_short() for hit in xss]
 
-    return jsonify(xss_list), 200
+    return xss_list
 
 
 @bp.route("/xss/data", methods=["GET"])
 @jwt_required()
-def client_loot_get():
-    """Get all captured data based on a filter"""
+@validate()
+def client_loot_get(query: ClientLootGetModel):
     loot = []
-
     filter_expression = {}
-    parameters = request.args.to_dict()
 
-    if "client_id" in parameters:
-        if not parameters["client_id"].isnumeric():
-            return jsonify({"status": "error", "detail": "Bad client ID"}), 400
-        filter_expression["client_id"] = parameters["client_id"]
+    if query.client_id is not None:
+        filter_expression["client_id"] = query.client_id
 
-    xss = XSS.query.filter_by(**filter_expression).all()
+    xss: List[XSS] = db.session.query(XSS).filter_by(**filter_expression).all()
 
     for hit in xss:
         loot_entry = {"xss_id": hit.id, "tags": json.loads(hit.tags), "data": {}}
         for element_name, element_value in json.loads(hit.data).items():
-            if element_name in ["fingerprint", "dom", "screenshot"]:
-                loot_entry["data"].update({element_name: ""})
-            else:
-                loot_entry["data"].update({element_name: element_value})
+            loot_entry["data"].update({element_name: "" if element_name in ["fingerprint", "dom", "screenshot"] else element_value})
 
         loot.append(loot_entry)
 
-    return jsonify(loot), 200
+    return loot

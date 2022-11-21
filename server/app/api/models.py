@@ -88,3 +88,12 @@ class XssGenerateModel(BaseModel):
             if value not in DATA_TO_GATHER:
                 raise ValueError(f"values in to_gather must be in {DATA_TO_GATHER}")
         return v
+
+
+class ClientXssGetAllModel(BaseModel):
+    client_id: Optional[int]
+    type: Optional[Literal["reflected", "stored"]]
+
+
+class ClientLootGetModel(BaseModel):
+    client_id: Optional[int]
