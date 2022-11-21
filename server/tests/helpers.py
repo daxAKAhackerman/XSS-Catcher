@@ -41,7 +41,7 @@ def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
 
 
 def create_xss(
-    headers: Dict[str, str] = {}, ip_addr: str = "127.0.0.1", client_id: int = 1, xss_type: str = "s", data: Dict[str, Any] = {}, tags: List[str] = []
+    headers: Dict[str, str] = {}, ip_addr: str = "127.0.0.1", client_id: int = 1, xss_type: str = "stored", data: Dict[str, Any] = {}, tags: List[str] = []
 ) -> XSS:
     xss = XSS(
         headers=json.dumps(headers),
