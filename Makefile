@@ -51,3 +51,6 @@ start: generate-secrets
 
 stop:
 	@docker-compose down
+
+lock-requirements:
+	pipenv requirements > $(SERVER_DIR)/requirements.txt
