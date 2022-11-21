@@ -29,7 +29,7 @@ export default {
       axios
         .delete(path)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.$emit("get-xss-list");
           this.$refs.deleteXSSModal.hide();
         })

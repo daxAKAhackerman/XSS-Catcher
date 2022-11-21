@@ -1,7 +1,9 @@
+import json
+import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import Client, Settings, User
+from app.models import XSS, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -10,9 +12,12 @@ def login(client_tester: FlaskClient, username: str, password: str) -> tuple[str
     return response.json["access_token"], response.json["refresh_token"]
 
 
-def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to: str = None) -> Client:
+def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to: str = None, uid: str = None) -> Client:
     client = Client(name=name, description="", owner_id=owner_id, webhook_url=webhook_url, mail_to=mail_to)
-    client.gen_uid()
+    if uid:
+        client.uid = uid
+    else:
+        client.gen_uid()
     db.session.add(client)
     db.session.commit()
     return client
@@ -33,3 +38,20 @@ def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
     db.session.add(settings)
     db.session.commit()
     return settings
+
+
+def create_xss(
+    headers: Dict[str, str] = {}, ip_addr: str = "127.0.0.1", client_id: int = 1, xss_type: str = "stored", data: Dict[str, Any] = {}, tags: List[str] = []
+) -> XSS:
+    xss = XSS(
+        headers=json.dumps(headers),
+        ip_addr=ip_addr,
+        client_id=client_id,
+        xss_type=xss_type,
+        data=json.dumps(data),
+        timestamp=int(time.time()),
+        tags=json.dumps(tags),
+    )
+    db.session.add(xss)
+    db.session.commit()
+    return xss
