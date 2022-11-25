@@ -5,9 +5,8 @@ from typing import List, Tuple
 from app import db
 from app.api import bp
 from app.api.models import DATA_TO_GATHER, ClientLootGetModel, ClientXssGetAllModel, XssGenerateModel
-from app.decorators import permissions
 from app.models import XSS, Client
-from flask import jsonify, request
+from app.utils import permissions
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
 
