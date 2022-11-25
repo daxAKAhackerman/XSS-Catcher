@@ -167,6 +167,7 @@ def test__client_xss_get__given_request__then_xss_returned(client_tester: FlaskC
 
 
 def test__xss_delete__given_xss_id__then_xss_deleted(client_tester: FlaskClient):
+    create_client(name="test")
     xss: XSS = create_xss()
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/xss/{xss.id}", headers={"Authorization": f"Bearer {access_token}"})
@@ -184,6 +185,7 @@ def test__xss_loot_get__given_xss_id_and_loot_type__then_loot_returned(client_te
 
 
 def test__xss_loot_delete__given_xss_id_and_loot_type__then_loot_deleted(client_tester: FlaskClient):
+    create_client(name="test")
     xss: XSS = create_xss(data={"cookies": {"Cookie1": "Value1"}})
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/xss/{xss.id}/data/cookies", headers={"Authorization": f"Bearer {access_token}"})
