@@ -2,7 +2,13 @@ from app import db
 from app.api import bp
 from app.api.models import LoginModel
 from app.models import Blocklist, User
-from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_jwt, jwt_required
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_current_user,
+    get_jwt,
+    jwt_required,
+)
 from flask_pydantic import validate
 
 

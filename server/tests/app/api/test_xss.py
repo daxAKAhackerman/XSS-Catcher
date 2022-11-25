@@ -2,7 +2,10 @@ import json
 
 from app import db
 from app.api.models import XssGenerateModel
-from app.api.xss import _generate_collector_payload_body, _generate_js_grabber_payload_elements
+from app.api.xss import (
+    _generate_collector_payload_body,
+    _generate_js_grabber_payload_elements,
+)
 from app.models import XSS
 from flask.testing import FlaskClient
 from freezegun import freeze_time

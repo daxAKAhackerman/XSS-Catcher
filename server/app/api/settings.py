@@ -2,7 +2,7 @@ from app import db
 from app.api import bp
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.models import Settings
-from app.utils import logger, permissions, send_mail, send_webhook
+from app.utils import logger, permissions, send_test_mail, send_test_webhook
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
 
@@ -100,7 +100,7 @@ def smtp_test_post(body: SmtpTestPostModel):
     settings: Settings = db.session.query(Settings).first()
 
     try:
-        send_mail(receiver=body.mail_to)
+        send_test_mail(mail_to=body.mail_to)
         settings.smtp_status = True
         db.session.commit()
         return {"msg": "SMTP configuration test successful"}
@@ -117,7 +117,7 @@ def smtp_test_post(body: SmtpTestPostModel):
 @validate()
 def webhook_test_post(body: WebhookTestPostModel):
     try:
-        send_webhook(receiver=body.webhook_url)
+        send_test_webhook(webhook_url=body.webhook_url)
         return {"msg": "Webhook configuration test successful"}
     except Exception as e:
         logger.error(e)
