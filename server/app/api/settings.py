@@ -1,9 +1,8 @@
 from app import db
 from app.api import bp
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
-from app.decorators import permissions
 from app.models import Settings
-from app.utils import logger, send_mail, send_webhook
+from app.utils import logger, permissions, send_mail, send_webhook
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
 

@@ -3,8 +3,8 @@ from typing import List
 from app import db
 from app.api import bp
 from app.api.models import ChangePasswordModel, RegisterModel, UserPatchModel
-from app.decorators import permissions
 from app.models import User
+from app.utils import permissions
 from flask_jwt_extended import get_current_user, jwt_required
 from flask_pydantic import validate
 
