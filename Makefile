@@ -16,8 +16,8 @@ init-dev:
 
 lint:
 	@npm run --prefix $(CLIENT_DIR) lint
-	@python3 -m pipenv run black --line-length=160 $(SERVER_DIR)/app $(SERVER_DIR)/tests $(SERVER_DIR)/config.py $(SERVER_DIR)/xss.py
-	@python3 -m pipenv run isort --profile black $(SERVER_DIR)/app $(SERVER_DIR)/tests $(SERVER_DIR)/config.py $(SERVER_DIR)/xss.py
+	@python3 -m pipenv run black --line-length=160 $(SERVER_DIR)
+	@python3 -m pipenv run isort --profile black $(SERVER_DIR)
 
 test:
 	@python3 -m pipenv run pytest $(SERVER_DIR)/tests
@@ -53,4 +53,4 @@ stop:
 	@docker-compose down
 
 lock-requirements:
-	pipenv requirements > $(SERVER_DIR)/requirements.txt
+	@pipenv requirements > $(SERVER_DIR)/requirements.txt
