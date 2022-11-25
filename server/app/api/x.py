@@ -4,7 +4,7 @@ import time
 from app import db
 from app.api import bp
 from app.models import XSS, Client, Settings
-from app.utils import logger, send_mail, send_webhook
+from app.utils import logger, send_xss_mail, send_xss_webhook
 from flask import request
 from flask_cors import cross_origin
 
@@ -73,7 +73,7 @@ def catch_xss(flavor: str, uid: str):
 
     if settings.smtp_host is not None and (settings.mail_to is not None or xss.client.mail_to is not None):
         try:
-            send_mail(xss=xss)
+            send_xss_mail(xss=xss)
             settings.smtp_status = True
             db.session.commit()
         except Exception as e:
@@ -83,7 +83,7 @@ def catch_xss(flavor: str, uid: str):
 
     if settings.webhook_url is not None or xss.client.webhook_url is not None:
         try:
-            send_webhook(xss=xss)
+            send_xss_webhook(xss=xss)
         except Exception as e:
             logger.error(e)
 
