@@ -35,9 +35,9 @@ class Client(db.Model):
 
     def to_dict(self):
         if self.owner_id is not None:
-            owner_username = db.session.query(User).filter_by(id=self.owner_id).one_or_none().username
+            owner_username = db.session.query(User).filter_by(id=self.owner_id).one().username
         else:
-            owner_username = "Nobody"
+            owner_username = "nobody"
         data = {
             "owner": owner_username,
             "id": self.id,

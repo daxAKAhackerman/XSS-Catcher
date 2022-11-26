@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import XSS, Client, Settings, User
+from app.models import XSS, BlockedJti, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -55,3 +55,10 @@ def create_xss(
     db.session.add(xss)
     db.session.commit()
     return xss
+
+
+def create_blocked_jti(jti: str) -> BlockedJti:
+    blocked_jti = BlockedJti(jti=jti)
+    db.session.add(blocked_jti)
+    db.session.commit()
+    return blocked_jti
