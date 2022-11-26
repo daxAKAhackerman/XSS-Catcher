@@ -4,7 +4,7 @@ from unittest import mock
 from app.models import XSS, Client, User
 from flask.testing import FlaskClient
 from freezegun import freeze_time
-from tests.helpers import create_client, create_xss
+from tests.helpers import create_client, create_user, create_xss
 
 
 def test__Client_summary__given_self__then_summary_returned(client_tester: FlaskClient):
@@ -53,13 +53,13 @@ def test__User_set_password__given_password__then_password_changed(generate_pass
 
 @mock.patch("app.models.check_password_hash")
 def test__User_check_password__given_password__then_password_checked(check_password_hash_mocker: mock.MagicMock, client_tester: FlaskClient):
-    user = User()
+    user: User = create_user("test")
     password_check = user.check_password("test")
     check_password_hash_mocker.assert_called_once_with(user.password_hash, "test")
     assert password_check == check_password_hash_mocker.return_value
 
 
 def test__User_generate_password__given_self__then_password_generated(client_tester: FlaskClient):
-    user = User()
+    user: User = create_user("test")
     password = user.generate_password()
     assert re.match(r"^[a-zA-Z\d]{12}$", password)
