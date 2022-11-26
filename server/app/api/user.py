@@ -14,7 +14,7 @@ from flask_pydantic import validate
 @permissions(all_of=["admin"])
 @validate()
 def register(body: RegisterModel):
-    if db.session.query(User).filter_by(username=body.username).first() is not None:
+    if db.session.query(User).filter_by(username=body.username).one_or_none() is not None:
         return {"msg": "This user already exists"}, 400
 
     user = User(username=body.username)

@@ -16,7 +16,7 @@ def test__client_post__given_client_info__when_client_already_exists__then_400_r
 def test__client_post__given_client_info__when_info_is_valid__then_201_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/client", json={"name": "test", "description": ""}, headers={"Authorization": f"Bearer {access_token}"})
-    client: Client = db.session.query(Client).first()
+    client: Client = db.session.query(Client).one()
     assert client.name == "test"
     assert client.description == ""
     assert response.json == {"msg": "New client test created successfuly"}

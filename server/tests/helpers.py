@@ -17,7 +17,7 @@ def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to
     if uid:
         client.uid = uid
     else:
-        client.gen_uid()
+        client.generate_uid()
     db.session.add(client)
     db.session.commit()
     return client
@@ -32,7 +32,7 @@ def create_user(username: str, password: str = "test") -> User:
 
 
 def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
-    current_settings = db.session.query(Settings).first()
+    current_settings = db.session.query(Settings).one()
     db.session.delete(current_settings)
     settings = Settings(id=1, **kwargs)
     db.session.add(settings)

@@ -18,7 +18,7 @@ def test__register__given_username__when_username_already_taken__then_400_return
 def test__register__given_username__then_user_created(generate_password_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user", json={"username": "dax"}, headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).filter_by(username="dax").first() is not None
+    assert db.session.query(User).filter_by(username="dax").one() is not None
     assert response.json == {"password": "random_password"}
     assert response.status_code == 200
 
@@ -43,7 +43,7 @@ def test__change_password__given_password__then_password_changed(client_tester: 
         json={"password1": "Password123", "password2": "Password123", "old_password": "xss"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    user: User = db.session.query(User).filter_by(username="admin").first()
+    user: User = db.session.query(User).filter_by(username="admin").one()
     assert user.check_password("Password123")
     assert response.json == {"msg": "Password changed successfuly"}
     assert response.status_code == 200
@@ -93,7 +93,7 @@ def test__change_password__given_password__when_passwords_dont_match__then_400_r
 def test__reset_password__given_user_id__then_password_is_reset(generate_password_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user/1/password", headers={"Authorization": f"Bearer {access_token}"})
-    user: User = db.session.query(User).filter_by(username="admin").first()
+    user: User = db.session.query(User).filter_by(username="admin").one()
     assert user.check_password("random_password")
     assert response.json == {"password": "random_password"}
     assert response.status_code == 200
@@ -127,7 +127,7 @@ def test__user_delete__given_user_id__then_user_deleted(client_tester: FlaskClie
     user: User = create_user("dax")
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/user/{user.id}", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).filter_by(id=user.id).first() is None
+    assert db.session.query(User).filter_by(id=user.id).one_or_none() is None
     assert response.json == {"msg": f"User {user.username} deleted successfuly"}
     assert response.status_code == 200
 
@@ -135,7 +135,7 @@ def test__user_delete__given_user_id__then_user_deleted(client_tester: FlaskClie
 def test__user_patch__given_request__when_trying_to_demote_yourself__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/user/1", json={"is_admin": False}, headers={"Authorization": f"Bearer {access_token}"})
-    user: User = db.session.query(User).filter_by(id=1).first()
+    user: User = db.session.query(User).filter_by(id=1).one()
     assert user.is_admin is True
     assert response.json == {"msg": "Can't demote yourself"}
     assert response.status_code == 400

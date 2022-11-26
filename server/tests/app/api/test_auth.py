@@ -1,5 +1,5 @@
 from app import db
-from app.models import Blocklist
+from app.models import BlockedJti
 from flask.testing import FlaskClient
 from tests.helpers import login
 
@@ -34,6 +34,6 @@ def test__refresh__given_refresh_token__then_new_token_returned(client_tester: F
 def test__logout__given_jti__then_added_to_blocklist(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/auth/logout", headers={"Authorization": f"Bearer {refresh_token}"})
-    assert db.session.query(Blocklist).count() == 1
+    assert db.session.query(BlockedJti).count() == 1
     assert response.json == {"msg": "Logged out successfully"}
     assert response.status_code == 200

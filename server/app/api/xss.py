@@ -176,7 +176,7 @@ def client_xss_get_all(query: ClientXssGetAllModel):
 
     xss: List[XSS] = db.session.query(XSS).filter_by(**filter_expression).all()
 
-    xss_list = [hit.to_dict_short() for hit in xss]
+    xss_list = [hit.summary() for hit in xss]
 
     return xss_list
 
