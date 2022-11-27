@@ -12,7 +12,7 @@ from flask_cors import cross_origin
 @bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
 @cross_origin()
 def catch_xss(flavor: str, uid: str):
-    client: Client = db.session.query(Client).filter_by(uid=uid).first()
+    client: Client = db.session.query(Client).filter_by(uid=uid).one_or_none()
 
     if client is None:
         return {"msg": "OK"}
@@ -69,7 +69,7 @@ def catch_xss(flavor: str, uid: str):
     db.session.add(xss)
     db.session.commit()
 
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
 
     if settings.smtp_host is not None and (settings.mail_to is not None or xss.client.mail_to is not None):
         try:

@@ -11,7 +11,7 @@ from flask_pydantic import validate
 @jwt_required()
 @permissions(all_of=["admin"])
 def settings_get():
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
 
     return settings.to_dict()
 
@@ -21,7 +21,7 @@ def settings_get():
 @permissions(all_of=["admin"])
 @validate()
 def settings_patch(body: SettingsPatchModel):
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
 
     if body.smtp_host is not None:
         if body.smtp_host == "":
@@ -97,7 +97,7 @@ def settings_patch(body: SettingsPatchModel):
 @permissions(all_of=["admin"])
 @validate()
 def smtp_test_post(body: SmtpTestPostModel):
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
 
     try:
         send_test_mail(mail_to=body.mail_to)

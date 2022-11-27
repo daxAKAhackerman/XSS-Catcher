@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import XSS, Client, Settings, User
+from app.models import XSS, BlockedJti, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -17,7 +17,7 @@ def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to
     if uid:
         client.uid = uid
     else:
-        client.gen_uid()
+        client.generate_uid()
     db.session.add(client)
     db.session.commit()
     return client
@@ -32,7 +32,7 @@ def create_user(username: str, password: str = "test") -> User:
 
 
 def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
-    current_settings = db.session.query(Settings).first()
+    current_settings = db.session.query(Settings).one()
     db.session.delete(current_settings)
     settings = Settings(id=1, **kwargs)
     db.session.add(settings)
@@ -55,3 +55,10 @@ def create_xss(
     db.session.add(xss)
     db.session.commit()
     return xss
+
+
+def create_blocked_jti(jti: str) -> BlockedJti:
+    blocked_jti = BlockedJti(jti=jti)
+    db.session.add(blocked_jti)
+    db.session.commit()
+    return blocked_jti

@@ -1,7 +1,7 @@
 from app import db
 from app.api import bp
 from app.api.models import LoginModel
-from app.models import Blocklist, User
+from app.models import BlockedJti, User
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
@@ -21,7 +21,7 @@ def login(body: LoginModel):
     if current_user:
         return {"msg": "Already logged in"}, 400
 
-    user: User = db.session.query(User).filter_by(username=body.username).first()
+    user: User = db.session.query(User).filter_by(username=body.username).one_or_none()
     if user is None or not user.check_password(body.password):
         return {"msg": "Bad username or password"}, 403
 
@@ -39,7 +39,7 @@ def refresh():
 @jwt_required(refresh=True)
 def logout():
     jti = get_jwt()["jti"]
-    blocked_jti = Blocklist(jti=jti)
+    blocked_jti = BlockedJti(jti=jti)
     db.session.add(blocked_jti)
     db.session.commit()
     return {"msg": "Logged out successfully"}

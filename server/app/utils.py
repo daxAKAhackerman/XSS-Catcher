@@ -15,7 +15,7 @@ logger.setLevel(logging.INFO)
 
 
 def send_xss_mail(xss: XSS):
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
     mail_from = settings.mail_from
     mail_to = xss.client.mail_to or settings.mail_to
 
@@ -27,7 +27,7 @@ def send_xss_mail(xss: XSS):
 
 
 def send_test_mail(mail_to: str):
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
     mail_from = settings.mail_from
 
     message = MIMEText("This is a test email from XSS catcher. If you are getting this, it's because your SMTP configuration works.")
@@ -58,7 +58,7 @@ def _send_mail(settings: Settings, mail_from: str, mail_to: str, message: MIMETe
 
 
 def send_xss_webhook(xss: XSS):
-    settings: Settings = db.session.query(Settings).first()
+    settings: Settings = db.session.query(Settings).one_or_none()
     webhook_url = xss.client.webhook_url or settings.webhook_url
 
     message = {"text": f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}! Go check it out!"}

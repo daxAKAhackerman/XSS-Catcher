@@ -19,7 +19,7 @@ def client_post(body: ClientPostModel):
         return {"msg": "Client already exists"}, 400
 
     new_client = Client(name=body.name, description=body.description, owner_id=current_user.id)
-    new_client.gen_uid()
+    new_client.generate_uid()
     db.session.add(new_client)
     db.session.commit()
     return {"msg": f"New client {new_client.name} created successfuly"}, 201
@@ -30,7 +30,7 @@ def client_post(body: ClientPostModel):
 def client_get(client_id: int):
     client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
 
-    return client.to_dict_client()
+    return client.to_dict()
 
 
 @bp.route("/client/<int:client_id>", methods=["PATCH"])
@@ -41,7 +41,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
     client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
 
     if body.name is not None:
-        if body.name != client.name and db.session.query(Client).filter_by(name=body.name).first() is not None:
+        if body.name != client.name and db.session.query(Client).filter_by(name=body.name).one_or_none() is not None:
             db.session.remove()
             return {"msg": "Another client already uses this name"}, 400
         client.name = body.name
@@ -50,7 +50,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
         client.description = body.description
 
     if body.owner is not None:
-        if db.session.query(User).filter_by(id=body.owner).first() is None:
+        if db.session.query(User).filter_by(id=body.owner).one_or_none() is None:
             db.session.remove()
             return {"msg": "This user does not exist"}, 400
         client.owner_id = body.owner
@@ -88,4 +88,4 @@ def client_delete(client_id: int):
 @jwt_required()
 def client_get_all():
     clients: List[Client] = db.session.query(Client).order_by(Client.id.desc()).all()
-    return [client.to_dict_clients() for client in clients]
+    return [client.summary() for client in clients]
