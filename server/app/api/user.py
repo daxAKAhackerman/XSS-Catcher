@@ -61,6 +61,7 @@ def reset_password(id: int):
 @jwt_required()
 def user_get():
     current_user: User = get_current_user()
+
     return current_user.to_dict()
 
 
