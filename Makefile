@@ -29,7 +29,7 @@ run-web-app:
 	@npm --prefix client run serve
 
 run-backend-server: lint
-	@cd $(SERVER_DIR) && FLASK_DEBUG="" pipenv run flask run
+	@cd $(SERVER_DIR) && FLASK_DEBUG=1 pipenv run flask run
 
 generate-secrets:
 ifeq ($(wildcard ./$(DB_PASSWORD_FILE)),)
