@@ -23,13 +23,13 @@ test:
 	@python3 -m pipenv run pytest $(SERVER_DIR)/tests
 
 test-coverage-report:
-	@python3 -m pipenv run pytest -v --cov=app --cov-report html:cov_html $(SERVER_DIR)/tests
+	@python3 -m pipenv run pytest -v --cov=app --cov=config --cov-report html:cov_html $(SERVER_DIR)/tests
 
 run-web-app:
 	@npm --prefix client run serve
 
 run-backend-server: lint
-	@cd $(SERVER_DIR) && FLASK_DEBUG=1 pipenv run flask run
+	@cd $(SERVER_DIR) && FLASK_DEBUG="" pipenv run flask run
 
 generate-secrets:
 ifeq ($(wildcard ./$(DB_PASSWORD_FILE)),)
