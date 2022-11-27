@@ -18,7 +18,7 @@
 import axios from "axios";
 
 import ChangePassword from "../shared/ChangePassword";
-import Logo from "./Logo";
+import Logo from "./LogoRow";
 import LoginForm from "./LoginForm";
 
 const axiosLogin = axios.create();
