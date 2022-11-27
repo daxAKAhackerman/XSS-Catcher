@@ -49,7 +49,7 @@
       <template v-slot:cell(tags)="row">
           <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{tag}}</b-badge>
       </template>
-      <template class="text-right" v-slot:cell(action)="row">
+      <template v-slot:cell(action)="row">
         <b-button
           type="button"
           variant="outline-info"

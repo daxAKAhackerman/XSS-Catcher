@@ -75,11 +75,11 @@ import ViewXSS from "./viewXSS/ViewXSS";
 import ViewClient from "./viewClient/ViewClient";
 import ChangePassword from "../shared/ChangePassword";
 import ManageUsers from "./manageUsers/ManageUsers";
-import Settings from "./settings/Settings";
+import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
 import ClientTable from "./ClientTable";
-import Navigation from "./Navigation";
-import Header from "./Header";
+import Navigation from "./NavigationRow";
+import Header from "./HeaderRow";
 
 const axiosRefresh = axios.create();
 
