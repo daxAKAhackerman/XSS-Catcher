@@ -23,7 +23,7 @@ test:
 	@python3 -m pipenv run pytest $(SERVER_DIR)/tests
 
 test-coverage-report:
-	@python3 -m pipenv run pytest -v --cov=app --cov-report html:cov_html $(SERVER_DIR)/tests
+	@python3 -m pipenv run pytest -v --cov=app --cov=config --cov-report html:cov_html $(SERVER_DIR)/tests
 
 run-web-app:
 	@npm --prefix client run serve
