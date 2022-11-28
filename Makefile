@@ -42,6 +42,10 @@ else
 	@echo "[-] Database password are already set"
 endif
 
+backup-database:
+	@echo $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}')
+	@docker cp $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}'):/var/www/html/server/app.db database-backup.db && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db, but will not be migrated automatically. "
+
 update: generate-secrets
 	@docker-compose build
 	@docker-compose up -d
