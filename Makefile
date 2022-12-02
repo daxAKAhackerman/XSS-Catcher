@@ -3,6 +3,7 @@ POSTGRES_PASSWORD := $(shell openssl rand -hex 32)
 CLIENT_DIR := client
 SERVER_DIR := server
 DB_PASSWORD_FILE := .db_password
+DB_BACKUP_FILE := database-backup.db
 
 export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
@@ -46,11 +47,17 @@ endif
 
 backup-database:
 	@echo $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}')
-	@docker cp $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}'):/var/www/html/server/app.db database-backup.db && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db, but will not be migrated automatically. "
+	@docker cp $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}'):/var/www/html/server/app.db $(DB_BACKUP_FILE) && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db, but will not be migrated automatically. "
 
-update: generate-secrets
+
+update: generate-secrets backup-databases
 	@docker-compose build
 	@docker-compose up -d
+ifneq ($(wildcard ./$(DB_BACKUP_FILE)),)
+	@docker cp $(DB_BACKUP_FILE) $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}'):/var/www/html/server/$(DB_BACKUP_FILE)
+	@docker exec $(shell docker-compose ps | grep backend | awk -F ' ' '{print $1}') /var/www/html/server/db_engine_migrate.sh
+endif
+
 
 start: generate-secrets
 	@docker-compose up -d
