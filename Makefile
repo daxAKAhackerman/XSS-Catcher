@@ -1,8 +1,10 @@
 SHELL := /usr/bin/env bash
-POSTGRES_PASSWORD := $(shell cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)\n
-CLIENT_DIR=client
-SERVER_DIR=server
-DB_PASSWORD_FILE=.db_password
+POSTGRES_PASSWORD := $(shell openssl rand -hex 32)
+CLIENT_DIR := client
+SERVER_DIR := server
+DB_PASSWORD_FILE := .db_password
+
+export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
 install:
 	@python3 -m pip install pipenv -U

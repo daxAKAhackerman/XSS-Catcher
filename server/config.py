@@ -7,7 +7,7 @@ def get_db_url() -> str:
     basedir = os.path.abspath(os.path.dirname(__file__))
     sqlite_db_path = os.path.join(basedir, "app.db")
 
-    if os.path.exists(sqlite_db_path) or os.getenv("FLASK_DEBUG"):
+    if os.getenv("FLASK_DEBUG"):
         return f"sqlite:///{sqlite_db_path}"
     else:
         with open(os.getenv("POSTGRES_PASSWORD_FILE"), "r") as file:
