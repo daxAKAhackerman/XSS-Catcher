@@ -5,6 +5,8 @@ SERVER_DIR := server
 DB_PASSWORD_FILE := .db_password
 DB_BACKUP_FILE := database-backup.db
 BACKEND_CONTAINER_NAME = $(shell docker-compose ps | grep backend | awk -F ' ' '{print $$1}')
+DB_CONTAINER_NAME = $(shell docker-compose ps | grep db | awk -F ' ' '{print $$1}')
+DB_VOLUME_NAME = $(shell docker inspect $(DB_CONTAINER_NAME) | jq -r '.[0].Mounts[] | select(.Type == "volume") | .Name')
 
 export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
@@ -17,6 +19,9 @@ install:
 init-dev:
 	@cd $(SERVER_DIR) && python3 -m pipenv run flask db upgrade
 	@cd $(SERVER_DIR) && python3 -m pipenv run python -c "import app; tmpapp = app.create_app(); app.models.init_app(tmpapp)"
+
+lock-requirements:
+	@pipenv requirements > $(SERVER_DIR)/requirements.txt
 
 lint:
 	@npm run --prefix $(CLIENT_DIR) lint
@@ -37,27 +42,17 @@ run-backend-server: lint
 
 generate-secrets:
 ifeq ($(wildcard ./$(DB_PASSWORD_FILE)),)
-ifneq ($(wildcard ./.env),)
-	@grep POSTGRES_PASSWORD .env | awk -F '=' '{print $2}' > $(DB_PASSWORD_FILE)
-else
 	@echo $(POSTGRES_PASSWORD) > .db_password
-endif
 else
 	@echo "[-] Database password are already set"
 endif
 
 backup-database:
-	docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db, but will not be migrated automatically. "
+	@docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db. If you want to import your backup to the new PostgreSQL, you can run 'make import-db'. Note that this will delete any potential content in the PostgreSQL database."
 
-
-update: generate-secrets
+update: generate-secrets backup-database
 	@docker-compose build
 	@docker-compose up -d
-ifneq ($(wildcard ./$(DB_BACKUP_FILE)),)
-	@docker cp $(DB_BACKUP_FILE) $(BACKEND_CONTAINER_NAME):/var/www/html/server/$(DB_BACKUP_FILE)
-	@docker exec $(BACKEND_CONTAINER_NAME) /var/www/html/server/db_engine_migrate.sh
-endif
-
 
 start: generate-secrets
 	@docker-compose up -d
@@ -65,5 +60,9 @@ start: generate-secrets
 stop:
 	@docker-compose down
 
-lock-requirements:
-	@pipenv requirements > $(SERVER_DIR)/requirements.txt
+import-db:
+ifneq ($(wildcard ./$(DB_BACKUP_FILE)),)
+	@docker volume rm $(DB_VOLUME_NAME)
+	@docker cp $(DB_BACKUP_FILE) $(BACKEND_CONTAINER_NAME):/var/www/html/server/$(DB_BACKUP_FILE)
+	@docker exec $(BACKEND_CONTAINER_NAME) /var/www/html/server/db_engine_migrate.sh
+endif
