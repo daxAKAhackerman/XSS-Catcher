@@ -1,10 +1,10 @@
 SHELL := /usr/bin/env bash
-POSTGRES_PASSWORD := $(shell openssl rand -hex 32)
+POSTGRES_PASSWORD = $(shell openssl rand -hex 32)
 CLIENT_DIR := client
 SERVER_DIR := server
 DB_PASSWORD_FILE := .db_password
 DB_BACKUP_FILE := database-backup.db
-BACKEND_CONTAINER_NAME := $(shell docker-compose ps | grep backend | awk -F ' ' '{print $$1}')
+BACKEND_CONTAINER_NAME = $(shell docker-compose ps | grep backend | awk -F ' ' '{print $$1}')
 
 export DOCKER_DEFAULT_PLATFORM := linux/amd64
 
