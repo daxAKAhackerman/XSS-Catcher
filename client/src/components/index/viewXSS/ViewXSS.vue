@@ -47,7 +47,9 @@
         convertTimestamp(row.item.timestamp)
       }}</template>
       <template v-slot:cell(tags)="row">
-          <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{tag}}</b-badge>
+        <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{
+          tag
+        }}</b-badge>
       </template>
       <template v-slot:cell(action)="row">
         <b-button
@@ -131,9 +133,9 @@ export default {
           label: "IP address",
         },
         {
-            key: "tags",
-            sortable: false,
-            label: "Tags"
+          key: "tags",
+          sortable: false,
+          label: "Tags",
         },
         {
           key: "action",
