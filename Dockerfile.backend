@@ -2,7 +2,7 @@ FROM python:3.10
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV PYTHONDONTWRITEBYTECODE 1
-RUN apt-get update && apt-get install -y postgresql-client pgloader
+RUN apt-get update && apt-get install -y postgresql-client
 RUN apt-get clean && apt-get autoremove --purge && rm -rf /var/lib/apt/lists/*
 
 COPY ./server /var/www/html/server

@@ -17,8 +17,8 @@ install:
 	@npm install --prefix $(CLIENT_DIR)
 
 init-dev:
-	@cd $(SERVER_DIR) && python3 -m pipenv run flask db upgrade
-	@cd $(SERVER_DIR) && python3 -m pipenv run python -c "import app; tmpapp = app.create_app(); app.models.init_app(tmpapp)"
+	@cd $(SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run flask db upgrade
+	@cd $(SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run python -c "import app; tmpapp = app.create_app(); app.models.init_app(tmpapp)"
 
 lock-requirements:
 	@pipenv requirements > $(SERVER_DIR)/requirements.txt
@@ -48,9 +48,9 @@ else
 endif
 
 backup-database:
-	@docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) && echo "[!] A SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db. If you want to import your backup to the new PostgreSQL, you can run 'make import-db'. Note that this will delete any potential content in the PostgreSQL database."
+	@docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) &> /dev/null && echo -e "\033[1;33m\n===== WARNING =====\nA SQLite database was found inside the backend container. As mentionned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db and your XSS Catcher instance will be reset. The data WILL NOT be migrated for you.\n===== WARNING =====\n\033[0m" && read -p "Press any key to proceed, or CTRL+C to abort "$$'\n' -s; true
 
-update: generate-secrets backup-database
+update: backup-database generate-secrets
 	@docker-compose build
 	@docker-compose up -d
 
@@ -59,10 +59,3 @@ start: generate-secrets
 
 stop:
 	@docker-compose down
-
-import-db:
-ifneq ($(wildcard ./$(DB_BACKUP_FILE)),)
-	@docker volume rm $(DB_VOLUME_NAME)
-	@docker cp $(DB_BACKUP_FILE) $(BACKEND_CONTAINER_NAME):/var/www/html/server/$(DB_BACKUP_FILE)
-	@docker exec $(BACKEND_CONTAINER_NAME) /var/www/html/server/db_engine_migrate.sh
-endif
