@@ -70,7 +70,7 @@ export default {
       axios
         .post(path, payload)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.cleanup();
         })
         .catch((error) => {

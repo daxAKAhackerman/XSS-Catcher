@@ -34,7 +34,7 @@ export default {
       axios
         .delete(path)
         .then((response) => {
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
           this.$refs.deleteUserModal.hide();
           this.$emit("get-users");
         })

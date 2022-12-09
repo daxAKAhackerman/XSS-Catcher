@@ -1,44 +1,45 @@
 from app import db
 from app.api import bp
-from app.models import Blocklist, User
-from flask import jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token, get_current_user, get_jwt, jwt_required
+from app.api.models import LoginModel
+from app.models import BlockedJti, User
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_current_user,
+    get_jwt,
+    jwt_required,
+)
+from flask_pydantic import validate
 
 
 @bp.route("/auth/login", methods=["POST"])
 @jwt_required(optional=True)
-def login():
-    """Logs a user in"""
+@validate()
+def login(body: LoginModel):
     current_user = get_current_user()
 
     if current_user:
-        return jsonify({"status": "error", "detail": "Already logged in"}), 400
-    data = request.get_json()
+        return {"msg": "Already logged in"}, 400
 
-    if "username" not in data.keys() or "password" not in data.keys():
-        return jsonify({"status": "error", "detail": "Missing username or password"}), 400
+    user: User = db.session.query(User).filter_by(username=body.username).one_or_none()
+    if user is None or not user.check_password(body.password):
+        return {"msg": "Bad username or password"}, 403
 
-    user = User.query.filter_by(username=data["username"]).first()
-    if user is None or not user.check_password(data["password"]):
-        return jsonify({"status": "error", "detail": "Bad username or password"}), 403
-
-    return jsonify({"status": "OK", "detail": {"access_token": create_access_token(user.username), "refresh_token": create_refresh_token(user.username)}}), 200
+    return {"access_token": create_access_token(user.username), "refresh_token": create_refresh_token(user.username)}
 
 
 @bp.route("/auth/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh():
-    """Uses a refresh token to generate a new access token"""
-    current_user = get_current_user()
-    return jsonify({"status": "OK", "detail": {"access_token": create_access_token(identity=current_user.username)}}), 200
+    current_user: User = get_current_user()
+    return {"access_token": create_access_token(identity=current_user.username)}
 
 
 @bp.route("/auth/logout", methods=["POST"])
 @jwt_required(refresh=True)
 def logout():
-    """Adds a refresh token jti to the blocklist"""
     jti = get_jwt()["jti"]
-    blocked_jti = Blocklist(jti=jti)
+    blocked_jti = BlockedJti(jti=jti)
     db.session.add(blocked_jti)
     db.session.commit()
-    return jsonify({"status": "OK", "detail": "Logged out successfully"}), 200
+    return {"msg": "Logged out successfully"}

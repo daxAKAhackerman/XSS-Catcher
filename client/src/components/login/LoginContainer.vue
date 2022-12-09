@@ -18,7 +18,7 @@
 import axios from "axios";
 
 import ChangePassword from "../shared/ChangePassword";
-import Logo from "./Logo";
+import Logo from "./LogoRow";
 import LoginForm from "./LoginForm";
 
 const axiosLogin = axios.create();
@@ -38,18 +38,6 @@ export default {
     };
   },
   methods: {
-    handleError(error) {
-      if (error.response.status === 422) {
-        sessionStorage.removeItem("access_token");
-        sessionStorage.removeItem("refresh_token");
-      } else {
-        this.makeToast(
-          error.response.data.detail,
-          "danger",
-          error.response.data.status
-        );
-      }
-    },
     loginProcess() {
       const path = `${basePath}/user/current`;
       axiosLogin

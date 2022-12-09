@@ -136,7 +136,7 @@ export default {
       axios
         .post(path, payload)
         .then((response) => {
-          this.xss_payload = response.data.detail;
+          this.xss_payload = response.data.payload;
         })
         .catch((error) => {
           this.handleError(error);

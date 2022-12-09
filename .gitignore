@@ -4,3 +4,5 @@ cov_html/
 .env
 .vscode
 .db_password
+.pytest_cache/
+database-backup.db

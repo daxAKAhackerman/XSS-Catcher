@@ -75,11 +75,11 @@ import ViewXSS from "./viewXSS/ViewXSS";
 import ViewClient from "./viewClient/ViewClient";
 import ChangePassword from "../shared/ChangePassword";
 import ManageUsers from "./manageUsers/ManageUsers";
-import Settings from "./settings/Settings";
+import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
 import ClientTable from "./ClientTable";
-import Navigation from "./Navigation";
-import Header from "./Header";
+import Navigation from "./NavigationRow";
+import Header from "./HeaderRow";
 
 const axiosRefresh = axios.create();
 
@@ -136,7 +136,7 @@ export default {
           sessionStorage.removeItem("access_token");
           sessionStorage.removeItem("refresh_token");
           this.$router.push({ name: "Login" });
-          this.makeToast(response.data.detail, "success", response.data.status);
+          this.makeToast(response.data.msg, "success");
         })
         .catch((error) => {
           this.handleError(error);
@@ -204,7 +204,7 @@ export default {
             .then((response) => {
               sessionStorage.setItem(
                 "access_token",
-                response.data.detail.access_token
+                response.data.access_token
               );
               return axios(originalRequest);
             });
