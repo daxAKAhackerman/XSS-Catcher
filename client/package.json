@@ -24,7 +24,7 @@
     "@vue/cli-plugin-babel": "^5.0.0",
     "@vue/cli-plugin-eslint": "^5.0.0",
     "@vue/cli-service": "^5.0.0",
-    "@babel/core": "^7.0.0",
+    "@babel/core": "^7.20.5",
     "@babel/eslint-parser": "^7.0.0",
     "eslint": "^7.0.0",
     "eslint-plugin-vue": "^8.0.0",
