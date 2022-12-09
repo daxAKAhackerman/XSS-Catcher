@@ -21,17 +21,17 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 
 ## Features
 
--   Generates simple customizable XSS payloads
--   Sends email alerts or webhooks (in Slack format) when a new XSS is caught
--   The destination email or webhook can be configured globally and per client
--   Separates the gathered data by clients
--   Multi-user with administrative and low privilege users
--   Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
--   Allows capture of cookies, local storage, session storage, and more.
--   Acts as a "catch-all" endpoint. Just send your data in the querystring (GET) or body (POST) to your client's URL and XSS Catcher will catch it!
--   Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
--   Captures the full DOM so you can easily know where the payload triggered
--   Allows you to add custom tags to your XSS to better categorize them.
+- Generates simple customizable XSS payloads
+- Sends email alerts or webhooks (in Slack format) when a new XSS is caught
+- The destination email or webhook can be configured globally and per client
+- Separates the gathered data by clients
+- Multi-user with administrative and low privilege users
+- Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
+- Allows capture of cookies, local storage, session storage, and more.
+- Acts as a "catch-all" endpoint. Just send your data in the querystring (GET) or body (POST) to your client's URL and XSS Catcher will catch it!
+- Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
+- Captures the full DOM so you can easily know where the payload triggered
+- Allows you to add custom tags to your XSS to better categorize them.
 
 ## Installation
 
@@ -73,8 +73,8 @@ $ make stop
 
 ## First login
 
--   Default credentials to connect to the Web interface are **admin:xss**
--   Default Web port is **8888**
+- Default credentials to connect to the Web interface are **admin:xss**
+- Default Web port is **8888**
 
 ## Demo
 
@@ -112,18 +112,46 @@ $ make stop
 $ make start
 ```
 
-###
+### I updated to XSS-Catcher v2, understood that my data would not carry over from v1 as stated by the release note and update warning, but I'd like some pointers on how I can import my data to the new PostgreSQL database
+
+While there is no guarantee about the following procedure, it is possible to "import" the data from v1 to v2 with a very manual (but achievable) process:
+
+```bash
+# Using SQLite3, create a dump using the database backup file
+$ sqlite database-backup.db .dump > dump
+
+# The statements you are interested in are the INSERT INTO statements
+# Choose which ones you want to import
+
+# While XSS Catcher is running, attach to the database container
+$ docker exec -it xss-catcher_db_1 bash
+
+# Log into the PostgreSQL database
+$ psql -U user xss
+
+# To import users, you will have to take the INSERT INTO statements, put double quotes around the table name (user) and replace the 1 and 0 by 't' or 'f' in the fourth and fifth columns.
+# Once that's done, you can paste the commands directly into the psql CLI
+
+# To import clients, the INSERT INTO statements can be executed as is
+
+# To import settings, first drop the current settings
+$ DELETE from settings where id=1;
+# Then replace the 1 and 0 by 't' or 'f' in the fourth and fifth columns
+# Once that's done, you can paste the statement into the psql CLI
+
+# Finaly, to import XSS, the INSERT INTO statements can be executed as is
+```
 
 ## Credits
 
--   [Flask](https://flask.palletsprojects.com/)
--   [VueJS](https://vuejs.org/)
--   [BootstrapVue](https://bootstrap-vue.org/)
--   [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs)
--   [html2canvas](https://github.com/niklasvh/html2canvas)
--   [Bootswatch Slate theme](https://bootswatch.com/slate/)
--   [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
--   [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
+- [Flask](https://flask.palletsprojects.com/)
+- [VueJS](https://vuejs.org/)
+- [BootstrapVue](https://bootstrap-vue.org/)
+- [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs)
+- [html2canvas](https://github.com/niklasvh/html2canvas)
+- [Bootswatch Slate theme](https://bootswatch.com/slate/)
+- [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
+- [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
 
 ## Disclaimer
 
@@ -131,8 +159,8 @@ Usage of this tool for attacking targets without prior mutual consent is illegal
 
 ## You may also like...
 
--   [Simple One Time Secret](https://github.com/daxAKAhackerman/simple-one-time-secret) - Generate single use, expiring links to share sensitive information
--   [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
+- [Simple One Time Secret](https://github.com/daxAKAhackerman/simple-one-time-secret) - Generate single use, expiring links to share sensitive information
+- [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
 
 ---
 
