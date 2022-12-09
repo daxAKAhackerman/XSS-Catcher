@@ -139,7 +139,7 @@ $ DELETE from settings where id=1;
 # Then replace the 1 and 0 by 't' or 'f' in the fourth and fifth columns
 # Once that's done, you can paste the statement into the psql CLI
 
-# Finaly, to import XSS, the INSERT INTO statements can be executed as is
+# Finally, to import XSS, the INSERT INTO statements can be executed as is
 ```
 
 ## Credits
