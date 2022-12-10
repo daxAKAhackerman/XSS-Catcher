@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^3.3.6",
     "html2canvas": "^1.4.1"
