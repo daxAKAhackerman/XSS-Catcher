@@ -1,6 +1,6 @@
 <template>
   <b-container>
-    <Header :user="user" />
+    <HeaderRow :user="user" />
     <br />
     <b-row>
       <b-col offset-sm="1" sm="10">
@@ -79,7 +79,7 @@ import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
 import ClientTable from "./ClientTable";
 import Navigation from "./NavigationRow";
-import Header from "./HeaderRow";
+import HeaderRow from "./HeaderRow";
 
 const axiosRefresh = axios.create();
 
@@ -98,7 +98,7 @@ export default {
     DeleteClient,
     ClientTable,
     Navigation,
-    Header,
+    HeaderRow,
   },
   data() {
     return {
