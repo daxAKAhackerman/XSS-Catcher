@@ -2,6 +2,7 @@ SHELL := /usr/bin/env bash
 POSTGRES_PASSWORD = $(shell openssl rand -hex 32)
 CLIENT_DIR := client
 SERVER_DIR := server
+COLLECTOR_SCRIPT_DIR := collector_script
 DB_PASSWORD_FILE := .db_password
 DB_BACKUP_FILE := database-backup.db
 BACKEND_CONTAINER_NAME = $(shell docker-compose ps | grep backend | awk -F ' ' '{print $$1}')
@@ -13,6 +14,7 @@ install:
 	@python3 -m pipenv install --dev
 	@python3 -m pipenv run pre-commit install
 	@npm install --prefix $(CLIENT_DIR)
+	@npm install --prefix $(COLLECTOR_SCRIPT_DIR)
 
 init-dev:
 	@cd $(SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run flask db upgrade
@@ -37,6 +39,9 @@ run-web-app:
 
 run-backend-server: lint
 	@cd $(SERVER_DIR) && FLASK_DEBUG=1 pipenv run flask run
+
+build-collector-script:
+	@cd $(COLLECTOR_SCRIPT_DIR) && npx webpack
 
 generate-secrets:
 ifeq ($(wildcard ./$(DB_PASSWORD_FILE)),)
