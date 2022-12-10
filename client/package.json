@@ -12,7 +12,7 @@
     "bootstrap-vue": "^2.0.0",
     "core-js": "^3.0.0",
     "moment-timezone": "^0.5.39",
-    "vue": "^2.0.0",
+    "vue": "^3.2.45",
     "vue-clipboard2": "^0.3.3",
     "vue-code-highlight": "^0.7.7",
     "vue-json-pretty": "^1.0.0",
