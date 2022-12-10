@@ -158,4 +158,7 @@ export default {
 </script>
 
 <style>
+.table td {
+  vertical-align: middle !important; /* !important is necessary to override bootstrap default behavior */
+}
 </style>
