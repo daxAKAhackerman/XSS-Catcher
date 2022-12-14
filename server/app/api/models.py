@@ -81,6 +81,7 @@ class XssGenerateModel(BaseModel):
     code_type: Literal["html", "js"]
     to_gather: List[str]
     tags: List[str]
+    custom_js: str
 
     @validator("to_gather")
     def to_gather_validator(cls, v, values, **kwargs):
