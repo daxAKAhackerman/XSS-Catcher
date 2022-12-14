@@ -63,6 +63,20 @@
     <p>Tags</p>
     <b-form-tags tag-variant="info" v-model="tags"></b-form-tags>
     <br />
+    <hr />
+    <p>Custom JavaScript</p>
+    <b-form-textarea
+      class="language-javascript"
+      id="custom-js-textarea"
+      v-model="custom_js"
+    ></b-form-textarea>
+    <b-popover target="custom-js-textarea" triggers="hover" placement="top">
+      Custom JavaScript is a multi-line JavaScript block, with each line being
+      terminated by a semicolon. It will be passed to an eval function at
+      runtime, and the output of the last statement in the block will be caught
+      by XSS-Catcher in the custom_js_output section.
+    </b-popover>
+    <br />
     <div class="text-right">
       <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
       <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
@@ -106,6 +120,7 @@ export default {
       code_type: "html",
       xss_payload: "",
       tags: [],
+      custom_js: "",
     };
   },
   methods: {
@@ -118,6 +133,7 @@ export default {
         client_id: this.client_id,
         to_gather: this.to_gather,
         tags: this.tags,
+        custom_js: btoa(this.custom_js),
       };
 
       if (this.all.includes("all")) {
@@ -149,6 +165,7 @@ export default {
       this.code_type = "html";
       this.xss_payload = "";
       this.tags = [];
+      this.custom_js = "";
 
       this.$refs.getPayloadModal.hide();
       this.$emit("get-clients");

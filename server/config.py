@@ -24,3 +24,4 @@ class Config:
     def __init__(self):
         if os.getenv("FLASK_DEBUG"):
             self.SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV"
+            self.JWT_ACCESS_TOKEN_EXPIRES = 3600
