@@ -32,6 +32,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 - Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
 - Captures the full DOM so you can easily know where the payload triggered
 - Allows you to add custom tags to your XSS to better categorize them.
+- Allows you to run custom JavaScript code and capture the output.
 
 ## Installation
 
