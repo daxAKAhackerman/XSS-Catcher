@@ -49,6 +49,26 @@
               ></b-icon-chevron-double-up>
             </b-button>
             <b-button
+              v-if="user.mfa"
+              v-b-tooltip.hover
+              title="Disable MFA"
+              @click="disableMfa(user.id)"
+              type="button"
+              variant="outline-danger"
+            >
+              <b-icon-lock style="width: 20px; height: 20px"></b-icon-lock>
+            </b-button>
+            <b-button
+              v-else
+              v-b-tooltip.hover
+              title="MFA not enabled"
+              type="button"
+              variant="outline-danger"
+              disabled
+            >
+              <b-icon-unlock style="width: 20px; height: 20px"></b-icon-unlock>
+            </b-button>
+            <b-button
               v-b-tooltip.hover
               title="Reset password"
               @click="resetPassword(user.id, user.username)"
@@ -154,6 +174,19 @@ export default {
           this.alert_msg = `New password for user ${username} is: ${response.data.password}`;
           this.show_alert = true;
           this.alert_type = "success";
+        })
+        .catch((error) => {
+          this.handleError(error);
+        });
+    },
+    disableMfa(userId) {
+      const path = `${basePath}/user/${userId}/mfa`;
+
+      axios
+        .delete(path)
+        .then((response) => {
+          this.makeToast(response.data.msg, "success");
+          this.cleanup();
         })
         .catch((error) => {
           this.handleError(error);

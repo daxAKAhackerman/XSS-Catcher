@@ -1,3 +1,4 @@
+import pyotp
 from app import db
 from app.api import bp
 from app.api.models import LoginModel
@@ -24,6 +25,12 @@ def login(body: LoginModel):
     user: User = db.session.query(User).filter_by(username=body.username).one_or_none()
     if user is None or not user.check_password(body.password):
         return {"msg": "Bad username or password"}, 403
+
+    if user.mfa_secret:
+        if not body.otp:
+            return {"msg": "OTP is required"}
+        elif not pyotp.TOTP(user.mfa_secret).verify(body.otp):
+            return {"msg": "Bad OTP"}, 400
 
     return {"access_token": create_access_token(user.username), "refresh_token": create_refresh_token(user.username)}
 

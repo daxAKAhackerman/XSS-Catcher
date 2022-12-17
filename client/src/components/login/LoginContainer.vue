@@ -10,14 +10,18 @@
         />
       </b-col>
     </b-row>
-    <ChangePassword :show_password_modal="show_password_modal" />
+    <PasswordMfa
+      :show_password_modal="show_password_modal"
+      :mfa_set="user.mfa"
+      :user_id="user.id"
+    />
   </b-container>
 </template>
 
 <script>
 import axios from "axios";
 
-import ChangePassword from "../shared/ChangePassword";
+import PasswordMfa from "../shared/PasswordMfa";
 import Logo from "./LogoRow";
 import LoginForm from "./LoginForm";
 
@@ -27,7 +31,7 @@ const basePath = "/api";
 
 export default {
   components: {
-    ChangePassword,
+    PasswordMfa,
     Logo,
     LoginForm,
   },

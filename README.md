@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/icon.png" alt="XSS-Catcher" width="150">
+  <img src="https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/icon.png" alt="XSS Catcher" width="150">
   <br>
   XSS Catcher
   <br>
@@ -113,7 +113,7 @@ $ make stop
 $ make start
 ```
 
-### I updated to XSS-Catcher v2, understood that my data would not carry over from v1 as stated by the release note and update warning, but I'd like some pointers on how I can import my data to the new PostgreSQL database
+### I updated to XSS Catcher v2, understood that my data would not carry over from v1 as stated by the release note and update warning, but I'd like some pointers on how I can import my data to the new PostgreSQL database
 
 While there is no guarantee about the following procedure, it is possible to "import" the data from v1 to v2 with a very manual (but achievable) process:
 

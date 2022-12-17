@@ -9,6 +9,13 @@ DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "
 class LoginModel(BaseModel):
     username: str
     password: str
+    otp: Optional[str] = Field(min_length=6, max_length=6)
+
+    @validator("otp")
+    def otp_validator(cls, v, values, **kwargs):
+        if not v.isnumeric():
+            raise ValueError(f"otp must only contain numbers")
+        return v
 
 
 class ClientPostModel(BaseModel):
@@ -98,3 +105,14 @@ class ClientXssGetAllModel(BaseModel):
 
 class ClientLootGetModel(BaseModel):
     client_id: Optional[int]
+
+
+class SetMfaModel(BaseModel):
+    secret: str = Field(..., min_length=32, max_length=32)
+    otp: str = Field(..., min_length=6, max_length=6)
+
+    @validator("otp")
+    def otp_validator(cls, v, values, **kwargs):
+        if not v.isnumeric():
+            raise ValueError(f"otp must only contain numbers")
+        return v

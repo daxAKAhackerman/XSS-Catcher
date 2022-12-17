@@ -74,7 +74,7 @@
       Custom JavaScript is a multi-line JavaScript block, with each line being
       terminated by a semicolon. It will be passed to an eval function at
       runtime, and the output of the last statement in the block will be caught
-      by XSS-Catcher in the custom_js_output section.
+      by XSS Catcher in the custom_js_output section.
     </b-popover>
     <br />
     <div class="text-right">

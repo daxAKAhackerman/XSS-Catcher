@@ -58,7 +58,13 @@
       :user_id="user.id"
       @get-clients="getClients(false)"
     />
-    <ChangePassword :show_password_modal="show_password_modal" />
+    <PasswordMfa
+      :show_password_modal="show_password_modal"
+      :mfa_set="user.mfa"
+      :user_id="user.id"
+      :show_mfa_section="true"
+      @get-user="getUser()"
+    />
     <ManageUsers />
     <Settings />
     <DeleteClient :to_delete="to_delete" @get-clients="getClients(false)" />
@@ -73,7 +79,7 @@ import GetPayload from "./generatePayload/GetPayload";
 import ViewData from "./viewData/ViewData";
 import ViewXSS from "./viewXSS/ViewXSS";
 import ViewClient from "./viewClient/ViewClient";
-import ChangePassword from "../shared/ChangePassword";
+import PasswordMfa from "../shared/PasswordMfa";
 import ManageUsers from "./manageUsers/ManageUsers";
 import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
@@ -92,7 +98,7 @@ export default {
     ViewData,
     ViewXSS,
     ViewClient,
-    ChangePassword,
+    PasswordMfa,
     ManageUsers,
     Settings,
     DeleteClient,
