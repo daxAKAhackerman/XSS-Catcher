@@ -5,7 +5,6 @@
     title="Password and MFA"
     hide-footer
     @hidden="cleanup()"
-    @show="hideSetupMfaButtonIfAlreadySet()"
     :visible="show_password_modal"
   >
     <h4>Change password</h4>
@@ -69,46 +68,49 @@
       <h4>Multi Factor Authentication</h4>
       <br />
       <b-button
-        v-if="show_generate_mfa_qr_code_button"
-        @click="generateMfaQrCode()"
-        block
-        variant="outline-success"
-        >Generate MFA QR code</b-button
-      >
-      <b-button
         v-if="mfa_set"
         @click="unsetMfa()"
         block
         variant="outline-danger"
         >Disable MFA</b-button
       >
-      <b-form v-on:submit.prevent v-if="show_mfa_form">
-        <b-img center :src="qr_code"></b-img>
-        <div class="text-center">
-          <p>{{ mfa_secret }}</p>
-        </div>
-        <b-form-group
-          id="input-group-otp"
-          label="OTP:"
-          label-cols="3"
-          label-for="input-field-otp"
-        >
-          <b-form-input
-            @keyup.enter="setMfa()"
-            v-model="otp"
-            id="input-field-otp"
-            autocomplete="off"
-            required
-          ></b-form-input>
-        </b-form-group>
-
-        <div class="text-right">
-          <b-button @click="setMfa()" variant="outline-info">Save</b-button>
-          <b-button @click="cleanup()" variant="outline-secondary"
-            >Cancel</b-button
+      <b-button
+        v-else
+        @click="generateMfaQrCode()"
+        block
+        variant="outline-success"
+        >Generate MFA QR code</b-button
+      >
+      <div v-if="show_mfa_form">
+        <br />
+        <b-form v-on:submit.prevent>
+          <b-img center :src="qr_code"></b-img>
+          <div class="text-center">
+            <p>{{ mfa_secret }}</p>
+          </div>
+          <b-form-group
+            id="input-group-otp"
+            label="OTP:"
+            label-cols="3"
+            label-for="input-field-otp"
           >
-        </div>
-      </b-form>
+            <b-form-input
+              @keyup.enter="setMfa()"
+              v-model="otp"
+              id="input-field-otp"
+              autocomplete="off"
+              required
+            ></b-form-input>
+          </b-form-group>
+
+          <div class="text-right">
+            <b-button @click="setMfa()" variant="outline-info">Save</b-button>
+            <b-button @click="cleanup()" variant="outline-secondary"
+              >Cancel</b-button
+            >
+          </div>
+        </b-form>
+      </div>
     </div>
   </b-modal>
 </template>
@@ -125,7 +127,6 @@ export default {
       old_password: "",
       new_password1: "",
       new_password2: "",
-      show_generate_mfa_qr_code_button: true,
       show_mfa_form: false,
       mfa_secret: "",
       mfa_qr_code_base64: "",
@@ -165,7 +166,6 @@ export default {
         .then((response) => {
           this.mfa_secret = response.data.secret;
           this.mfa_qr_code_base64 = response.data.qr_code;
-          this.show_generate_mfa_qr_code_button = false;
           this.show_mfa_form = true;
         })
         .catch((error) => {
@@ -203,17 +203,11 @@ export default {
           this.handleError(error);
         });
     },
-    hideSetupMfaButtonIfAlreadySet() {
-      if (this.mfa_set) {
-        this.show_generate_mfa_qr_code_button = false;
-      }
-    },
     cleanup() {
       this.$refs.passwordMfaModal.hide();
       this.old_password = "";
       this.new_password1 = "";
       this.new_password2 = "";
-      this.show_generate_mfa_qr_code_button = true;
       this.show_mfa_form = false;
       this.mfa_secret = "";
       this.mfa_qr_code_base64 = "";
