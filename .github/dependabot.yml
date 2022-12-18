@@ -22,3 +22,5 @@ updates:
     ignore:
       - dependency-name: "vue" # Updating to Vue 3 is currently not on the roadmap
         update-types: ["version-update:semver-major"]
+      - dependency-name: "vue-json-pretty" # Updating to Vue 3 is currently not on the roadmap
+        update-types: ["version-update:semver-major"]
