@@ -247,4 +247,8 @@ export default {
   filter: alpha(opacity=25);
   transition: opacity 0.25s ease-in-out;
 }
+.transform-button-group:hover {
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
 </style>
