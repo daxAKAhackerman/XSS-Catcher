@@ -22,7 +22,7 @@ def client_post(body: ClientPostModel):
     new_client.generate_uid()
     db.session.add(new_client)
     db.session.commit()
-    return {"msg": f"New client {new_client.name} created successfuly"}, 201
+    return {"msg": f"New client {new_client.name} created successfully"}, 201
 
 
 @bp.route("/client/<int:client_id>", methods=["GET"])
@@ -69,7 +69,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
 
     db.session.commit()
 
-    return {"msg": f"Client {client.name} edited successfuly"}
+    return {"msg": f"Client {client.name} edited successfully"}
 
 
 @bp.route("/client/<int:client_id>", methods=["DELETE"])
@@ -81,7 +81,7 @@ def client_delete(client_id: int):
     db.session.delete(client)
     db.session.commit()
 
-    return {"msg": f"Client {client.name} deleted successfuly"}
+    return {"msg": f"Client {client.name} deleted successfully"}
 
 
 @bp.route("/client", methods=["GET"])

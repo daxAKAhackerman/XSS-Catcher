@@ -45,7 +45,7 @@ def test__change_password__given_password__then_password_changed(client_tester: 
     )
     user: User = db.session.query(User).filter_by(username="admin").one()
     assert user.check_password("Password123")
-    assert response.json == {"msg": "Password changed successfuly"}
+    assert response.json == {"msg": "Password changed successfully"}
     assert response.status_code == 200
 
 
@@ -128,7 +128,7 @@ def test__user_delete__given_user_id__then_user_deleted(client_tester: FlaskClie
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/user/{user.id}", headers={"Authorization": f"Bearer {access_token}"})
     assert db.session.query(User).filter_by(id=user.id).one_or_none() is None
-    assert response.json == {"msg": f"User {user.username} deleted successfuly"}
+    assert response.json == {"msg": f"User {user.username} deleted successfully"}
     assert response.status_code == 200
 
 
@@ -146,7 +146,7 @@ def test__user_patch__given_valid_request__then_user_privileges_changed(client_t
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch(f"/api/user/{user.id}", json={"is_admin": True}, headers={"Authorization": f"Bearer {access_token}"})
     assert user.is_admin is True
-    assert response.json == {"msg": f"User {user.username} modified successfuly"}
+    assert response.json == {"msg": f"User {user.username} modified successfully"}
     assert response.status_code == 200
 
 
@@ -187,7 +187,7 @@ def test__set_mfa__given_otp__when_good_otp__then_200_returned(pyotp_mocker: moc
 
     user: User = db.session.query(User).filter_by(id=1).one()
     assert user.mfa_secret == "A" * 32
-    assert response.json == {"msg": "MFA set successfuly"}
+    assert response.json == {"msg": "MFA set successfully"}
     assert response.status_code == 200
 
 

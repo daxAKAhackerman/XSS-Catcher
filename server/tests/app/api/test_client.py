@@ -19,7 +19,7 @@ def test__client_post__given_client_info__when_info_is_valid__then_201_returned(
     client: Client = db.session.query(Client).one()
     assert client.name == "test"
     assert client.description == ""
-    assert response.json == {"msg": "New client test created successfuly"}
+    assert response.json == {"msg": "New client test created successfully"}
     assert response.status_code == 201
 
 
@@ -52,7 +52,7 @@ def test__client_patch__given_all_fields__when_fields_are_valid__then_client_edi
     assert client.owner_id == 2
     assert client.mail_to == "user@example.com"
     assert client.webhook_url == "https://example.com"
-    assert response.json == {"msg": "Client test2 edited successfuly"}
+    assert response.json == {"msg": "Client test2 edited successfully"}
     assert response.status_code == 200
 
 
@@ -96,7 +96,7 @@ def test__client_delete__given_client_id__then_client_deleted(client_tester: Fla
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/client/{client.id}", headers={"Authorization": f"Bearer {access_token}"})
     assert db.session.query(Client).count() == 0
-    assert response.json == {"msg": "Client test deleted successfuly"}
+    assert response.json == {"msg": "Client test deleted successfully"}
     assert response.status_code == 200
 
 

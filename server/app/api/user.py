@@ -49,7 +49,7 @@ def change_password(body: ChangePasswordModel):
     current_user.first_login = False
 
     db.session.commit()
-    return {"msg": "Password changed successfuly"}
+    return {"msg": "Password changed successfully"}
 
 
 @bp.route("/user/<int:user_id>/password", methods=["POST"])
@@ -91,7 +91,7 @@ def user_delete(user_id: int):
     db.session.delete(user)
     db.session.commit()
 
-    return {"msg": f"User {user.username} deleted successfuly"}
+    return {"msg": f"User {user.username} deleted successfully"}
 
 
 @bp.route("/user/<int:user_id>", methods=["PATCH"])
@@ -109,7 +109,7 @@ def user_patch(user_id: int, body: UserPatchModel):
     user.is_admin = body.is_admin
     db.session.commit()
 
-    return {"msg": f"User {user.username} modified successfuly"}
+    return {"msg": f"User {user.username} modified successfully"}
 
 
 @bp.route("/user", methods=["GET"])
@@ -148,7 +148,7 @@ def set_mfa(body: SetMfaModel):
     current_user.mfa_secret = body.secret
     db.session.commit()
 
-    return {"msg": "MFA set successfuly"}
+    return {"msg": "MFA set successfully"}
 
 
 @bp.route("/user/<int:user_id>/mfa", methods=["DELETE"])
