@@ -15,7 +15,7 @@
     "vue": "^2.0.0",
     "vue-clipboard2": "^0.3.3",
     "vue-code-highlight": "^0.7.7",
-    "vue-json-pretty": "^1.0.0",
+    "vue-json-pretty": "^2.0.2",
     "vue-moment": "^4.0.0",
     "vue-router": "^3.0.0",
     "vue2-filters": "^0.14.0"
