@@ -26,6 +26,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 - The destination email or webhook can be configured globally and per client
 - Separates the gathered data by clients
 - Multi-user with administrative and low privilege users
+- MFA with TOTP
 - Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
 - Allows capture of cookies, local storage, session storage, and more.
 - Acts as a "catch-all" endpoint. Just send your data in the querystring (GET) or body (POST) to your client's URL and XSS Catcher will catch it!
