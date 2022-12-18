@@ -9,6 +9,7 @@ DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "
 class LoginModel(BaseModel):
     username: str
     password: str
+    otp: Optional[str] = Field(regex=r"\d{6}")
 
 
 class ClientPostModel(BaseModel):
@@ -98,3 +99,8 @@ class ClientXssGetAllModel(BaseModel):
 
 class ClientLootGetModel(BaseModel):
     client_id: Optional[int]
+
+
+class SetMfaModel(BaseModel):
+    secret: str = Field(..., regex=r"[A-Z2-7]{32}")
+    otp: str = Field(..., regex=r"\d{6}")

@@ -134,7 +134,7 @@ def xss_delete(xss_id: int):
     db.session.delete(xss)
     db.session.commit()
 
-    return {"msg": "XSS deleted successfuly"}
+    return {"msg": "XSS deleted successfully"}
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
@@ -160,7 +160,7 @@ def xss_loot_delete(xss_id: int, loot_type: str):
 
     db.session.commit()
 
-    return {"msg": "Data deleted successfuly"}
+    return {"msg": "Data deleted successfully"}
 
 
 @bp.route("/xss", methods=["GET"])

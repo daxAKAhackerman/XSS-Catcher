@@ -51,7 +51,7 @@ else
 endif
 
 backup-database:
-	@docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) &> /dev/null && echo -e "\033[1;33m\n===== WARNING =====\nA SQLite database was found inside the backend container. As mentioned in the release notes for XSS-Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db and your XSS Catcher instance will be reset. The data WILL NOT be migrated for you.\n===== WARNING =====\n\033[0m" && read -p "Press any key to proceed, or CTRL+C to abort "$$'\n' -s; true
+	@docker cp $(BACKEND_CONTAINER_NAME):/var/www/html/server/app.db $(DB_BACKUP_FILE) &> /dev/null && echo -e "\033[1;33m\n===== WARNING =====\nA SQLite database was found inside the backend container. As mentioned in the release notes for XSS Catcher v2.0.0, the local SQLite database in the backend container is no longer supported, and was replaced by a PostgreSQL database container. Your data was backed up to database-backup.db and your XSS Catcher instance will be reset. The data WILL NOT be migrated for you.\n===== WARNING =====\n\033[0m" && read -p "Press any key to proceed, or CTRL+C to abort "$$'\n' -s; true
 
 update: backup-database generate-secrets
 	@docker-compose build

@@ -14,6 +14,9 @@ Flask-Pydantic = "==0.11.0"
 waitress = "==2.1.2"
 pydantic = {extras = ["email"], version = "==1.10.2"}
 psycopg2-binary = "==2.9.5"
+pyotp = "==2.8.0"
+pyqrcode = "==1.2.1"
+pypng = "==0.20220715.0"
 
 [dev-packages]
 black = "*"

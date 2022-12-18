@@ -202,7 +202,7 @@ def test__xss_delete__given_xss_id__then_xss_deleted(client_tester: FlaskClient)
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/xss/{xss.id}", headers={"Authorization": f"Bearer {access_token}"})
     assert db.session.query(XSS).count() == 0
-    assert response.json == {"msg": "XSS deleted successfuly"}
+    assert response.json == {"msg": "XSS deleted successfully"}
     assert response.status_code == 200
 
 
@@ -220,7 +220,7 @@ def test__xss_loot_delete__given_xss_id_and_loot_type__then_loot_deleted(client_
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/xss/{xss.id}/data/cookies", headers={"Authorization": f"Bearer {access_token}"})
     assert xss.data == json.dumps({})
-    assert response.json == {"msg": "Data deleted successfuly"}
+    assert response.json == {"msg": "Data deleted successfully"}
     assert response.status_code == 200
 
 

@@ -89,7 +89,7 @@ def settings_patch(body: SettingsPatchModel):
 
     db.session.commit()
 
-    return {"msg": "Configuration saved successfuly"}
+    return {"msg": "Configuration saved successfully"}
 
 
 @bp.route("/settings/smtp_test", methods=["POST"])

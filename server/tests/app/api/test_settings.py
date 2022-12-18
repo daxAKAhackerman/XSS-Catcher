@@ -81,7 +81,7 @@ def test__settings_patch__given_all_fields__when_fields_are_valid__then_settings
     assert settings.webhook_url == "http://127.0.0.1"
     assert settings.ssl_tls is True
     assert settings.starttls is False
-    assert response.json == {"msg": "Configuration saved successfuly"}
+    assert response.json == {"msg": "Configuration saved successfully"}
     assert response.status_code == 200
 
 

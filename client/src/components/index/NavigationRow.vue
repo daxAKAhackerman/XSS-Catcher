@@ -26,8 +26,8 @@
         v-b-modal.manage-users-modal
         >Manage users</b-button
       >
-      <b-button variant="outline-warning" v-b-modal.change-password-modal
-        >Change password</b-button
+      <b-button variant="outline-warning" v-b-modal.password-mfa-modal
+        >Password and MFA</b-button
       >
       <b-button type="button" variant="outline-warning" @click="$emit('logout')"
         >Log out</b-button

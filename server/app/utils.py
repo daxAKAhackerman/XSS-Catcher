@@ -82,17 +82,25 @@ def permissions(all_of: List[str] = [], one_of: List[str] = []):
         def new_function(*args, **kwargs):
             current_user: User = get_current_user()
 
-            permission_attributes = [current_user.is_admin]
+            permission_attributes = {"admin": current_user.is_admin}
 
-            if "client_id" in kwargs:
+            if "user_id" in kwargs:
+                permission_attributes["owner"] = current_user.id == kwargs["user_id"]
+            elif "client_id" in kwargs:
                 client: Client = db.session.query(Client).filter_by(id=kwargs["client_id"]).first_or_404()
-                permission_attributes.append(current_user.id == client.owner_id)
+                permission_attributes["owner"] = current_user.id == client.owner_id
             elif "xss_id" in kwargs:
                 xss: XSS = db.session.query(XSS).filter_by(id=kwargs["xss_id"]).first_or_404()
-                permission_attributes.append(current_user.id == xss.client.owner_id)
+                permission_attributes["owner"] = current_user.id == xss.client.owner_id
 
-            if (all_of and all(permission_attributes)) or (one_of and any(permission_attributes)) or (not all_of and not one_of):
-                return original_function(*args, **kwargs)
+            if all_of:
+                values_to_check = [v for k, v in permission_attributes.items() if k in all_of]
+                if all(values_to_check):
+                    return original_function(*args, **kwargs)
+            elif one_of:
+                values_to_check = [v for k, v in permission_attributes.items() if k in one_of]
+                if any(values_to_check):
+                    return original_function(*args, **kwargs)
 
             return {"msg": "Forbidden"}, 403
 

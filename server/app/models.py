@@ -96,6 +96,7 @@ class User(db.Model):
     password_hash = db.Column(db.Text, nullable=False)
     first_login = db.Column(db.Boolean, nullable=False, default=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    mfa_secret = db.Column(db.String(32))
     client = db.relationship("Client", backref="owner", lazy="dynamic")
 
     def set_password(self, password: str):
@@ -109,7 +110,7 @@ class User(db.Model):
         return "".join(random.choice(characters) for i in range(12))
 
     def to_dict(self):
-        data = {"id": self.id, "username": self.username, "first_login": self.first_login, "is_admin": self.is_admin}
+        data = {"id": self.id, "username": self.username, "first_login": self.first_login, "is_admin": self.is_admin, "mfa": bool(self.mfa_secret)}
         return data
 
 
