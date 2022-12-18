@@ -107,7 +107,7 @@ def test__User_generate_password__given_self__then_password_generated(client_tes
 
 def test__User_to_dict__given_self__then_dict_returned(client_tester: FlaskClient):
     user: User = create_user("test")
-    assert user.to_dict() == {"first_login": True, "id": 2, "is_admin": False, "username": "test"}
+    assert user.to_dict() == {"first_login": True, "id": 2, "is_admin": False, "mfa": False, "username": "test"}
 
 
 def test__Settings_to_dict__given_self__then_dict_returned(client_tester: FlaskClient):

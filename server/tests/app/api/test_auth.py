@@ -1,5 +1,7 @@
+from unittest import mock
+
 from app import db
-from app.models import BlockedJti
+from app.models import BlockedJti, User
 from flask.testing import FlaskClient
 from tests.helpers import login
 
@@ -22,6 +24,32 @@ def test__login__given_credentials__when_credentials_are_valid__then_200_returne
     assert "access_token" in response.json
     assert "refresh_token" in response.json
     assert response.status_code == 200
+
+
+def test__login__given_credentials__when_mfa_configured__then_200_returned(client_tester: FlaskClient):
+    user: User = db.session.query(User).filter_by(id=1).one()
+    user.mfa_secret = "ABC123"
+    db.session.commit()
+    response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss"})
+    assert response.json == {"msg": "OTP is required"}
+    assert response.status_code == 200
+
+
+@mock.patch("app.api.auth.pyotp")
+def test__login__given_credentials__when_invalid_mfa__then_400_returned(pyotp_mocker: mock.MagicMock, client_tester: FlaskClient):
+    pyotp_mocker.TOTP.return_value.verify.return_value = False
+
+    user: User = db.session.query(User).filter_by(id=1).one()
+    user.mfa_secret = "ABC123"
+    db.session.commit()
+    response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss", "otp": "123123"})
+    assert response.json == {"msg": "Bad OTP"}
+    assert response.status_code == 400
+
+
+def test__login__given_credentials__when_otp_malformed__then_400_returned(client_tester: FlaskClient):
+    response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss", "otp": "abcabc"})
+    assert response.status_code == 400
 
 
 def test__refresh__given_refresh_token__then_new_token_returned(client_tester: FlaskClient):

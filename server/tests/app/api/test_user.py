@@ -102,7 +102,7 @@ def test__reset_password__given_user_id__then_password_is_reset(generate_passwor
 def test__user_get__given_request__user_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.get("/api/user/current", headers={"Authorization": f"Bearer {access_token}"})
-    assert response.json == {"first_login": True, "id": 1, "is_admin": True, "username": "admin"}
+    assert response.json == {"first_login": True, "id": 1, "is_admin": True, "mfa": False, "username": "admin"}
     assert response.status_code == 200
 
 
@@ -152,6 +152,59 @@ def test__user_patch__given_valid_request__then_user_privileges_changed(client_t
 
 def test__client_get_all__given_request__then_users_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
-    response = client_tester.get(f"/api/user", headers={"Authorization": f"Bearer {access_token}"})
-    assert response.json == [{"first_login": True, "id": 1, "is_admin": True, "username": "admin"}]
+    response = client_tester.get("/api/user", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == [{"first_login": True, "id": 1, "is_admin": True, "mfa": False, "username": "admin"}]
+    assert response.status_code == 200
+
+
+@mock.patch("app.api.user.pyotp.random_base32", return_value="ABCD")
+def test__get_mfa__given_request__then_mfa_info_returned(random_base32_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get("/api/user/mfa", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == {
+        "qr_code": "iVBORw0KGgoAAAANSUhEUgAAAKsAAACrAQAAAAAxk1G0AAACwElEQVR4nOWXP86cMBDFB7lwBxew5Gu485WWCyxwAbiSO1/Dki+AOxcWk+csyZciRQalStBqYX9I43/z3swS/+5K9H/jk2gJNIe8ejMEWwINcly4zYFGr3Znj9CGCCLHwcyR3hpv6KXzFml+iO3p2xzTi/h4jEOaIpHOJTI/w9xeRBObJRg8LF+LF2Ds9xzN1+frGAQY1+XsFnB0efdt+EoICY5pwEKrIY1B2tthsmJ8kuKQOdhdI4MUxmE5vjyiqtVjkFyYd7LlAXb2cmmq6qg4fwRWhxyXakayJzXyaotm9GaRY0YCarUxUri9fT6YNzk+HfXYjrsuK5gZ5LhECzASDVgo253u1BRhZrCM2DtiR0PeDA9wQPg010TalsorfSQlxWmBLmsbkcWx7/0mx5fLq2ujSy+dXn12iuUYBvP2NIRuMxDEFD+xZbiw2rGySi+X975haZbji4hcGhg3u3sk460GEe73wJdu2LClYnZqk+PumozcQSloCx7inYMifHU9GbjLEhoWWvgjKRmGa8IhoEj49+XwQ7EcM1uufOrMDFF+LwUPcLdtdQR7VOSRXfUdW4RLzUdQJyX47ujUqvmQYxSxUcOoeEVG41ub+QEOUDak0OD9E2wmZpZjTG3USGELYRH6BbyU4wueXW2JZqltqvnyH9cUYkrk7VZVT+Fq+dalDPcDx3Gh1FfVy0j4UXRl2PR2o5sNwSqmoIocn1gWFMnd7eaqSk2DHF8+vZ2ZehLli2A5uTzAvSJ9DOZ7PYn3oYnwqdvLq9UlotQf7iIgw7jOXkPgVa3Hvr1KhnsXVtUFEQR79QneQ4pw75Fr97mlF4GflUSIA4DFrlPfaazSlmc4JKTPFtPYJXV3M1KMRhvdU6l9uav+tf/+Y8wojGrX6DVQG+3uMssx9vvdCzVCKpzeSmaW47/yz+ufwt8AD6YRyAq+9OUAAAAASUVORK5CYII=",
+        "secret": "ABCD",
+    }
+    assert response.status_code == 200
+
+
+@mock.patch("app.api.user.pyotp")
+def test__set_mfa__given_otp__when_bad_otp__then_400_returned(pyotp_mocker: mock.MagicMock, client_tester: FlaskClient):
+    pyotp_mocker.TOTP.return_value.verify.return_value = False
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/user/mfa", json={"secret": "A" * 32, "otp": "123123"}, headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json == {"msg": "Bad OTP"}
+    assert response.status_code == 400
+
+
+@mock.patch("app.api.user.pyotp")
+def test__set_mfa__given_otp__when_good_otp__then_200_returned(pyotp_mocker: mock.MagicMock, client_tester: FlaskClient):
+    pyotp_mocker.TOTP.return_value.verify.return_value = True
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/user/mfa", json={"secret": "A" * 32, "otp": "123123"}, headers={"Authorization": f"Bearer {access_token}"})
+
+    user: User = db.session.query(User).filter_by(id=1).one()
+    assert user.mfa_secret == "A" * 32
+    assert response.json == {"msg": "MFA set successfuly"}
+    assert response.status_code == 200
+
+
+def test__set_mfa__given_otp__when_otp_malformed__then_400_returned(client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/user/mfa", json={"secret": "A" * 32, "otp": "abcabc"}, headers={"Authorization": f"Bearer {access_token}"})
+    assert response.status_code == 400
+
+
+def test__delete_mfa__given_user_id__then_200_returned(client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+
+    user: User = db.session.query(User).filter_by(id=1).one()
+    user.mfa_secret = "A" * 32
+    db.session.commit()
+
+    response = client_tester.delete(f"/api/user/{user.id}/mfa", headers={"Authorization": f"Bearer {access_token}"})
+    assert user.mfa_secret == None
+    assert response.json == {"msg": f"MFA removed for user {user.username}"}
     assert response.status_code == 200
