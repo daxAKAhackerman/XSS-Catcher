@@ -9,13 +9,7 @@ DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "
 class LoginModel(BaseModel):
     username: str
     password: str
-    otp: Optional[str] = Field(min_length=6, max_length=6)
-
-    @validator("otp")
-    def otp_validator(cls, v, values, **kwargs):
-        if not v.isnumeric():
-            raise ValueError(f"otp must only contain numbers")
-        return v
+    otp: Optional[str] = Field(regex=r"\d{6}")
 
 
 class ClientPostModel(BaseModel):
@@ -108,11 +102,5 @@ class ClientLootGetModel(BaseModel):
 
 
 class SetMfaModel(BaseModel):
-    secret: str = Field(..., min_length=32, max_length=32)
-    otp: str = Field(..., min_length=6, max_length=6)
-
-    @validator("otp")
-    def otp_validator(cls, v, values, **kwargs):
-        if not v.isnumeric():
-            raise ValueError(f"otp must only contain numbers")
-        return v
+    secret: str = Field(..., regex=r"[A-Z2-7]{32}")
+    otp: str = Field(..., regex=r"\d{6}")

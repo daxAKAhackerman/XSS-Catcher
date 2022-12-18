@@ -47,11 +47,6 @@ def test__login__given_credentials__when_invalid_mfa__then_400_returned(pyotp_mo
     assert response.status_code == 400
 
 
-def test__login__given_credentials__when_otp_malformed__then_400_returned(client_tester: FlaskClient):
-    response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss", "otp": "abcabc"})
-    assert response.status_code == 400
-
-
 def test__refresh__given_refresh_token__then_new_token_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})

@@ -191,12 +191,6 @@ def test__set_mfa__given_otp__when_good_otp__then_200_returned(pyotp_mocker: moc
     assert response.status_code == 200
 
 
-def test__set_mfa__given_otp__when_otp_malformed__then_400_returned(client_tester: FlaskClient):
-    access_token, refresh_token = login(client_tester, "admin", "xss")
-    response = client_tester.post("/api/user/mfa", json={"secret": "A" * 32, "otp": "abcabc"}, headers={"Authorization": f"Bearer {access_token}"})
-    assert response.status_code == 400
-
-
 def test__delete_mfa__given_user_id__then_200_returned(client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
 
