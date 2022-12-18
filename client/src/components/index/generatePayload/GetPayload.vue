@@ -11,7 +11,6 @@
       <b-form-textarea
         rows="3"
         no-auto-shrink
-        readonly
         v-model="xss_payload"
       ></b-form-textarea>
       <b-button
