@@ -7,19 +7,34 @@
     hide-footer
     @hidden="cleanup()"
   >
-    <div v-if="xss_payload !== ''">
+    <div class="payload-textarea" v-if="xss_payload !== ''">
       <b-form-textarea
         rows="3"
         no-auto-shrink
         readonly
         v-model="xss_payload"
       ></b-form-textarea>
-      <br />
-      <b-link
+      <b-button
+        id="copy-button"
+        variant="outline-secondary"
         v-clipboard:copy="xss_payload"
-        @click="makeToast('Payload copied to clipboard. ', 'success', 'OK')"
-        >Copy to clipboard</b-link
+        class="copy-button"
+        ><b-icon-files></b-icon-files
+      ></b-button>
+      <b-tooltip target="copy-button" triggers="hover"
+        >Copy to clipboard</b-tooltip
       >
+      <b-button-group size="sm" class="transform-button-group">
+        <b-button @click="urlSafe()" variant="outline-secondary"
+          >URL safe</b-button
+        >
+        <b-button @click="urlEncode()" variant="outline-secondary"
+          >URL encode</b-button
+        >
+        <b-button @click="htmlEncode()" variant="outline-secondary"
+          >HTML encode</b-button
+        >
+      </b-button-group>
       <hr />
     </div>
     <p>XSS type</p>
@@ -158,6 +173,23 @@ export default {
           this.handleError(error);
         });
     },
+    urlSafe() {
+      this.xss_payload = encodeURIComponent(this.xss_payload)
+        .replace(/'/g, "%27")
+        .replace(/"/g, "%22");
+    },
+    urlEncode() {
+      this.xss_payload = this.xss_payload
+        .split("")
+        .map((x) => `%${x.charCodeAt(0).toString(16)}`)
+        .join("");
+    },
+    htmlEncode() {
+      this.xss_payload = this.xss_payload
+        .split("")
+        .map((x) => `&#${x.charCodeAt(0)};`)
+        .join("");
+    },
     cleanup() {
       this.to_gather = [];
       this.all = [];
@@ -191,5 +223,28 @@ export default {
 .btn-outline-primary:not(:disabled):not(.disabled).active,
 .show > .btn-outline-primary.dropdown-toggle {
   background-color: #5bc0de !important;
+}
+.copy-button {
+  position: absolute;
+  top: 4px;
+  right: 20px;
+  opacity: 0.25;
+  filter: alpha(opacity=25);
+  transition: opacity 0.25s ease-in-out;
+}
+.copy-button:hover {
+  opacity: 0.75;
+  filter: alpha(opacity=75);
+}
+.payload-textarea {
+  position: relative;
+}
+.transform-button-group {
+  position: absolute !important;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0.25;
+  filter: alpha(opacity=25);
+  transition: opacity 0.25s ease-in-out;
 }
 </style>
