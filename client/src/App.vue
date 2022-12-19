@@ -21,4 +21,7 @@ export default {
 .modal-backdrop:not(.show):not(.fade) {
   opacity: 0.5 !important;
 }
+body {
+  background-color: #1e1e1e;
+}
 </style>

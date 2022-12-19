@@ -11,6 +11,7 @@ from app.utils import (
     send_xss_webhook,
 )
 from flask.testing import FlaskClient
+from freezegun import freeze_time
 from tests.helpers import create_client, create_user, create_xss, login, set_settings
 
 
@@ -102,6 +103,7 @@ def test___send_mail__given_mail_properties__when_starttls_and_auth__then_mail_s
     )
 
 
+@freeze_time("2000-01-01")
 @mock.patch("app.utils._send_webhook")
 def test__send_xss_webhook__given_xss__when_global_webhook__then_webhook_sent(_send_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
     settings: Settings = set_settings(webhook_url="http://127.0.0.1")
@@ -109,16 +111,57 @@ def test__send_xss_webhook__given_xss__when_global_webhook__then_webhook_sent(_s
     xss: XSS = create_xss()
 
     send_xss_webhook(xss)
-    _send_webhook_mocker.assert_called_once_with("http://127.0.0.1", {"text": "XSS Catcher just caught a new stored XSS for client test! Go check it out!"})
+    _send_webhook_mocker.assert_called_once_with(
+        "http://127.0.0.1",
+        {
+            "text": "XSS Catcher just caught a new stored XSS for client test",
+            "blocks": [
+                {"type": "section", "text": {"type": "mrkdwn", "text": ":rotating_light: *XSS Catcher just caught a new XSS* :rotating_light:"}},
+                {
+                    "type": "section",
+                    "fields": [
+                        {"type": "mrkdwn", "text": ":bust_in_silhouette: *Client:* test"},
+                        {"type": "mrkdwn", "text": ":lock: *XSS type:* stored"},
+                        {"type": "mrkdwn", "text": ":calendar: *Timestamp:* 2000-01-01 00:00:00"},
+                        {"type": "mrkdwn", "text": ":globe_with_meridians: *IP address:* 127.0.0.1"},
+                        {"type": "mrkdwn", "text": ":label: *Tags:* "},
+                        {"type": "mrkdwn", "text": ":floppy_disk: *Data collected:* 0"},
+                    ],
+                },
+                {"type": "divider"},
+            ],
+        },
+    )
 
 
+@freeze_time("2000-01-01")
 @mock.patch("app.utils._send_webhook")
 def test__send_xss_webhook__given_xss__when_client_webhook__then_webhook_sent(_send_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
     create_client("test", webhook_url="http://127.0.0.1")
     xss: XSS = create_xss()
 
     send_xss_webhook(xss)
-    _send_webhook_mocker.assert_called_once_with("http://127.0.0.1", {"text": "XSS Catcher just caught a new stored XSS for client test! Go check it out!"})
+    _send_webhook_mocker.assert_called_once_with(
+        "http://127.0.0.1",
+        {
+            "text": "XSS Catcher just caught a new stored XSS for client test",
+            "blocks": [
+                {"type": "section", "text": {"type": "mrkdwn", "text": ":rotating_light: *XSS Catcher just caught a new XSS* :rotating_light:"}},
+                {
+                    "type": "section",
+                    "fields": [
+                        {"type": "mrkdwn", "text": ":bust_in_silhouette: *Client:* test"},
+                        {"type": "mrkdwn", "text": ":lock: *XSS type:* stored"},
+                        {"type": "mrkdwn", "text": ":calendar: *Timestamp:* 2000-01-01 00:00:00"},
+                        {"type": "mrkdwn", "text": ":globe_with_meridians: *IP address:* 127.0.0.1"},
+                        {"type": "mrkdwn", "text": ":label: *Tags:* "},
+                        {"type": "mrkdwn", "text": ":floppy_disk: *Data collected:* 0"},
+                    ],
+                },
+                {"type": "divider"},
+            ],
+        },
+    )
 
 
 @mock.patch("app.utils._send_webhook")

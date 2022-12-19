@@ -1,6 +1,8 @@
+import json
 import logging
 import smtplib
 import ssl
+from datetime import datetime
 from email.mime.text import MIMEText
 from functools import wraps
 from typing import Callable, Dict, List
@@ -61,8 +63,30 @@ def send_xss_webhook(xss: XSS):
     settings: Settings = db.session.query(Settings).one_or_none()
     webhook_url = xss.client.webhook_url or settings.webhook_url
 
-    message = {"text": f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}! Go check it out!"}
-
+    message = {
+        "text": f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}",
+        "blocks": [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f":rotating_light: *XSS Catcher just caught a new XSS* :rotating_light:",
+                },
+            },
+            {
+                "type": "section",
+                "fields": [
+                    {"type": "mrkdwn", "text": f":bust_in_silhouette: *Client:* {xss.client.name}"},
+                    {"type": "mrkdwn", "text": f":lock: *XSS type:* {xss.xss_type}"},
+                    {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(xss.timestamp)}"},
+                    {"type": "mrkdwn", "text": f":globe_with_meridians: *IP address:* {xss.ip_addr}"},
+                    {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(xss.tags))}"},
+                    {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(xss.data))}"},
+                ],
+            },
+            {"type": "divider"},
+        ],
+    }
     _send_webhook(webhook_url, message)
 
 
