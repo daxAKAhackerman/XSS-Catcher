@@ -70,7 +70,7 @@ def send_xss_webhook(xss: XSS):
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f":rotating_light: *XSS Catcher just caught a new XSS* :rotating_light:",
+                    "text": f"*XSS Catcher just caught a new XSS*",
                 },
             },
             {
