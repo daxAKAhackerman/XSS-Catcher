@@ -10,6 +10,7 @@ from typing import Callable, Dict, List
 import requests
 from app import db
 from app.models import XSS, Client, Settings, User
+from app.templates.notifications import Notification, TestNotification
 from flask_jwt_extended import get_current_user
 
 logger = logging.getLogger()
@@ -21,8 +22,7 @@ def send_xss_mail(xss: XSS):
     mail_from = settings.mail_from
     mail_to = xss.client.mail_to or settings.mail_to
 
-    message = MIMEText(f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}! Go check it out!")
-    message["Subject"] = f"Captured XSS for client {xss.client.name}"
+    message = Notification(xss=xss).email
     message["To"] = mail_to
     message["From"] = f"XSS Catcher <{mail_from}>"
     _send_mail(settings, mail_from, mail_to, message)
@@ -32,8 +32,7 @@ def send_test_mail(mail_to: str):
     settings: Settings = db.session.query(Settings).one_or_none()
     mail_from = settings.mail_from
 
-    message = MIMEText("This is a test email from XSS catcher. If you are getting this, it's because your SMTP configuration works.")
-    message["Subject"] = "XSS Catcher mail test"
+    message = TestNotification().email
     message["To"] = mail_to
     message["From"] = f"XSS Catcher <{mail_from}>"
     _send_mail(settings, mail_from, mail_to, message)
@@ -63,35 +62,13 @@ def send_xss_webhook(xss: XSS):
     settings: Settings = db.session.query(Settings).one_or_none()
     webhook_url = xss.client.webhook_url or settings.webhook_url
 
-    message = {
-        "text": f"XSS Catcher just caught a new {xss.xss_type} XSS for client {xss.client.name}",
-        "blocks": [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": f"*XSS Catcher just caught a new XSS*",
-                },
-            },
-            {
-                "type": "section",
-                "fields": [
-                    {"type": "mrkdwn", "text": f":bust_in_silhouette: *Client:* {xss.client.name}"},
-                    {"type": "mrkdwn", "text": f":lock: *XSS type:* {xss.xss_type}"},
-                    {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(xss.timestamp)}"},
-                    {"type": "mrkdwn", "text": f":globe_with_meridians: *IP address:* {xss.ip_addr}"},
-                    {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(xss.tags))}"},
-                    {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(xss.data))}"},
-                ],
-            },
-            {"type": "divider"},
-        ],
-    }
+    message = Notification(xss=xss).slack
+
     _send_webhook(webhook_url, message)
 
 
 def send_test_webhook(webhook_url: str):
-    message = {"text": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}
+    message = TestNotification().slack
 
     _send_webhook(webhook_url, message)
 

@@ -1,0 +1,65 @@
+<html>
+
+<head>
+  <title>XSS Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      background-color: #cccccc;
+      color: #333333;
+      margin: 0;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .field {
+      margin: 20px;
+      width: 80%;
+    }
+
+    .field-label {
+      font-weight: bold;
+    }
+
+    .field-value {
+      font-size: 14px;
+      margin-left: 20px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h1>XSS Catcher just caught a new XSS</h1>
+  <div class="field">
+    <div class="field-label">Client:</div>
+    <div class="field-value">{{ client_name }}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">XSS type:</div>
+    <div class="field-value">{{ xss_type }}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">Timestamp:</div>
+    <div class="field-value">{{ timestamp }}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">IP address:</div>
+    <div class="field-value">{{ ip_address }}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">Tags:</div>
+    <div class="field-value">{{ tags }}</div>
+  </div>
+  <div class="field">
+    <div class="field-label">Data collected:</div>
+    <div class="field-value">{{ nb_data }}</div>
+  </div>
+</body>
+
+</html>
