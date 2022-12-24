@@ -1,5 +1,4 @@
 <html>
-
 <head>
   <title>XSS Alert</title>
   <style>
@@ -17,49 +16,52 @@
       text-align: center;
     }
 
-    .field {
+    table {
+      border-collapse: collapse;
       margin: 20px;
       width: 80%;
     }
 
-    .field-label {
+    td {
+      font-size: 14px;
+      padding: 5px;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .label {
+      color: #666666;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 16px;
       font-weight: bold;
     }
-
-    .field-value {
-      font-size: 14px;
-      margin-left: 20px;
-    }
-
   </style>
 </head>
-
 <body>
   <h1>XSS Catcher just caught a new XSS</h1>
-  <div class="field">
-    <div class="field-label">Client:</div>
-    <div class="field-value">{{ client_name }}</div>
-  </div>
-  <div class="field">
-    <div class="field-label">XSS type:</div>
-    <div class="field-value">{{ xss_type }}</div>
-  </div>
-  <div class="field">
-    <div class="field-label">Timestamp:</div>
-    <div class="field-value">{{ timestamp }}</div>
-  </div>
-  <div class="field">
-    <div class="field-label">IP address:</div>
-    <div class="field-value">{{ ip_address }}</div>
-  </div>
-  <div class="field">
-    <div class="field-label">Tags:</div>
-    <div class="field-value">{{ tags }}</div>
-  </div>
-  <div class="field">
-    <div class="field-label">Data collected:</div>
-    <div class="field-value">{{ nb_data }}</div>
-  </div>
+  <table>
+    <tr>
+      <th class="label">Client</th>
+      <td class="value">{{ client_name }}</td>
+      <th class="label">XSS type</th>
+      <td class="value">{{ xss_type }}</td>
+      <th class="label">Timestamp</th>
+      <td class="value">{{ timestamp }}</td>
+      <th class="label">IP address</th>
+      <td class="value">{{ ip_address }}</td>
+      <th class="label">Tags</th>
+      <td class="value">{{ tags }}</td>
+      <th class="label">Data collected</th>
+      <td class="value">{{ nb_data }}</td>
+    </tr>
+  </table>
 </body>
-
 </html>

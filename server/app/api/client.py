@@ -4,7 +4,7 @@ from app import db
 from app.api import bp
 from app.api.models import ClientPatchModel, ClientPostModel
 from app.models import XSS, Client, User
-from app.utils import permissions
+from app.permissions import permissions
 from flask_jwt_extended import get_current_user, jwt_required
 from flask_pydantic import validate
 

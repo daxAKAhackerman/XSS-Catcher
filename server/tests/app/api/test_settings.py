@@ -171,20 +171,21 @@ def test__settings_patch__given_empty_smtp_host__then_smtp_configuration_reset(c
     assert settings.mail_from is None
 
 
-@mock.patch("app.api.settings.send_test_mail")
-def test__smtp_test_post__given_mail_to__then_configuration_successfully_tested(send_test_mail_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.settings.EmailTestNotification")
+def test__smtp_test_post__given_mail_to__then_configuration_successfully_tested(EmailTestNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
     settings: Settings = db.session.query(Settings).one()
-    send_test_mail_mocker.assert_called_once_with(mail_to="test@example.com")
+    EmailTestNotification_mocker.assert_called_once_with(email_to="test@example.com")
+    EmailTestNotification_mocker.return_value.send.assert_called_once()
     assert settings.smtp_status == True
     assert response.json == {"msg": "SMTP configuration test successful"}
     assert response.status_code == 200
 
 
-@mock.patch("app.api.settings.send_test_mail", side_effect=ValueError)
+@mock.patch("app.api.settings.EmailTestNotification", side_effect=ValueError)
 def test__smtp_test_post__given_mail_to__when_send_test_mail_fails__then_configuration_test_fails(
-    send_test_mail_mocker: mock.MagicMock, client_tester: FlaskClient
+    EmailTestNotification_mocker: mock.MagicMock, client_tester: FlaskClient
 ):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
@@ -194,17 +195,18 @@ def test__smtp_test_post__given_mail_to__when_send_test_mail_fails__then_configu
     assert response.status_code == 400
 
 
-@mock.patch("app.api.settings.send_test_webhook")
-def test__webhook_test_post__given_webhook_url__then_test_successful(send_test_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.settings.WebhookTestNotification")
+def test__webhook_test_post__given_webhook_url__then_test_successful(WebhookTestNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/webhook_test", json={"webhook_url": "https://test.com"}, headers={"Authorization": f"Bearer {access_token}"})
-    send_test_webhook_mocker.assert_called_once_with(webhook_url="https://test.com")
+    WebhookTestNotification_mocker.assert_called_once_with(webhook_url="https://test.com")
+    WebhookTestNotification_mocker.return_value.send.assert_called_once()
     assert response.json == {"msg": "Webhook configuration test successful"}
     assert response.status_code == 200
 
 
-@mock.patch("app.api.settings.send_test_webhook", side_effect=ValueError)
-def test__webhook_test_post__given_webhook_url__when_bad_url__then_test_fails(send_test_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.settings.WebhookTestNotification", side_effect=ValueError)
+def test__webhook_test_post__given_webhook_url__when_bad_url__then_test_fails(WebhookTestNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post(
         "/api/settings/webhook_test", json={"webhook_url": "https://donotexist.com"}, headers={"Authorization": f"Bearer {access_token}"}

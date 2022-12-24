@@ -118,30 +118,32 @@ def test__catch_xss__given_tags__then_tags_stored(client_tester: FlaskClient):
     assert json.loads(xss.tags) == ["tag1", "tag2"]
 
 
-@mock.patch("app.api.x.send_xss_mail")
-def test__catch_xss__given_xss__when_global_mail_to_configured__then_mail_sent(send_xss_mail_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.x.EmailXssNotification")
+def test__catch_xss__given_xss__when_global_mail_to_configured__then_mail_sent(EmailXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     client: Client = create_client("test")
     settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca", mail_to="test@example.com")
     client_tester.post(f"/api/x/s/{client.uid}")
     xss: XSS = db.session.query(XSS).one()
-    send_xss_mail_mocker.assert_called_once_with(xss=xss)
+    EmailXssNotification_mocker.assert_called_once_with(xss=xss)
+    EmailXssNotification_mocker.return_value.send.assert_called_once
     assert settings.smtp_status == True
 
 
-@mock.patch("app.api.x.send_xss_mail")
-def test__catch_xss__given_xss__when_client_mail_to_configured__then_mail_sent(send_xss_mail_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.x.EmailXssNotification")
+def test__catch_xss__given_xss__when_client_mail_to_configured__then_mail_sent(EmailXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     client: Client = create_client("test", mail_to="test@example.com")
     settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca")
     client_tester.post(f"/api/x/s/{client.uid}")
     xss: XSS = db.session.query(XSS).one()
-    send_xss_mail_mocker.assert_called_once_with(xss=xss)
+    EmailXssNotification_mocker.assert_called_once_with(xss=xss)
+    EmailXssNotification_mocker.return_value.send.assert_called_once
     assert settings.smtp_status == True
 
 
-@mock.patch("app.api.x.send_xss_mail", side_effect=ValueError)
+@mock.patch("app.api.x.EmailXssNotification", side_effect=ValueError)
 @mock.patch("app.api.x.logger")
 def test__catch_xss__given_xss__when_client_mail_to_configured_but_sending_error_occurs__then_smtp_status_set_to_false(
-    logger_mocker: mock.MagicMock, send_xss_mail_mocker: mock.MagicMock, client_tester: FlaskClient
+    logger_mocker: mock.MagicMock, EmailXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient
 ):
     client: Client = create_client("test", mail_to="test@example.com")
     settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca")
@@ -150,27 +152,29 @@ def test__catch_xss__given_xss__when_client_mail_to_configured_but_sending_error
     logger_mocker.error.assert_called_once()
 
 
-@mock.patch("app.api.x.send_xss_webhook")
-def test__catch_xss__given_xss__when_global_webhook_configured__then_webhook_sent(send_xss_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.x.WebhookXssNotification")
+def test__catch_xss__given_xss__when_global_webhook_configured__then_webhook_sent(WebhookXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     client: Client = create_client("test")
     set_settings(webhook_url="http://test.com")
     client_tester.post(f"/api/x/s/{client.uid}")
     xss: XSS = db.session.query(XSS).one()
-    send_xss_webhook_mocker.assert_called_once_with(xss=xss)
+    WebhookXssNotification_mocker.assert_called_once_with(xss=xss)
+    WebhookXssNotification_mocker.return_value.send.assert_called_once()
 
 
-@mock.patch("app.api.x.send_xss_webhook")
-def test__catch_xss__given_xss__when_client_webhook_configured__then_webhook_sent(send_xss_webhook_mocker: mock.MagicMock, client_tester: FlaskClient):
+@mock.patch("app.api.x.WebhookXssNotification")
+def test__catch_xss__given_xss__when_client_webhook_configured__then_webhook_sent(WebhookXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     client: Client = create_client("test", webhook_url="http://test.com")
     client_tester.post(f"/api/x/s/{client.uid}")
     xss: XSS = db.session.query(XSS).one()
-    send_xss_webhook_mocker.assert_called_once_with(xss=xss)
+    WebhookXssNotification_mocker.assert_called_once_with(xss=xss)
+    WebhookXssNotification_mocker.return_value.send.assert_called_once()
 
 
-@mock.patch("app.api.x.send_xss_webhook", side_effect=ValueError)
+@mock.patch("app.api.x.WebhookXssNotification", side_effect=ValueError)
 @mock.patch("app.api.x.logger")
 def test__catch_xss__given_xss__when_client_webhook_configured_but_sending_error_occurs__then_error_logged(
-    logger_mocker: mock.MagicMock, send_xss_webhook_mocker: mock.MagicMock, client_tester: FlaskClient
+    logger_mocker: mock.MagicMock, WebhookXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient
 ):
     client: Client = create_client("test", webhook_url="http://test.com")
     client_tester.post(f"/api/x/s/{client.uid}")

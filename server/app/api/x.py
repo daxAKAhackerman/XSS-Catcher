@@ -1,12 +1,16 @@
 import json
+import logging
 import time
 
 from app import db
 from app.api import bp
 from app.models import XSS, Client, Settings
-from app.utils import logger, send_xss_mail, send_xss_webhook
+from app.notifications import EmailXssNotification, WebhookXssNotification
 from flask import request
 from flask_cors import cross_origin
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 @bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
@@ -73,7 +77,7 @@ def catch_xss(flavor: str, uid: str):
 
     if settings.smtp_host is not None and (settings.mail_to is not None or xss.client.mail_to is not None):
         try:
-            send_xss_mail(xss=xss)
+            EmailXssNotification(xss=xss).send()
             settings.smtp_status = True
             db.session.commit()
         except Exception as e:
@@ -83,7 +87,7 @@ def catch_xss(flavor: str, uid: str):
 
     if settings.webhook_url is not None or xss.client.webhook_url is not None:
         try:
-            send_xss_webhook(xss=xss)
+            WebhookXssNotification(xss=xss).send()
         except Exception as e:
             logger.error(e)
 

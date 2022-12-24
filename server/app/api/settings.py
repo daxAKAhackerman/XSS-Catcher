@@ -1,10 +1,16 @@
+import logging
+
 from app import db
 from app.api import bp
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.models import Settings
-from app.utils import logger, permissions, send_test_mail, send_test_webhook
+from app.notifications import EmailTestNotification, WebhookTestNotification
+from app.permissions import permissions
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 @bp.route("/settings", methods=["GET"])
@@ -100,7 +106,7 @@ def smtp_test_post(body: SmtpTestPostModel):
     settings: Settings = db.session.query(Settings).one_or_none()
 
     try:
-        send_test_mail(mail_to=body.mail_to)
+        EmailTestNotification(email_to=body.mail_to).send()
         settings.smtp_status = True
         db.session.commit()
         return {"msg": "SMTP configuration test successful"}
@@ -117,7 +123,7 @@ def smtp_test_post(body: SmtpTestPostModel):
 @validate()
 def webhook_test_post(body: WebhookTestPostModel):
     try:
-        send_test_webhook(webhook_url=body.webhook_url)
+        WebhookTestNotification(webhook_url=body.webhook_url).send()
         return {"msg": "Webhook configuration test successful"}
     except Exception as e:
         logger.error(e)

@@ -11,7 +11,7 @@ from app.api.models import (
     XssGenerateModel,
 )
 from app.models import XSS, Client
-from app.utils import permissions
+from app.permissions import permissions
 from flask_jwt_extended import jwt_required
 from flask_pydantic import validate
 
