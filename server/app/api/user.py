@@ -13,7 +13,7 @@ from app.api.models import (
     UserPatchModel,
 )
 from app.models import User
-from app.utils import permissions
+from app.permissions import permissions
 from flask_jwt_extended import get_current_user, jwt_required
 from flask_pydantic import validate
 
