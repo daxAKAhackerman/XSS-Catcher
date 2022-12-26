@@ -18,6 +18,7 @@ from jinja2 import Environment, FileSystemLoader
 class WebhookType(IntEnum):
     SLACK = 0
     DISCORD = 1
+    AUTOMATION = 2
 
 
 class Notification(ABC):
@@ -122,7 +123,9 @@ class WebhookNotification(Notification, metaclass=ABCMeta):
 
     @property
     def message(self) -> Dict[str, Any]:
-        if self.webhook_type == WebhookType.DISCORD.value:
+        if self.webhook_type == WebhookType.AUTOMATION.value:
+            return self.automation_message
+        elif self.webhook_type == WebhookType.DISCORD.value:
             return self.discord_message
         else:
             return self.slack_message
@@ -135,6 +138,11 @@ class WebhookNotification(Notification, metaclass=ABCMeta):
     @property
     @abstractmethod
     def discord_message(self) -> Dict[str, Any]:  # pragma: no cover
+        pass
+
+    @property
+    @abstractmethod
+    def automation_message(self) -> Dict[str, Any]:  # pragma: no cover
         pass
 
     def send(self):
@@ -166,7 +174,7 @@ class WebhookXssNotification(WebhookNotification):
                     "fields": [
                         {"type": "mrkdwn", "text": f":bust_in_silhouette: *Client:* {self.xss.client.name}"},
                         {"type": "mrkdwn", "text": f":lock: *XSS type:* {self.xss.xss_type}"},
-                        {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(self.xss.timestamp)}"},
+                        {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(self.xss.timestamp)} (UTC)"},
                         {"type": "mrkdwn", "text": f":globe_with_meridians: *IP address:* {self.xss.ip_addr}"},
                         {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(self.xss.tags)) or '_None_'}"},
                         {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(self.xss.data))}"},
@@ -185,13 +193,34 @@ class WebhookXssNotification(WebhookNotification):
                     "fields": [
                         {"inline": True, "name": ":bust_in_silhouette: **Client**", "value": self.xss.client.name},
                         {"inline": True, "name": ":lock: **XSS type**", "value": self.xss.xss_type},
-                        {"inline": True, "name": ":calendar: **Timestamp**", "value": str(datetime.fromtimestamp(self.xss.timestamp))},
+                        {"inline": True, "name": ":calendar: **Timestamp**", "value": f"{datetime.fromtimestamp(self.xss.timestamp)} (UTC)"},
                         {"inline": True, "name": ":globe_with_meridians: **IP address**", "value": self.xss.ip_addr},
                         {"inline": True, "name": ":label: **Tags**", "value": ", ".join(json.loads(self.xss.tags)) or "*None*"},
                         {"inline": True, "name": ":floppy_disk: **Data collected**", "value": len(json.loads(self.xss.data))},
                     ],
                 }
             ],
+        }
+
+    @property
+    def automation_message(self) -> Dict[str, Any]:
+        return {
+            "xss": {
+                "id": self.xss.id,
+                "ip_address": self.xss.ip_addr,
+                "tags": json.loads(self.xss.tags),
+                "timestamp": self.xss.timestamp,
+                "type": self.xss.xss_type,
+                "nb_of_collected_data": len(json.loads(self.xss.data)),
+                "captured_data": list(json.loads(self.xss.data).keys()),
+                "captured_headers": list(json.loads(self.xss.headers).keys()),
+            },
+            "client": {"id": self.xss.client.id, "uid": self.xss.client.uid, "name": self.xss.client.name, "description": self.xss.client.description},
+            "user": {
+                "id": self.xss.client.owner.id,
+                "username": self.xss.client.owner.username,
+                "admin": self.xss.client.owner.is_admin,
+            },
         }
 
 
@@ -207,3 +236,7 @@ class WebhookTestNotification(WebhookNotification):
     @property
     def discord_message(self) -> Dict[str, str]:
         return {"content": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}
+
+    @property
+    def automation_message(self) -> Dict[str, str]:
+        return {"msg": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}

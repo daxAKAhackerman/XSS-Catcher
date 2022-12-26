@@ -35,7 +35,7 @@ class SettingsPatchModel(BaseModel):
     smtp_user: Optional[str] = Field(max_length=128)
     smtp_pass: Optional[str] = Field(max_length=128)
     webhook_url: Union[AnyHttpUrl, None, Literal[""]]
-    webhook_type: Optional[Literal[0, 1]]
+    webhook_type: Optional[Literal[0, 1, 2]]
 
 
 class SmtpTestPostModel(BaseModel):
