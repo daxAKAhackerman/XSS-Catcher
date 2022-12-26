@@ -186,3 +186,13 @@ def delete_api_key(key_id: int):
     db.session.commit()
 
     return {"msg": "API key deleted successfully"}
+
+
+@bp.route("/user/apikey", methods=["GET"])
+@jwt_required()
+def list_api_keys():
+    current_user: User = get_current_user()
+
+    api_keys: List[ApiKey] = db.session.query(ApiKey).filter_by(owner_id=current_user.id)
+
+    return [api_key.to_obfuscated_dict() for api_key in api_keys]

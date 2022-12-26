@@ -105,6 +105,9 @@ class ApiKey(db.Model):
     def to_dict(self):
         return {"id": self.id, "key": self.key}
 
+    def to_obfuscated_dict(self):
+        return {"id": self.id, "key": len(self.key[:-4]) * "*" + self.key[-4:]}
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)

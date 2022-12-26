@@ -1,7 +1,7 @@
 """Add API keys
 
 Revision ID: 06ce8ca0fea4
-Revises: a994d989e1d7
+Revises: f63e4dc55168
 Create Date: 2022-12-26 17:56:00.070528
 
 """
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "06ce8ca0fea4"
-down_revision = "a994d989e1d7"
+down_revision = "f63e4dc55168"
 branch_labels = None
 depends_on = None
 
