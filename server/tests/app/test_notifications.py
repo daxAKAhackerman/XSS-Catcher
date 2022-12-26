@@ -117,7 +117,7 @@ def test__EmailXssNotification___init__(client_tester: FlaskClient):
 
 
 @mock.patch("app.notifications.requests")
-def test__WebhookTestNotification_send__then_webhook_sent(requests_mocker: mock.MagicMock):
+def test__WebhookTestNotification_send__then_webhook_sent(requests_mocker: mock.MagicMock, client_tester: FlaskClient):
     webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
     webhook_test_notification.send()
 
@@ -127,20 +127,55 @@ def test__WebhookTestNotification_send__then_webhook_sent(requests_mocker: mock.
     )
 
 
-def test__WebhookTestNotification_message():
+def test__WebhookTestNotification_message__when_discord_type_in_settings__then_discord_message_returned(client_tester: FlaskClient):
+    set_settings(webhook_type=1)
+    webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
+    assert webhook_test_notification.message == {
+        "content": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."
+    }
+
+
+def test__WebhookTestNotification_message__when_slack_type_in_settings__then_slack_message_returned(client_tester: FlaskClient):
     webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
     assert webhook_test_notification.message == {
         "text": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."
     }
 
 
-def test__WebhookTestNotification___init__():
+def test__WebhookTestNotification___init__(client_tester: FlaskClient):
+    settings: Settings = set_settings()
     webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
     assert webhook_test_notification.webhook_url == "http://localhost"
+    assert webhook_test_notification.settings == settings
+    assert webhook_test_notification.webhook_type == 0
 
 
 @freeze_time("2000-01-01")
-def test__WebhookXssNotification_message(client_tester: FlaskClient):
+def test__WebhookXssNotification_message__when_discord_type_in_settings__then_discord_message_returned(client_tester: FlaskClient):
+    set_settings(webhook_url="http://localhost", webhook_type=1)
+    client: Client = create_client(name="test")
+    xss: XSS = create_xss(client_id=client.id)
+
+    webhook_xss_notification = WebhookXssNotification(xss=xss)
+    assert webhook_xss_notification.message == {
+        "content": "**XSS Catcher just caught a new XSS**",
+        "embeds": [
+            {
+                "fields": [
+                    {"inline": True, "name": ":bust_in_silhouette: **Client**", "value": "test"},
+                    {"inline": True, "name": ":lock: **XSS type**", "value": "stored"},
+                    {"inline": True, "name": ":calendar: **Timestamp**", "value": "2000-01-01 00:00:00"},
+                    {"inline": True, "name": ":globe_with_meridians: **IP address**", "value": "127.0.0.1"},
+                    {"inline": True, "name": ":label: **Tags**", "value": "*None*"},
+                    {"inline": True, "name": ":floppy_disk: **Data collected**", "value": 0},
+                ]
+            }
+        ],
+    }
+
+
+@freeze_time("2000-01-01")
+def test__WebhookXssNotification_message__when_slack_type_in_settings__then_slack_message_returned(client_tester: FlaskClient):
     set_settings(webhook_url="http://localhost")
     client: Client = create_client(name="test")
     xss: XSS = create_xss(client_id=client.id)
@@ -157,7 +192,7 @@ def test__WebhookXssNotification_message(client_tester: FlaskClient):
                     {"type": "mrkdwn", "text": ":lock: *XSS type:* stored"},
                     {"type": "mrkdwn", "text": ":calendar: *Timestamp:* 2000-01-01 00:00:00"},
                     {"type": "mrkdwn", "text": ":globe_with_meridians: *IP address:* 127.0.0.1"},
-                    {"type": "mrkdwn", "text": ":label: *Tags:* "},
+                    {"type": "mrkdwn", "text": ":label: *Tags:* _None_"},
                     {"type": "mrkdwn", "text": ":floppy_disk: *Data collected:* 0"},
                 ],
             },
@@ -167,9 +202,12 @@ def test__WebhookXssNotification_message(client_tester: FlaskClient):
 
 
 def test__WebhookXssNotification___init__(client_tester: FlaskClient):
+    settings: Settings = set_settings()
     client: Client = create_client(name="test", webhook_url="http://localhost")
     xss: XSS = create_xss(client_id=client.id)
 
     webhook_xss_notification = WebhookXssNotification(xss=xss)
     assert webhook_xss_notification.webhook_url == "http://localhost"
     assert webhook_xss_notification.xss == xss
+    assert webhook_xss_notification.settings == settings
+    assert webhook_xss_notification.webhook_type == 0

@@ -5,6 +5,7 @@ from typing import Dict, List
 
 from app import db, jwt
 from flask import Flask
+from sqlalchemy.sql import expression
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -94,8 +95,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
-    first_login = db.Column(db.Boolean, nullable=False, default=True)
-    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    first_login = db.Column(db.Boolean, nullable=False, server_default=expression.true())
+    is_admin = db.Column(db.Boolean, nullable=False, server_default=expression.false())
     mfa_secret = db.Column(db.String(32))
     client = db.relationship("Client", backref="owner", lazy="dynamic")
 
@@ -118,14 +119,15 @@ class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     smtp_host = db.Column(db.String(256))
     smtp_port = db.Column(db.Integer)
-    starttls = db.Column(db.Boolean, nullable=False, default=False)
-    ssl_tls = db.Column(db.Boolean, nullable=False, default=False)
+    starttls = db.Column(db.Boolean, nullable=False, server_default=expression.false())
+    ssl_tls = db.Column(db.Boolean, nullable=False, server_default=expression.false())
     mail_from = db.Column(db.Text)
     smtp_user = db.Column(db.String(128))
     smtp_pass = db.Column(db.String(128))
     smtp_status = db.Column(db.Boolean)
     mail_to = db.Column(db.Text)
     webhook_url = db.Column(db.Text)
+    webhook_type = db.Column(db.Integer, nullable=False, server_default="0")
 
     def to_dict(self):
         data = {
@@ -138,6 +140,7 @@ class Settings(db.Model):
             "smtp_user": self.smtp_user,
             "smtp_status": self.smtp_status,
             "webhook_url": self.webhook_url,
+            "webhook_type": self.webhook_type,
         }
         return data
 

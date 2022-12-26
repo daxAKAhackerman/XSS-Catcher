@@ -122,6 +122,7 @@ def test__Settings_to_dict__given_self__then_dict_returned(client_tester: FlaskC
         "smtp_user": None,
         "smtp_status": None,
         "webhook_url": None,
+        "webhook_type": 0,
     }
 
 

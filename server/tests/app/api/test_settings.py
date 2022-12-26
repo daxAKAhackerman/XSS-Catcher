@@ -19,6 +19,7 @@ def test__settings_get__given_request__then_settings_returned(client_tester: Fla
         "ssl_tls": False,
         "starttls": False,
         "webhook_url": None,
+        "webhook_type": 0,
     }
     assert response.status_code == 200
 
@@ -68,6 +69,7 @@ def test__settings_patch__given_all_fields__when_fields_are_valid__then_settings
             "smtp_pass": "pass",
             "webhook_url": "http://127.0.0.1",
             "ssl_tls": True,
+            "webhook_type": 1,
         },
         headers={"Authorization": f"Bearer {access_token}"},
     )

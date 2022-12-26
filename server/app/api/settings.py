@@ -68,6 +68,9 @@ def settings_patch(body: SettingsPatchModel):
     if body.smtp_pass is not None:
         settings.smtp_pass = body.smtp_pass
 
+    if body.webhook_type is not None:
+        settings.webhook_type = body.webhook_type
+
     if settings.smtp_host is None:
         settings.smtp_port = None
         settings.starttls = False

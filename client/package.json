@@ -21,11 +21,12 @@
     "vue2-filters": "^0.14.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/eslint-parser": "^7.0.0",
+    "@volar-plugins/vetur": "^0.1.0",
     "@vue/cli-plugin-babel": "^5.0.0",
     "@vue/cli-plugin-eslint": "^5.0.0",
     "@vue/cli-service": "^5.0.0",
-    "@babel/core": "^7.0.0",
-    "@babel/eslint-parser": "^7.0.0",
     "eslint": "^8.0.0",
     "eslint-plugin-vue": "^9.0.0",
     "vue-template-compiler": "^2.0.0"
