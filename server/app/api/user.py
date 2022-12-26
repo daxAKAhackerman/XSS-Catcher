@@ -26,7 +26,7 @@ def register(body: RegisterModel):
     if db.session.query(User).filter_by(username=body.username).one_or_none() is not None:
         return {"msg": "This user already exists"}, 400
 
-    user = User(username=body.username)
+    user = User(username=body.username, first_login=True, is_admin=False)
     password = user.generate_password()
     user.set_password(password)
 
