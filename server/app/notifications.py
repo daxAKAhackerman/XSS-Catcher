@@ -6,12 +6,18 @@ from datetime import datetime
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from enum import IntEnum
 from typing import Any, Dict
 
 import requests
 from app import db
 from app.models import XSS, Settings
 from jinja2 import Environment, FileSystemLoader
+
+
+class WebhookType(IntEnum):
+    SLACK = 0
+    DISCORD = 1
 
 
 class Notification(ABC):
@@ -116,7 +122,7 @@ class WebhookNotification(Notification, metaclass=ABCMeta):
 
     @property
     def message(self) -> Dict[str, Any]:
-        if self.webhook_type == 1:
+        if self.webhook_type == WebhookType.DISCORD.value:
             return self.discord_message
         else:
             return self.slack_message
@@ -162,7 +168,7 @@ class WebhookXssNotification(WebhookNotification):
                         {"type": "mrkdwn", "text": f":lock: *XSS type:* {self.xss.xss_type}"},
                         {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(self.xss.timestamp)}"},
                         {"type": "mrkdwn", "text": f":globe_with_meridians: *IP address:* {self.xss.ip_addr}"},
-                        {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(self.xss.tags))}"},
+                        {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(self.xss.tags)) or '_None_'}"},
                         {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(self.xss.data))}"},
                     ],
                 },
@@ -181,7 +187,7 @@ class WebhookXssNotification(WebhookNotification):
                         {"inline": True, "name": ":lock: **XSS type**", "value": self.xss.xss_type},
                         {"inline": True, "name": ":calendar: **Timestamp**", "value": str(datetime.fromtimestamp(self.xss.timestamp))},
                         {"inline": True, "name": ":globe_with_meridians: **IP address**", "value": self.xss.ip_addr},
-                        {"inline": True, "name": ":label: **Tags**", "value": ", ".join(json.loads(self.xss.tags))},
+                        {"inline": True, "name": ":label: **Tags**", "value": ", ".join(json.loads(self.xss.tags)) or "*None*"},
                         {"inline": True, "name": ":floppy_disk: **Data collected**", "value": len(json.loads(self.xss.data))},
                     ],
                 }

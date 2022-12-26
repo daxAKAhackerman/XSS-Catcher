@@ -166,7 +166,7 @@ def test__WebhookXssNotification_message__when_discord_type_in_settings__then_di
                     {"inline": True, "name": ":lock: **XSS type**", "value": "stored"},
                     {"inline": True, "name": ":calendar: **Timestamp**", "value": "2000-01-01 00:00:00"},
                     {"inline": True, "name": ":globe_with_meridians: **IP address**", "value": "127.0.0.1"},
-                    {"inline": True, "name": ":label: **Tags**", "value": ""},
+                    {"inline": True, "name": ":label: **Tags**", "value": "*None*"},
                     {"inline": True, "name": ":floppy_disk: **Data collected**", "value": 0},
                 ]
             }
@@ -192,7 +192,7 @@ def test__WebhookXssNotification_message__when_slack_type_in_settings__then_slac
                     {"type": "mrkdwn", "text": ":lock: *XSS type:* stored"},
                     {"type": "mrkdwn", "text": ":calendar: *Timestamp:* 2000-01-01 00:00:00"},
                     {"type": "mrkdwn", "text": ":globe_with_meridians: *IP address:* 127.0.0.1"},
-                    {"type": "mrkdwn", "text": ":label: *Tags:* "},
+                    {"type": "mrkdwn", "text": ":label: *Tags:* _None_"},
                     {"type": "mrkdwn", "text": ":floppy_disk: *Data collected:* 0"},
                 ],
             },
