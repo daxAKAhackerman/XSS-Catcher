@@ -169,7 +169,7 @@ def init_app(app: Flask):
         if db.session.query(User).count() != 0:
             print("[-] User creation not needed")
         else:
-            user = User(username="admin", is_admin=True, first_login=False)
+            user = User(username="admin", is_admin=True, first_login=True)
             user.set_password("xss")
             db.session.add(user)
             db.session.commit()
