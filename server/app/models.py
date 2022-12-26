@@ -110,8 +110,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(128), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
-    first_login = db.Column(db.Boolean, nullable=False, server_default=expression.true())
-    is_admin = db.Column(db.Boolean, nullable=False, server_default=expression.false())
+    first_login = db.Column(db.Boolean, nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False)
     mfa_secret = db.Column(db.String(32))
     client = db.relationship("Client", backref="owner", lazy="dynamic")
     api_key = db.relationship("ApiKey", backref="owner", lazy="dynamic")
@@ -136,15 +136,15 @@ class Settings(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     smtp_host = db.Column(db.String(256))
     smtp_port = db.Column(db.Integer)
-    starttls = db.Column(db.Boolean, nullable=False, server_default=expression.false())
-    ssl_tls = db.Column(db.Boolean, nullable=False, server_default=expression.false())
+    starttls = db.Column(db.Boolean, nullable=False)
+    ssl_tls = db.Column(db.Boolean, nullable=False)
     mail_from = db.Column(db.Text)
     smtp_user = db.Column(db.String(128))
     smtp_pass = db.Column(db.String(128))
     smtp_status = db.Column(db.Boolean)
     mail_to = db.Column(db.Text)
     webhook_url = db.Column(db.Text)
-    webhook_type = db.Column(db.Integer, nullable=False, server_default="0")
+    webhook_type = db.Column(db.Integer, nullable=False)
 
     def to_dict(self):
         data = {
@@ -186,7 +186,7 @@ def init_app(app: Flask):
         if db.session.query(User).count() != 0:
             print("[-] User creation not needed")
         else:
-            user = User(username="admin", is_admin=True)
+            user = User(username="admin", is_admin=True, first_login=True)
             user.set_password("xss")
             db.session.add(user)
             db.session.commit()
@@ -195,7 +195,7 @@ def init_app(app: Flask):
         if db.session.query(Settings).count() != 0:
             print("[-] Settings initialization not needed")
         else:
-            settings = Settings()
+            settings = Settings(starttls=False, ssl_tls=False, webhook_type=0)
             db.session.add(settings)
             db.session.commit()
             print("[+] Settings initialization successful")
