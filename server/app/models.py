@@ -1,6 +1,8 @@
+import hashlib
 import json
 import random
 import string
+import uuid
 from typing import Dict, List
 
 from app import db, jwt
@@ -91,6 +93,19 @@ class XSS(db.Model):
         return data
 
 
+class ApiKey(db.Model):
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    key = db.Column(db.Text, nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+
+    @staticmethod
+    def generate_key():
+        return str(uuid.uuid4())
+
+    def to_dict(self):
+        return {"id": self.id, "key": self.key}
+
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(128), unique=True, nullable=False)
@@ -99,6 +114,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, server_default=expression.false())
     mfa_secret = db.Column(db.String(32))
     client = db.relationship("Client", backref="owner", lazy="dynamic")
+    api_key = db.relationship("ApiKey", backref="owner", lazy="dynamic")
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
@@ -106,7 +122,8 @@ class User(db.Model):
     def check_password(self, password: str):
         return check_password_hash(self.password_hash, password)
 
-    def generate_password(self):
+    @staticmethod
+    def generate_password():
         characters = string.ascii_letters + string.digits
         return "".join(random.choice(characters) for i in range(12))
 

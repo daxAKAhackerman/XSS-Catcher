@@ -2,7 +2,7 @@ from functools import wraps
 from typing import Callable, List
 
 from app import db
-from app.models import XSS, Client, User
+from app.models import XSS, ApiKey, Client, User
 from flask_jwt_extended import get_current_user
 
 
@@ -22,6 +22,9 @@ def permissions(all_of: List[str] = [], one_of: List[str] = []):
             elif "xss_id" in kwargs:
                 xss: XSS = db.session.query(XSS).filter_by(id=kwargs["xss_id"]).first_or_404()
                 permission_attributes["owner"] = current_user.id == xss.client.owner_id
+            elif "key_id" in kwargs:
+                api_key: ApiKey = db.session.query(ApiKey).filter_by(id=kwargs["key_id"]).first_or_404()
+                permission_attributes["owner"] = current_user.id == api_key.owner_id
 
             if all_of:
                 values_to_check = [v for k, v in permission_attributes.items() if k in all_of]
