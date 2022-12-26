@@ -140,6 +140,7 @@ class Settings(db.Model):
             "smtp_user": self.smtp_user,
             "smtp_status": self.smtp_status,
             "webhook_url": self.webhook_url,
+            "webhook_type": self.webhook_type,
         }
         return data
 

@@ -3,5 +3,8 @@
       "module": "commonjs",
       "target": "es6"
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "vueCompilerOptions": {
+      "target": 2.7
+    }
   }
