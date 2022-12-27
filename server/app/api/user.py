@@ -168,6 +168,9 @@ def delete_mfa(user_id: int):
 def create_api_key():
     current_user: User = get_current_user()
 
+    if db.session.query(ApiKey).filter_by(owner_id=current_user.id).count() >= 5:
+        return {"msg": "You already have 5 API keys"}, 400
+
     api_key = ApiKey(owner_id=current_user.id, key=ApiKey.generate_key())
     db.session.add(api_key)
     db.session.commit()
