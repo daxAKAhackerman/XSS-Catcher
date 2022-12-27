@@ -1,4 +1,3 @@
-import hashlib
 import json
 import random
 import string
@@ -7,7 +6,6 @@ from typing import Dict, List
 
 from app import db, jwt
 from flask import Flask
-from sqlalchemy.sql import expression
 from werkzeug.security import check_password_hash, generate_password_hash
 
 

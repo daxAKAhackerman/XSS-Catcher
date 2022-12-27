@@ -60,7 +60,7 @@ def _is_valid_uuid4(value: str) -> bool:
 
 
 def get_current_user() -> User:
-    api_key_user_dict = g.get("_apikey_user", None)
+    api_key_user_dict = g.get("_apikey_user")
     if api_key_user_dict:
         return api_key_user_dict["loaded_user"]
     else:
