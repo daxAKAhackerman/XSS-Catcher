@@ -24,7 +24,7 @@ def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to
 
 
 def create_user(username: str, password: str = "test") -> User:
-    user = User(username=username)
+    user = User(username=username, first_login=True, is_admin=False)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
@@ -34,7 +34,8 @@ def create_user(username: str, password: str = "test") -> User:
 def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
     current_settings = db.session.query(Settings).one()
     db.session.delete(current_settings)
-    settings = Settings(id=1, **kwargs)
+    effective_settings = {"id": 1, "starttls": False, "ssl_tls": False, "webhook_type": 0, **kwargs}
+    settings = Settings(**effective_settings)
     db.session.add(settings)
     db.session.commit()
     return settings

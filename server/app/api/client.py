@@ -4,13 +4,12 @@ from app import db
 from app.api import bp
 from app.api.models import ClientPatchModel, ClientPostModel
 from app.models import XSS, Client, User
-from app.permissions import permissions
-from flask_jwt_extended import get_current_user, jwt_required
+from app.permissions import authorization_required, get_current_user, permissions
 from flask_pydantic import validate
 
 
 @bp.route("/client", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @validate()
 def client_post(body: ClientPostModel):
     current_user: User = get_current_user()
@@ -26,7 +25,7 @@ def client_post(body: ClientPostModel):
 
 
 @bp.route("/client/<int:client_id>", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def client_get(client_id: int):
     client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
 
@@ -34,7 +33,7 @@ def client_get(client_id: int):
 
 
 @bp.route("/client/<int:client_id>", methods=["PATCH"])
-@jwt_required()
+@authorization_required()
 @permissions(one_of=["admin", "owner"])
 @validate()
 def client_patch(client_id: int, body: ClientPatchModel):
@@ -73,7 +72,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
 
 
 @bp.route("/client/<int:client_id>", methods=["DELETE"])
-@jwt_required()
+@authorization_required()
 @permissions(one_of=["admin", "owner"])
 def client_delete(client_id: int):
     client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
@@ -85,7 +84,7 @@ def client_delete(client_id: int):
 
 
 @bp.route("/client", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def client_get_all():
     clients: List[Client] = db.session.query(Client).order_by(Client.id.desc()).all()
     return [client.summary() for client in clients]
