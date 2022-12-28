@@ -63,7 +63,7 @@
       :mfa_set="user.mfa"
       :user_id="user.id"
       :show_mfa_section="true"
-      :show_api_key_section="true"
+      :showApiKeysSection="true"
       @get-user="getUser()"
     />
     <ManageUsers />

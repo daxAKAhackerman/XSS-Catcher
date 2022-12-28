@@ -1,6 +1,6 @@
 <template>
   <b-modal ref="passwordMfaModal" id="password-mfa-modal" title="Password and MFA" hide-footer @hidden="cleanup()"
-    @show="show_api_key_section && listApiKeys()" :visible="show_password_modal">
+    @show="showApiKeysSection && listApiKeys()" :visible="show_password_modal">
     <h4>Change password</h4>
     <br />
     <b-form v-on:submit.prevent>
@@ -48,17 +48,12 @@
         </b-form>
       </div>
     </div>
-    <div v-if="show_api_key_section">
+    <div v-if="showApiKeysSection">
       <hr />
       <h4>API keys</h4>
       <br />
-      <b-table :items="api_keys" :fields="fields" hover>
-        <template v-slot:cell(action)="row">
-          <b-button title="Delete API key" variant="outline-danger" @click="deleteApiKey(row.item.id)">
-            <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
-          </b-button>
-        </template>
-      </b-table>
+      <ApiKeysTable :apiKeys="apiKeys" @list-api-keys="listApiKeys()" />
+      <ShowApiKey :apiKey="newApiKey" @list-api-keys="listApiKeys()" @cleanup-new-api-key="newApiKey = ''"/>
       <b-button block variant="outline-success" @click="createApiKey()" v-b-tooltip.hover
         title="You can generate a maximum of 5 API keys">Generate API key</b-button>
     </div>
@@ -68,10 +63,17 @@
 <script>
 import axios from "axios"
 
+import ApiKeysTable from "../index/security/ApiKeysTable"
+import ShowApiKey from "../index/security/ShowApiKey"
+
 const basePath = "/api"
 
 export default {
-  props: ["show_password_modal", "mfa_set", "user_id", "show_mfa_section", "show_api_key_section"],
+  props: ["show_password_modal", "mfa_set", "user_id", "show_mfa_section", "showApiKeysSection"],
+  components: {
+    ApiKeysTable,
+    ShowApiKey
+  },
   data() {
     return {
       old_password: "",
@@ -81,22 +83,8 @@ export default {
       mfa_secret: "",
       mfa_qr_code_base64: "",
       otp: "",
-      api_keys: [],
-      fields: [
-        {
-          key: "id",
-          label: "ID",
-        },
-        {
-          key: "key",
-          label: "API key",
-        },
-        {
-          key: "action",
-          label: "Action",
-          class: "text-right",
-        },
-      ],
+      apiKeys: [],
+      newApiKey: "",
     }
   },
   computed: {
@@ -170,25 +158,12 @@ export default {
         })
     },
     listApiKeys() {
-      const path = `${basePath}/user/apikey`
+      const path = `${basePath}/user/${this.user_id}/apikey`
 
       axios
         .get(path)
         .then((response) => {
-          this.api_keys = response.data
-        })
-        .catch((error) => {
-          this.handleError(error)
-        })
-    },
-    deleteApiKey(keyId) {
-      const path = `${basePath}/user/apikey/${keyId}`
-
-      axios
-        .delete(path)
-        .then((response) => {
-          void (response)
-          this.listApiKeys()
+          this.apiKeys = response.data
         })
         .catch((error) => {
           this.handleError(error)
@@ -200,8 +175,8 @@ export default {
       axios
         .post(path)
         .then((response) => {
-          void (response)
-          this.listApiKeys()
+          this.newApiKey = response.data.key
+          this.$bvModal.show("show-api-key-modal")
         })
         .catch((error) => {
           this.handleError(error)
