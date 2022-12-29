@@ -1,5 +1,5 @@
 <template>
-  <b-modal ref="deleteUserModal" id="delete-user-modal" title="Are you sure?" @hide="$emit('cleanup')" hide-footer>
+  <b-modal ref="deleteUserModal" id="delete-user-modal" title="Are you sure?" @hidden="$emit('cleanup')" hide-footer>
     <b-form v-on:submit.prevent>
       <div class="text-right">
         <b-button @click="deleteUser()" variant="outline-danger">Yes, delete this user</b-button>

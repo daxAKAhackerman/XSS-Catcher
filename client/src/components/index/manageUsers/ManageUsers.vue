@@ -149,7 +149,8 @@ export default {
     },
     cleanup() {
       this.users = []
-      this.to_delete = 0
+      this.to_delete = undefined
+      this.apiKeysOwner = {}
       this.show_alert = false
       this.alert_msg = ""
       this.$refs.manageUsersModal.hide()

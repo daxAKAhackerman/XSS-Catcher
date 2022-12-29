@@ -7,7 +7,7 @@
                 </b-button>
             </template>
         </b-table>
-        <DeleteApiKey :apiKeyId="apiKeyIdToDelete" @cleanup-api-key-id-to-delete="apiKeyIdToDelete = ''"
+        <DeleteApiKey :apiKeyId="apiKeyIdToDelete" @cleanup-api-key-id-to-delete="apiKeyIdToDelete = undefined"
             @list-api-keys="$emit('list-api-keys')" />
     </div>
 </template>
@@ -22,7 +22,7 @@ export default {
     },
     data() {
         return {
-            apiKeyIdToDelete: "",
+            apiKeyIdToDelete: undefined,
             fields: [
                 {
                     key: "id",

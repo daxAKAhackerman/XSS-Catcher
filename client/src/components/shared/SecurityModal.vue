@@ -53,7 +53,7 @@
       <h4>API keys</h4>
       <br />
       <ApiKeysTable :apiKeys="apiKeys" @list-api-keys="listApiKeys()" />
-      <ShowApiKey :apiKey="newApiKey" @list-api-keys="listApiKeys()" @cleanup-new-api-key="newApiKey = ''"/>
+      <ShowApiKey :apiKey="newApiKey" @list-api-keys="listApiKeys()" @cleanup-new-api-key="newApiKey = undefined"/>
       <b-button block variant="outline-success" @click="createApiKey()" v-b-tooltip.hover
         title="You can generate a maximum of 5 API keys">Generate API key</b-button>
     </div>
@@ -84,7 +84,7 @@ export default {
       mfa_qr_code_base64: "",
       otp: "",
       apiKeys: [],
-      newApiKey: "",
+      newApiKey: undefined,
     }
   },
   computed: {
@@ -191,6 +191,8 @@ export default {
       this.mfa_secret = ""
       this.mfa_qr_code_base64 = ""
       this.otp = ""
+      this.apiKeys = []
+      this.newApiKey = undefined
       this.$emit("get-user")
       if (this.$route.name !== "Index") {
         this.$router.push({

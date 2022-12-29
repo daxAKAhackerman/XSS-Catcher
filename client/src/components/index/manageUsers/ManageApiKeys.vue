@@ -1,6 +1,6 @@
 <template>
     <b-modal ref="manageApiKeysModal" id="manage-api-keys-modal" :title="`API keys for user ${user.username}`"
-        @show="listApiKeys()" @hide="$emit('cleanup')" hide-footer>
+        @show="listApiKeys()" @hidden="$emit('cleanup'); apiKeys = []" hide-footer>
         <ApiKeysTable :apiKeys="apiKeys" @list-api-keys="listApiKeys()" />
     </b-modal>
 </template>
