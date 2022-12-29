@@ -58,8 +58,8 @@
       :user_id="user.id"
       @get-clients="getClients(false)"
     />
-    <PasswordMfa
-      :show_password_modal="show_password_modal"
+    <Security
+      :showSecurityModal="showSecurityModal"
       :mfa_set="user.mfa"
       :user_id="user.id"
       :show_mfa_section="true"
@@ -80,7 +80,7 @@ import GetPayload from "./generatePayload/GetPayload";
 import ViewData from "./viewData/ViewData";
 import ViewXSS from "./viewXSS/ViewXSS";
 import ViewClient from "./viewClient/ViewClient";
-import PasswordMfa from "../shared/PasswordMfa";
+import Security from "../shared/SecurityModal";
 import ManageUsers from "./manageUsers/ManageUsers";
 import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
@@ -99,7 +99,7 @@ export default {
     ViewData,
     ViewXSS,
     ViewClient,
-    PasswordMfa,
+    Security,
     ManageUsers,
     Settings,
     DeleteClient,
@@ -113,7 +113,7 @@ export default {
       viewed_client: "",
       xss_type: "",
       to_delete: 0,
-      show_password_modal: false,
+      showSecurityModal: false,
       user: {},
       totalRows: 0,
     };

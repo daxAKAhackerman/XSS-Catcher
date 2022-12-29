@@ -1,6 +1,6 @@
 <template>
-  <b-modal ref="passwordMfaModal" id="password-mfa-modal" title="Password and MFA" hide-footer @hidden="cleanup()"
-    @show="showApiKeysSection && listApiKeys()" :visible="show_password_modal">
+  <b-modal ref="securityModal" id="security-modal" title="Security" hide-footer @hidden="cleanup()"
+    @show="showApiKeysSection && listApiKeys()" :visible="showSecurityModal">
     <h4>Change password</h4>
     <br />
     <b-form v-on:submit.prevent>
@@ -69,7 +69,7 @@ import ShowApiKey from "../index/security/ShowApiKey"
 const basePath = "/api"
 
 export default {
-  props: ["show_password_modal", "mfa_set", "user_id", "show_mfa_section", "showApiKeysSection"],
+  props: ["showSecurityModal", "mfa_set", "user_id", "show_mfa_section", "showApiKeysSection"],
   components: {
     ApiKeysTable,
     ShowApiKey
@@ -183,7 +183,7 @@ export default {
         })
     },
     cleanup() {
-      this.$refs.passwordMfaModal.hide()
+      this.$refs.securityModal.hide()
       this.old_password = ""
       this.new_password1 = ""
       this.new_password2 = ""
