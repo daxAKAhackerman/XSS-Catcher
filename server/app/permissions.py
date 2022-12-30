@@ -36,7 +36,6 @@ def _verify_api_key_in_request() -> bool:
 
 def _get_api_key_from_request() -> Optional[ApiKey]:
     authorization_header = request.headers.get("Authorization")
-    print(authorization_header)
     if authorization_header:
         key = authorization_header.removeprefix("Bearer ")
         if _is_valid_uuid4(key):
