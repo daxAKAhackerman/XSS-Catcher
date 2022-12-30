@@ -27,6 +27,7 @@ def authorization_required(optional: bool = False, refresh: bool = False):
 
 def _verify_api_key_in_request() -> bool:
     api_key = _get_api_key_from_request()
+
     if api_key:
         g._apikey_user = {"loaded_user": _get_user_from_api_key(api_key=api_key)}
         return True
