@@ -28,7 +28,7 @@ def test__settings_patch__given_smtp_host__when_smtp_port_missing__then_400_retu
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1"}, headers={"Authorization": f"Bearer {access_token}"})
     settings: Settings = db.session.query(Settings).one()
-    assert settings.smtp_host == None
+    assert settings.smtp_host is None
     assert response.json == {"msg": "Missing SMTP port"}
     assert response.status_code == 400
 
@@ -51,7 +51,7 @@ def test__settings_patch__given_smtp_host__when_mail_from_missing__then_400_retu
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1", "smtp_port": 465}, headers={"Authorization": f"Bearer {access_token}"})
     settings: Settings = db.session.query(Settings).one()
-    assert settings.smtp_host == None
+    assert settings.smtp_host is None
     assert response.json == {"msg": "Missing sender address"}
     assert response.status_code == 400
 
@@ -180,7 +180,7 @@ def test__smtp_test_post__given_mail_to__then_configuration_successfully_tested(
     settings: Settings = db.session.query(Settings).one()
     EmailTestNotification_mocker.assert_called_once_with(email_to="test@example.com")
     EmailTestNotification_mocker.return_value.send.assert_called_once()
-    assert settings.smtp_status == True
+    assert settings.smtp_status is True
     assert response.json == {"msg": "SMTP configuration test successful"}
     assert response.status_code == 200
 
@@ -192,7 +192,7 @@ def test__smtp_test_post__given_mail_to__when_send_test_mail_fails__then_configu
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
     settings: Settings = db.session.query(Settings).one()
-    assert settings.smtp_status == False
+    assert settings.smtp_status is False
     assert response.json == {"msg": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. "}
     assert response.status_code == 400
 

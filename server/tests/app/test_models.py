@@ -1,9 +1,11 @@
 import re
+import uuid
 from unittest import mock
 
 from app import db
 from app.models import (
     XSS,
+    ApiKey,
     BlockedJti,
     Client,
     Settings,
@@ -14,7 +16,13 @@ from app.models import (
 )
 from flask.testing import FlaskClient
 from freezegun import freeze_time
-from tests.helpers import create_blocked_jti, create_client, create_user, create_xss
+from tests.helpers import (
+    create_api_key,
+    create_blocked_jti,
+    create_client,
+    create_user,
+    create_xss,
+)
 
 
 def test__Client_summary__given_self__then_summary_returned(client_tester: FlaskClient):
@@ -162,3 +170,18 @@ def test__init_app__given_app__when_need_init__then_db_modified(client_tester_no
     assert db.session.query(User).count() == 1
     assert db.session.query(Settings).count() == 1
     assert db.session.query(BlockedJti).count() == 0
+
+
+@mock.patch("app.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-4111-a111-111111111111", version=4))
+def test__ApiKey_generate_key__then_return_uuid(uuid4_mocker: mock.MagicMock, client_tester: FlaskClient):
+    assert ApiKey.generate_key() == "11111111-1111-4111-a111-111111111111"
+
+
+def test__ApiKey_to_dict__given_self__then_dict_returned(client_tester: FlaskClient):
+    api_key = create_api_key(key="11111111-1111-4111-a111-111111111111")
+    assert api_key.to_dict() == {"id": 1, "key": "11111111-1111-4111-a111-111111111111"}
+
+
+def test__ApiKey_to_obfuscated_dict__given_self__then_obfuscated_dict_returned(client_tester: FlaskClient):
+    api_key = create_api_key(key="11111111-1111-4111-a111-111111111111")
+    assert api_key.to_obfuscated_dict() == {"id": 1, "key": "********************************1111"}

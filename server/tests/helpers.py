@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import XSS, BlockedJti, Client, Settings, User
+from app.models import XSS, ApiKey, BlockedJti, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -63,3 +63,10 @@ def create_blocked_jti(jti: str) -> BlockedJti:
     db.session.add(blocked_jti)
     db.session.commit()
     return blocked_jti
+
+
+def create_api_key(key: str = None, user_id: int = None) -> ApiKey:
+    api_key = ApiKey(key=key or ApiKey.generate_key(), owner_id=user_id or 1)
+    db.session.add(api_key)
+    db.session.commit()
+    return api_key
