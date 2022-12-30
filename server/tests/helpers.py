@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict, List
 
 from app import db
-from app.models import XSS, BlockedJti, Client, Settings, User
+from app.models import XSS, ApiKey, BlockedJti, Client, Settings, User
 from flask.testing import FlaskClient
 
 
@@ -24,7 +24,7 @@ def create_client(name: str, owner_id: int = 1, webhook_url: str = None, mail_to
 
 
 def create_user(username: str, password: str = "test") -> User:
-    user = User(username=username)
+    user = User(username=username, first_login=True, is_admin=False)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
@@ -34,7 +34,8 @@ def create_user(username: str, password: str = "test") -> User:
 def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
     current_settings = db.session.query(Settings).one()
     db.session.delete(current_settings)
-    settings = Settings(id=1, **kwargs)
+    effective_settings = {"id": 1, "starttls": False, "ssl_tls": False, "webhook_type": 0, **kwargs}
+    settings = Settings(**effective_settings)
     db.session.add(settings)
     db.session.commit()
     return settings
@@ -62,3 +63,10 @@ def create_blocked_jti(jti: str) -> BlockedJti:
     db.session.add(blocked_jti)
     db.session.commit()
     return blocked_jti
+
+
+def create_api_key(key: str = None, user_id: int = None) -> ApiKey:
+    api_key = ApiKey(key=key or ApiKey.generate_key(), owner_id=user_id or 1)
+    db.session.add(api_key)
+    db.session.commit()
+    return api_key

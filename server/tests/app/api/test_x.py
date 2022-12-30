@@ -126,7 +126,7 @@ def test__catch_xss__given_xss__when_global_mail_to_configured__then_mail_sent(E
     xss: XSS = db.session.query(XSS).one()
     EmailXssNotification_mocker.assert_called_once_with(xss=xss)
     EmailXssNotification_mocker.return_value.send.assert_called_once
-    assert settings.smtp_status == True
+    assert settings.smtp_status is True
 
 
 @mock.patch("app.api.x.EmailXssNotification")
@@ -137,7 +137,7 @@ def test__catch_xss__given_xss__when_client_mail_to_configured__then_mail_sent(E
     xss: XSS = db.session.query(XSS).one()
     EmailXssNotification_mocker.assert_called_once_with(xss=xss)
     EmailXssNotification_mocker.return_value.send.assert_called_once
-    assert settings.smtp_status == True
+    assert settings.smtp_status is True
 
 
 @mock.patch("app.api.x.EmailXssNotification", side_effect=ValueError)
@@ -148,7 +148,7 @@ def test__catch_xss__given_xss__when_client_mail_to_configured_but_sending_error
     client: Client = create_client("test", mail_to="test@example.com")
     settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca")
     client_tester.post(f"/api/x/s/{client.uid}")
-    assert settings.smtp_status == False
+    assert settings.smtp_status is False
     logger_mocker.error.assert_called_once()
 
 

@@ -12,14 +12,13 @@ from app.api.models import (
     SetMfaModel,
     UserPatchModel,
 )
-from app.models import User
-from app.permissions import permissions
-from flask_jwt_extended import get_current_user, jwt_required
+from app.models import ApiKey, User
+from app.permissions import authorization_required, get_current_user, permissions
 from flask_pydantic import validate
 
 
 @bp.route("/user", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 @validate()
 def register(body: RegisterModel):
@@ -37,7 +36,7 @@ def register(body: RegisterModel):
 
 
 @bp.route("/user/password", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @validate()
 def change_password(body: ChangePasswordModel):
     current_user: User = get_current_user()
@@ -53,7 +52,7 @@ def change_password(body: ChangePasswordModel):
 
 
 @bp.route("/user/<int:user_id>/password", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 def reset_password(user_id: int):
     user: User = db.session.query(User).filter_by(id=user_id).first_or_404()
@@ -67,7 +66,7 @@ def reset_password(user_id: int):
 
 
 @bp.route("/user/current", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def user_get():
     current_user: User = get_current_user()
 
@@ -75,7 +74,7 @@ def user_get():
 
 
 @bp.route("/user/<int:user_id>", methods=["DELETE"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 def user_delete(user_id: int):
     current_user: User = get_current_user()
@@ -95,7 +94,7 @@ def user_delete(user_id: int):
 
 
 @bp.route("/user/<int:user_id>", methods=["PATCH"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 @validate()
 def user_patch(user_id: int, body: UserPatchModel):
@@ -113,7 +112,7 @@ def user_patch(user_id: int, body: UserPatchModel):
 
 
 @bp.route("/user", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def user_get_all():
     users: List[User] = db.session.query(User).all()
 
@@ -121,7 +120,7 @@ def user_get_all():
 
 
 @bp.route("/user/mfa", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def get_mfa():
     current_user: User = get_current_user()
 
@@ -137,7 +136,7 @@ def get_mfa():
 
 
 @bp.route("/user/mfa", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @validate()
 def set_mfa(body: SetMfaModel):
     totp = pyotp.TOTP(body.secret)
@@ -152,7 +151,7 @@ def set_mfa(body: SetMfaModel):
 
 
 @bp.route("/user/<int:user_id>/mfa", methods=["DELETE"])
-@jwt_required()
+@authorization_required()
 @permissions(one_of=["admin", "owner"])
 def delete_mfa(user_id: int):
     user: User = db.session.query(User).filter_by(id=user_id).first_or_404()
@@ -162,3 +161,39 @@ def delete_mfa(user_id: int):
     db.session.commit()
 
     return {"msg": f"MFA removed for user {user.username}"}
+
+
+@bp.route("/user/apikey", methods=["POST"])
+@authorization_required()
+def create_api_key():
+    current_user: User = get_current_user()
+
+    if db.session.query(ApiKey).filter_by(owner_id=current_user.id).count() >= 5:
+        return {"msg": "You already have 5 API keys"}, 400
+
+    api_key = ApiKey(owner_id=current_user.id, key=ApiKey.generate_key())
+    db.session.add(api_key)
+    db.session.commit()
+
+    return api_key.to_dict()
+
+
+@bp.route("/user/apikey/<int:key_id>", methods=["DELETE"])
+@authorization_required()
+@permissions(all_of=["owner"])
+def delete_api_key(key_id: int):
+    api_key: ApiKey = db.session.query(ApiKey).filter_by(id=key_id).first_or_404()
+
+    db.session.delete(api_key)
+    db.session.commit()
+
+    return {"msg": "API key deleted successfully"}
+
+
+@bp.route("/user/<int:user_id>/apikey", methods=["GET"])
+@authorization_required()
+@permissions(one_of=["admin", "owner"])
+def list_api_keys(user_id: int):
+    api_keys: List[ApiKey] = db.session.query(ApiKey).filter_by(owner_id=user_id)
+
+    return [api_key.to_obfuscated_dict() for api_key in api_keys]

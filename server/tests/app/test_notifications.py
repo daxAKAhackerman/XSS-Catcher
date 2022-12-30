@@ -71,7 +71,7 @@ def test__EmailTestNotification___init__(client_tester: FlaskClient):
 
     email_test_notification = EmailTestNotification(email_to="test@test.com")
 
-    assert email_test_notification.settings == settings
+    assert email_test_notification.settings is settings
     assert email_test_notification.email_from == "test@example.com"
     assert email_test_notification.email_to == "test@test.com"
 
@@ -110,10 +110,10 @@ def test__EmailXssNotification___init__(client_tester: FlaskClient):
 
     email_xss_notification = EmailXssNotification(xss=xss)
 
-    assert email_xss_notification.settings == settings
+    assert email_xss_notification.settings is settings
     assert email_xss_notification.email_from == "test@example.com"
     assert email_xss_notification.email_to == "test@test.com"
-    assert email_xss_notification.xss == xss
+    assert email_xss_notification.xss is xss
 
 
 @mock.patch("app.notifications.requests")
@@ -146,7 +146,7 @@ def test__WebhookTestNotification___init__(client_tester: FlaskClient):
     settings: Settings = set_settings()
     webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
     assert webhook_test_notification.webhook_url == "http://localhost"
-    assert webhook_test_notification.settings == settings
+    assert webhook_test_notification.settings is settings
     assert webhook_test_notification.webhook_type == 0
 
 
@@ -208,8 +208,8 @@ def test__WebhookXssNotification___init__(client_tester: FlaskClient):
 
     webhook_xss_notification = WebhookXssNotification(xss=xss)
     assert webhook_xss_notification.webhook_url == "http://localhost"
-    assert webhook_xss_notification.xss == xss
-    assert webhook_xss_notification.settings == settings
+    assert webhook_xss_notification.xss is xss
+    assert webhook_xss_notification.settings is settings
     assert webhook_xss_notification.webhook_type == 0
 
 

@@ -5,8 +5,7 @@ from app.api import bp
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.models import Settings
 from app.notifications import EmailTestNotification, WebhookTestNotification
-from app.permissions import permissions
-from flask_jwt_extended import jwt_required
+from app.permissions import authorization_required, permissions
 from flask_pydantic import validate
 
 logger = logging.getLogger()
@@ -14,7 +13,7 @@ logger.setLevel(logging.INFO)
 
 
 @bp.route("/settings", methods=["GET"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 def settings_get():
     settings: Settings = db.session.query(Settings).one_or_none()
@@ -23,7 +22,7 @@ def settings_get():
 
 
 @bp.route("/settings", methods=["PATCH"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 @validate()
 def settings_patch(body: SettingsPatchModel):
@@ -102,7 +101,7 @@ def settings_patch(body: SettingsPatchModel):
 
 
 @bp.route("/settings/smtp_test", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 @validate()
 def smtp_test_post(body: SmtpTestPostModel):
@@ -121,7 +120,7 @@ def smtp_test_post(body: SmtpTestPostModel):
 
 
 @bp.route("/settings/webhook_test", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @permissions(all_of=["admin"])
 @validate()
 def webhook_test_post(body: WebhookTestPostModel):
