@@ -96,7 +96,7 @@ def test__User_set_password__given_password__then_password_changed(generate_pass
     user = User()
     user.set_password("test")
     generate_password_hash_mocker.assert_called_once_with("test")
-    assert user.password_hash == generate_password_hash_mocker.return_value
+    assert user.password_hash is generate_password_hash_mocker.return_value
 
 
 @mock.patch("app.models.check_password_hash")
@@ -104,7 +104,7 @@ def test__User_check_password__given_password__then_password_checked(check_passw
     user: User = create_user("test")
     password_check = user.check_password("test")
     check_password_hash_mocker.assert_called_once_with(user.password_hash, "test")
-    assert password_check == check_password_hash_mocker.return_value
+    assert password_check is check_password_hash_mocker.return_value
 
 
 def test__User_generate_password__given_self__then_password_generated(client_tester: FlaskClient):
@@ -137,7 +137,7 @@ def test__Settings_to_dict__given_self__then_dict_returned(client_tester: FlaskC
 def test__user_loader_callback__given_jwt__then_user_returned(client_tester: FlaskClient):
     user: User = user_loader_callback({}, {"sub": "admin"})
     admin: User = db.session.query(User).filter_by(username="admin").one()
-    assert user == admin
+    assert user is admin
 
 
 def test__check_if_token_in_blocklist__given_access_token__then_false_returned(client_tester: FlaskClient):
