@@ -2,43 +2,138 @@ from unittest import mock
 
 import pytest
 from app import db
-from app.models import ApiKey, Client, User
+from app.models import ApiKey, User
 from app.permissions import (
     UserLookupError,
     _get_api_key_from_request,
     _get_user_from_api_key,
     _is_valid_uuid4,
     _verify_api_key_in_request,
+    authorization_required,
     get_current_user,
+    permissions,
 )
 from flask import g
 from flask.testing import FlaskClient
-from tests.helpers import create_api_key, create_client, create_user, login
+from tests.helpers import create_api_key, create_client, create_user, create_xss, login
 
 
-def test__permissions__given_all_of_permission__when_unauthorized__then_403_returned(client_tester: FlaskClient):
-    create_user(username="test")
-    access_token, refresh_token = login(client_tester, "test", "test")
-    response = client_tester.post("/api/user/1/password", headers={"Authorization": f"Bearer {access_token}"})
-    assert response.json == {"msg": "Forbidden"}
-    assert response.status_code == 403
+def test__permissions__given_request_context__when_user_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(all_of=["owner"])
+    def test_fn(user_id: int):
+        pass
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(user_id=1) == None
+        assert test_fn(user_id=2) == ({"msg": "Forbidden"}, 403)
 
 
-def test__permissions__given_one_of_permission__when_unauthorized__then_403_returned(client_tester: FlaskClient):
-    create_user(username="test")
-    client: Client = create_client("test")
-    access_token, refresh_token = login(client_tester, "test", "test")
-    response = client_tester.delete(f"/api/client/{client.id}", headers={"Authorization": f"Bearer {access_token}"})
-    assert response.json == {"msg": "Forbidden"}
-    assert response.status_code == 403
+def test__permissions__given_request_context__when_client_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(all_of=["owner"])
+    def test_fn(client_id: int):
+        pass
+
+    create_client("test")
+    create_client("test2", owner_id=2)
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(client_id=1) == None
+        assert test_fn(client_id=2) == ({"msg": "Forbidden"}, 403)
 
 
-def test__permissions__given_api_key__then_successfull_api_call(client_tester: FlaskClient):
+def test__permissions__given_request_context__when_xss_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(all_of=["owner"])
+    def test_fn(xss_id: int):
+        pass
+
+    create_client("test")
+    create_client("test2", owner_id=2)
+    create_xss()
+    create_xss(client_id=2)
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(xss_id=1) == None
+        assert test_fn(xss_id=2) == ({"msg": "Forbidden"}, 403)
+
+
+def test__permissions__given_request_context__when_key_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(all_of=["owner"])
+    def test_fn(key_id: int):
+        pass
+
+    create_api_key()
+    create_api_key(user_id=2)
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(key_id=1) == None
+        assert test_fn(key_id=2) == ({"msg": "Forbidden"}, 403)
+
+
+def test__permissions__given_request_context__when_all_of_used__then_all_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(all_of=["owner", "admin"])
+    def test_fn(user_id: int):
+        pass
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(user_id=1) == None
+        assert test_fn(user_id=2) == ({"msg": "Forbidden"}, 403)
+
+
+def test__permissions__given_request_context__when_one_of_used__then_one_permission_enforced(client_tester: FlaskClient):
+    @authorization_required()
+    @permissions(one_of=["owner", "admin"])
+    def test_fn(user_id: int):
+        pass
+
+    create_user("test")
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    test_access_token, test_refresh_token = login(client_tester, "test", "test")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        assert test_fn(user_id=2) == None
+        request_context.request.headers = {"Authorization": f"Bearer {test_access_token}"}
+        assert test_fn(user_id=1) == ({"msg": "Forbidden"}, 403)
+
+
+def test__authorization_required__given_request_context__when_api_key_present__then_g_properly_set(client_tester: FlaskClient):
+    @authorization_required()
+    def test_fn():
+        pass
+
     api_key: ApiKey = create_api_key()
+    user: User = db.session.query(User).filter_by(id=1).one()
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {api_key.key}"}
+        test_fn()
+        assert g.get("_apikey_user") == {"loaded_user": user}
 
-    response = client_tester.get(f"/api/user/current", headers={"Authorization": f"Bearer {api_key.key}"})
 
-    assert response.json == {"first_login": True, "id": 1, "is_admin": True, "mfa": False, "username": "admin"}
+def test__authorization_required__given_request_context__when_jwt_present__then_g_properly_set(client_tester: FlaskClient):
+    @authorization_required()
+    def test_fn():
+        pass
+
+    user: User = db.session.query(User).filter_by(id=1).one()
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    with client_tester.application.test_request_context() as request_context:
+        request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
+        test_fn()
+        assert g.get("_jwt_extended_jwt_user") == {"loaded_user": user}
 
 
 @mock.patch("app.permissions._get_api_key_from_request")

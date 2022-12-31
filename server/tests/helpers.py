@@ -65,8 +65,8 @@ def create_blocked_jti(jti: str) -> BlockedJti:
     return blocked_jti
 
 
-def create_api_key(key: str = None, user_id: int = None) -> ApiKey:
-    api_key = ApiKey(key=key or ApiKey.generate_key(), owner_id=user_id or 1)
+def create_api_key(key: str = None, user_id: int = 1) -> ApiKey:
+    api_key = ApiKey(key=key or ApiKey.generate_key(), owner_id=user_id)
     db.session.add(api_key)
     db.session.commit()
     return api_key
