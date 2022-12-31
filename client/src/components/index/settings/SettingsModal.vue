@@ -58,7 +58,8 @@
           <b-form-input @keyup.enter="testSettings()" v-model="smtp_test_mail_to" id="input-field-smtp_test"
             placeholder="Recipient"></b-form-input>
           <b-input-group-append>
-            <b-button v-b-tooltip.hover title="Don't forget to save before testing!" @click="testSettings()" variant="outline-warning">Test</b-button>
+            <b-button v-b-tooltip.hover title="Don't forget to save before testing!" @click="testSettings()"
+              variant="outline-warning">Test</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -102,6 +103,7 @@ export default {
       webhook_types_radio: [
         { text: "Slack", value: 0 },
         { text: "Discord", value: 1 },
+        { text: "Automation", value: 2 },
       ],
     }
   },

@@ -5,13 +5,14 @@
   XSS Catcher
   <br>
 </h1>
-<h4 align="center">A blind XSS detection framework that runs on <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a> and <a href="https://vuejs.org/" target="_blank">VueJS</a>.</h4>
+<h4 align="center">A blind XSS detection framework that runs on <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>, <a href="https://vuejs.org/" target="_blank">VueJS</a> and <a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>.</h4>
 XSS Catcher is a simple application that facilitates blind Cross-Site Scripting attacks and attacks that aim to gather data (e.g. cookies, session/local storage, screenshots, etc.).
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
   <a href="#updating">Updating</a> •
   <a href="#first-login">First login</a> •
+  <a href="#api-documentation">API documentation</a> •
   <a href="#demo">Demo</a> •
   <a href="#troubleshooting">Troubleshooting</a> •
   <a href="#credits">Credits</a>
@@ -21,19 +22,19 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 
 ## Features
 
-- Generates simple customizable XSS payloads
-- Sends email alerts or webhooks (in Slack format) when a new XSS is caught
+- Generate simple and customizable XSS payloads with an easy-to-use payload generator
+- Send notifications when a new XSS is caught using webhooks (Slack, Discord or automation format) and email
 - The destination email or webhook can be configured globally and per client
-- Separates the gathered data by clients
-- Multi-user with administrative and low privilege users
-- MFA with TOTP
-- Stores information about the triggered XSS payloads like User-Agent, source IP address, timestamp, etc.
-- Allows capture of cookies, local storage, session storage, and more.
+- Multi-user with admin and low privilege users
+- Multi factor authentication with TOTP
+- Allows capture of cookies, local storage, session storage, and more
+- Stores additional information about the XSS such as like HTTP headers, source IP address, timestamp, etc.
 - Acts as a "catch-all" endpoint. Just send your data in the querystring (GET) or body (POST) to your client's URL and XSS Catcher will catch it!
 - Leverages [html2canvas](https://github.com/niklasvh/html2canvas) and [fingerprintjs](https://github.com/fingerprintjs/fingerprintjs)
 - Captures the full DOM so you can easily know where the payload triggered
-- Allows you to add custom tags to your XSS to better categorize them.
+- Allows you to add custom tags to your XSS to better categorize and search them.
 - Allows you to run custom JavaScript code and capture the output.
+- Support up to 5 API keys per user to automate advanced attack scenarios when combined with webhooks
 
 ## Installation
 
@@ -81,6 +82,10 @@ $ make stop
 ## Demo
 
 ![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/animation.gif)
+
+## API documentation
+
+The Postman collections can be found here: https://www.postman.com/maintenance-architect-74448403/workspace/xss-catcher
 
 ## Troubleshooting
 

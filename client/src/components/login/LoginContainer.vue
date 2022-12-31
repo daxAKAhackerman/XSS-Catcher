@@ -10,8 +10,8 @@
         />
       </b-col>
     </b-row>
-    <PasswordMfa
-      :show_password_modal="show_password_modal"
+    <Security
+      :showSecurityModal="showSecurityModal"
       :mfa_set="user.mfa"
       :user_id="user.id"
     />
@@ -21,7 +21,7 @@
 <script>
 import axios from "axios";
 
-import PasswordMfa from "../shared/PasswordMfa";
+import Security from "../shared/SecurityModal";
 import Logo from "./LogoRow";
 import LoginForm from "./LoginForm";
 
@@ -31,14 +31,14 @@ const basePath = "/api";
 
 export default {
   components: {
-    PasswordMfa,
+    Security,
     Logo,
     LoginForm,
   },
   data() {
     return {
       user: {},
-      show_password_modal: false,
+      showSecurityModal: false,
     };
   },
   methods: {
@@ -49,7 +49,7 @@ export default {
         .then((response) => {
           this.user = response.data;
           if (this.user.first_login) {
-            this.show_password_modal = true;
+            this.showSecurityModal = true;
           } else {
             this.$router.push({
               name: "Index",

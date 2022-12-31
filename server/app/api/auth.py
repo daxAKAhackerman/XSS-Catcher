@@ -3,18 +3,13 @@ from app import db
 from app.api import bp
 from app.api.models import LoginModel
 from app.models import BlockedJti, User
-from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
-    get_current_user,
-    get_jwt,
-    jwt_required,
-)
+from app.permissions import authorization_required, get_current_user
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt
 from flask_pydantic import validate
 
 
 @bp.route("/auth/login", methods=["POST"])
-@jwt_required(optional=True)
+@authorization_required(optional=True)
 @validate()
 def login(body: LoginModel):
     current_user = get_current_user()
@@ -36,14 +31,14 @@ def login(body: LoginModel):
 
 
 @bp.route("/auth/refresh", methods=["POST"])
-@jwt_required(refresh=True)
+@authorization_required(refresh=True)
 def refresh():
     current_user: User = get_current_user()
     return {"access_token": create_access_token(identity=current_user.username)}
 
 
 @bp.route("/auth/logout", methods=["POST"])
-@jwt_required(refresh=True)
+@authorization_required(refresh=True)
 def logout():
     jti = get_jwt()["jti"]
     blocked_jti = BlockedJti(jti=jti)

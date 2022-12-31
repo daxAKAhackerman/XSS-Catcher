@@ -11,13 +11,12 @@ from app.api.models import (
     XssGenerateModel,
 )
 from app.models import XSS, Client
-from app.permissions import permissions
-from flask_jwt_extended import jwt_required
+from app.permissions import authorization_required, permissions
 from flask_pydantic import validate
 
 
 @bp.route("/xss/generate", methods=["POST"])
-@jwt_required()
+@authorization_required()
 @validate()
 def xss_generate(body: XssGenerateModel):
     client: Client = db.session.query(Client).filter_by(id=body.client_id).first_or_404()
@@ -118,7 +117,7 @@ def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, 
 
 
 @bp.route("/xss/<int:xss_id>", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def client_xss_get(xss_id: int):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
@@ -126,7 +125,7 @@ def client_xss_get(xss_id: int):
 
 
 @bp.route("/xss/<int:xss_id>", methods=["DELETE"])
-@jwt_required()
+@authorization_required()
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id: int):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
@@ -138,7 +137,7 @@ def xss_delete(xss_id: int):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
-@jwt_required()
+@authorization_required()
 def xss_loot_get(xss_id: int, loot_type: str):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
 
@@ -148,7 +147,7 @@ def xss_loot_get(xss_id: int, loot_type: str):
 
 
 @bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
-@jwt_required()
+@authorization_required()
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id: int, loot_type: str):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
@@ -164,7 +163,7 @@ def xss_loot_delete(xss_id: int, loot_type: str):
 
 
 @bp.route("/xss", methods=["GET"])
-@jwt_required()
+@authorization_required()
 @validate()
 def client_xss_get_all(query: ClientXssGetAllModel):
     filter_expression = {}
@@ -182,7 +181,7 @@ def client_xss_get_all(query: ClientXssGetAllModel):
 
 
 @bp.route("/xss/data", methods=["GET"])
-@jwt_required()
+@authorization_required()
 @validate()
 def client_loot_get(query: ClientLootGetModel):
     loot = []

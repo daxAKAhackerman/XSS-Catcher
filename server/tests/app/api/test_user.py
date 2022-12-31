@@ -1,9 +1,9 @@
 from unittest import mock
 
 from app import db
-from app.models import User
+from app.models import ApiKey, User
 from flask.testing import FlaskClient
-from tests.helpers import create_user, login
+from tests.helpers import create_api_key, create_user, login
 
 
 def test__register__given_username__when_username_already_taken__then_400_returned(client_tester: FlaskClient):
@@ -199,6 +199,45 @@ def test__delete_mfa__given_user_id__then_200_returned(client_tester: FlaskClien
     db.session.commit()
 
     response = client_tester.delete(f"/api/user/{user.id}/mfa", headers={"Authorization": f"Bearer {access_token}"})
-    assert user.mfa_secret == None
+    assert user.mfa_secret is None
     assert response.json == {"msg": f"MFA removed for user {user.username}"}
     assert response.status_code == 200
+
+
+@mock.patch("app.api.user.ApiKey.generate_key", return_value="11111111-1111-4111-a111-111111111111")
+def test__create_api_key__given_request__then_api_key_created(generate_key_mocker: mock.MagicMock, client_tester: FlaskClient):
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/user/apikey", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert db.session.query(ApiKey).count() == 1
+    assert response.json == {"id": 1, "key": "11111111-1111-4111-a111-111111111111"}
+
+
+def test__create_api_key__given_request__when_already_5_api_keys__then_400_returned(client_tester: FlaskClient):
+    for i in range(0, 5):
+        create_api_key()
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.post("/api/user/apikey", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert db.session.query(ApiKey).count() == 5
+    assert response.json == {"msg": "You already have 5 API keys"}
+
+
+def test__delete_api_key__given_key_id__then_key_deleted(client_tester: FlaskClient):
+    api_key: ApiKey = create_api_key()
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.delete(f"/api/user/apikey/{api_key.id}", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert db.session.query(ApiKey).count() == 0
+    assert response.json == {"msg": "API key deleted successfully"}
+
+
+def test__list_api_keys__given_user_id__then_key_list_returned(client_tester: FlaskClient):
+    create_api_key(key="11111111-1111-4111-a111-111111111111")
+
+    access_token, refresh_token = login(client_tester, "admin", "xss")
+    response = client_tester.get(f"/api/user/1/apikey", headers={"Authorization": f"Bearer {access_token}"})
+
+    assert [{"id": 1, "key": "********************************1111"}]
