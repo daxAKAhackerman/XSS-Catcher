@@ -12,6 +12,7 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
   <a href="#installation">Installation</a> •
   <a href="#updating">Updating</a> •
   <a href="#first-login">First login</a> •
+  <a href="#api-documentation">API documentation</a> •
   <a href="#demo">Demo</a> •
   <a href="#troubleshooting">Troubleshooting</a> •
   <a href="#credits">Credits</a>
@@ -81,6 +82,10 @@ $ make stop
 ## Demo
 
 ![screenshot](https://raw.githubusercontent.com/daxAKAhackerman/XSS-Catcher/master/resources/animation.gif)
+
+## API documentation
+
+The Postman collections can be found here: https://www.postman.com/maintenance-architect-74448403/workspace/xss-catcher
 
 ## Troubleshooting
 
