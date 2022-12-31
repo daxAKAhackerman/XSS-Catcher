@@ -74,6 +74,7 @@ def permissions(all_of: List[str] = [], one_of: List[str] = []):
             current_user: User = get_current_user()
 
             permission_attributes = {"admin": current_user.is_admin}
+
             if "user_id" in kwargs:
                 permission_attributes["owner"] = current_user.id == kwargs["user_id"]
             elif "client_id" in kwargs:
