@@ -74,18 +74,17 @@ def permissions(all_of: List[str] = [], one_of: List[str] = []):
             current_user: User = get_current_user()
 
             permission_attributes = {"admin": current_user.is_admin}
-
             if "user_id" in kwargs:
                 permission_attributes["owner"] = current_user.id == kwargs["user_id"]
             elif "client_id" in kwargs:
                 client: Client = db.session.query(Client).filter_by(id=kwargs["client_id"]).first_or_404()
                 permission_attributes["owner"] = current_user.id == client.owner_id
-            elif "xss_id" in kwargs:
-                xss: XSS = db.session.query(XSS).filter_by(id=kwargs["xss_id"]).first_or_404()
-                permission_attributes["owner"] = current_user.id == xss.client.owner_id
             elif "key_id" in kwargs:
                 api_key: ApiKey = db.session.query(ApiKey).filter_by(id=kwargs["key_id"]).first_or_404()
                 permission_attributes["owner"] = current_user.id == api_key.owner_id
+            elif "xss_id" in kwargs:
+                xss: XSS = db.session.query(XSS).filter_by(id=kwargs["xss_id"]).first_or_404()
+                permission_attributes["owner"] = current_user.id == xss.client.owner_id
 
             if all_of:
                 values_to_check = [v for k, v in permission_attributes.items() if k in all_of]
