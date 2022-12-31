@@ -180,7 +180,7 @@ def create_api_key():
 
 @bp.route("/user/apikey/<int:key_id>", methods=["DELETE"])
 @authorization_required()
-@permissions(all_of=["owner"])
+@permissions(one_of=["admin", "owner"])
 def delete_api_key(key_id: int):
     api_key: ApiKey = db.session.query(ApiKey).filter_by(id=key_id).first_or_404()
 
