@@ -10,7 +10,7 @@ flask-cors==3.0.10
 flask-jwt-extended==4.4.4
 flask-migrate==4.0.0
 flask-pydantic==0.11.0
-flask-sqlalchemy==3.0.2
+flask-sqlalchemy==3.0.3
 greenlet==2.0.1 ; python_version >= '3' and platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))
 idna==3.4 ; python_version >= '3.5'
 itsdangerous==2.1.2 ; python_version >= '3.7'
