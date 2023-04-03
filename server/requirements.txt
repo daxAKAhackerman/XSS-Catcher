@@ -1,7 +1,7 @@
 -i https://pypi.org/simple
-alembic==1.9.4 ; python_version >= '3.7'
+alembic==1.10.2 ; python_version >= '3.7'
 certifi==2022.12.7 ; python_version >= '3.6'
-charset-normalizer==3.0.1 ; python_full_version >= '3.6.0'
+charset-normalizer==3.1.0 ; python_full_version >= '3.7.0'
 click==8.1.3 ; python_version >= '3.7'
 dnspython==2.3.0 ; python_version >= '3.7' and python_version < '4.0'
 email-validator==1.3.1
@@ -14,19 +14,19 @@ flask-sqlalchemy==3.0.3
 greenlet==2.0.2 ; platform_machine == 'aarch64' or (platform_machine == 'ppc64le' or (platform_machine == 'x86_64' or (platform_machine == 'amd64' or (platform_machine == 'AMD64' or (platform_machine == 'win32' or platform_machine == 'WIN32')))))
 idna==3.4 ; python_version >= '3.5'
 itsdangerous==2.1.2 ; python_version >= '3.7'
-jinja2==3.1.2 ; python_version >= '3.7'
+jinja2==3.1.2
 mako==1.2.4 ; python_version >= '3.7'
 markupsafe==2.1.2 ; python_version >= '3.7'
 psycopg2-binary==2.9.5
-pydantic[email]==1.10.5
+pydantic[email]==1.10.7
 pyjwt==2.6.0 ; python_version >= '3.7'
 pyotp==2.8.0
 pypng==0.20220715.0
 pyqrcode==1.2.1
 requests==2.28.2
 six==1.16.0 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
-sqlalchemy==2.0.4 ; python_version >= '3.7'
+sqlalchemy==2.0.8 ; python_version >= '3.7'
 typing-extensions==4.5.0 ; python_version >= '3.7'
-urllib3==1.26.14 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
+urllib3==1.26.15 ; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'
 waitress==2.1.2
 werkzeug==2.2.3 ; python_version >= '3.7'
