@@ -21,7 +21,7 @@
     "vue2-filters": "^0.14.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.21.4",
+    "@babel/core": "^7.22.11",
     "@babel/eslint-parser": "^7.0.0",
     "@volar-plugins/vetur": "^2.0.0",
     "@vue/cli-plugin-babel": "^5.0.0",
