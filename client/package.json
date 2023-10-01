@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
-    "@babel/eslint-parser": "^7.0.0",
+    "@babel/eslint-parser": "^7.22.15",
     "@volar-plugins/vetur": "^2.0.0",
     "@vue/cli-plugin-babel": "^5.0.0",
     "@vue/cli-plugin-eslint": "^5.0.0",
