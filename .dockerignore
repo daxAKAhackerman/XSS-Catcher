@@ -1,5 +1,3 @@
-server/app.db
 server/tests
 server/**/__pycache__
-**/.gitignore
 **/node_modules
