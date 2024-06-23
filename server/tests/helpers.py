@@ -31,6 +31,12 @@ def create_user(username: str, password: str = "test") -> User:
     return user
 
 
+def delete_user(username: str) -> None:
+    user = db.session.query(User).filter_by(username=username).one_or_none()
+    db.session.delete(user)
+    db.session.commit()
+
+
 def set_settings(*args: List, **kwargs: Dict[str, Any]) -> Settings:
     current_settings = db.session.query(Settings).one()
     db.session.delete(current_settings)

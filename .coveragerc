@@ -1,2 +1,4 @@
 [run]
-omit = server/tests/*
+omit =
+        server/tests/*
+        server/xss.py

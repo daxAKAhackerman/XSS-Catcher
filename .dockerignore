@@ -1,3 +1,4 @@
 server/tests
 server/**/__pycache__
 **/node_modules
+client/public/static/*

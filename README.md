@@ -119,36 +119,6 @@ $ make stop
 $ make start
 ```
 
-### I updated to XSS Catcher v2, understood that my data would not carry over from v1 as stated by the release note and update warning, but I'd like some pointers on how I can import my data to the new PostgreSQL database
-
-While there is no guarantee about the following procedure, it is possible to "import" the data from v1 to v2 with a very manual (but achievable) process:
-
-```bash
-# Using SQLite3, create a dump using the database backup file
-$ sqlite database-backup.db .dump > dump
-
-# The statements you are interested in are the INSERT INTO statements
-# Choose which ones you want to import
-
-# While XSS Catcher is running, attach to the database container
-$ docker exec -it xss-catcher_db_1 bash
-
-# Log into the PostgreSQL database
-$ psql -U user xss
-
-# To import users, you will have to take the INSERT INTO statements, put double quotes around the table name (user) and replace the 1 and 0 by 't' or 'f' in the fourth and fifth columns.
-# Once that's done, you can paste the commands directly into the psql CLI
-
-# To import clients, the INSERT INTO statements can be executed as is
-
-# To import settings, first drop the current settings
-$ DELETE from settings where id=1;
-# Then replace the 1 and 0 by 't' or 'f' in the fourth and fifth columns
-# Once that's done, you can paste the statement into the psql CLI
-
-# Finally, to import XSS, the INSERT INTO statements can be executed as is
-```
-
 ## Credits
 
 - [Flask](https://flask.palletsprojects.com/)

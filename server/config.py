@@ -4,7 +4,10 @@ import string
 
 
 def get_db_url() -> str:
-    return f'postgresql:///{os.getenv("POSTGRES_DB", "postgres")}'
+    if os.getenv("FLASK_DEBUG"):
+        return "postgresql://postgres:postgres@localhost:5432/postgres"
+    else:
+        return f'postgresql://postgres@/{os.getenv("POSTGRES_DB", "postgres")}'
 
 
 class Config:
