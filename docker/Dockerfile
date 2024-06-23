@@ -15,7 +15,7 @@ FROM ubuntu:22.04
 
 # Install dependencies
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get update && apt-get install -y software-properties-common python3 python3-launchpadlib gnupg curl postgresql-client nginx supervisor postgresql sudo
+RUN apt-get update && apt-get install -y software-properties-common python3 python3-launchpadlib gnupg curl postgresql-client nginx supervisor postgresql
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y python3.10
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3.10

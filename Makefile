@@ -4,7 +4,7 @@ SRC_CLIENT_DIR := client
 COLLECTOR_SCRIPT_DIR := collector_script
 TEST_DIR := $(SRC_SERVER_DIR)/tests
 
-.PHONY: build start stop install lock-requirements lint test test-coverage-report run-backend build-frontend run-frontend
+.PHONY: build install lock-requirements lint test test-coverage-report run-backend build-collector-script build-frontend run-frontend run-database run-testing-database start stop init-dev
 
 build:
 	docker volume create xsscatcher-db
