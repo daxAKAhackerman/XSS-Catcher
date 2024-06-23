@@ -44,10 +44,10 @@ run-frontend:
 	npm run --prefix $(SRC_CLIENT_DIR) serve
 
 run-database:
-	docker run -p 5432:5432 -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres --rm --name xsscatcher-dev postgres:14.12
+	docker run -p 5432:5432 -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres --rm --name xsscatcher-dev-db postgres:14.12
 
 run-testing-database:
-	docker run -p 5433:5432 -d -e POSTGRES_PASSWORD=testing -e POSTGRES_DB=testing -e POSTGRES_USER=testing --rm --name xsscatcher-dev-testing postgres:14.12
+	docker run -p 5433:5432 -d -e POSTGRES_PASSWORD=testing -e POSTGRES_DB=testing -e POSTGRES_USER=testing --rm --name xsscatcher-testing-db postgres:14.12
 
 start:
 	docker run -p 8080:80 -v xsscatcher-db:/var/lib/postgresql/14/main/ -d --name xsscatcher xsscatcher
