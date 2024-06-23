@@ -1,0 +1,26 @@
+server {
+    listen       80;
+    listen  [::]:80;
+    server_name  localhost;
+
+    location /api/ {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://localhost:8080/api/;
+    }
+
+    location /static/collector.min.js {
+        root /frontend;
+        add_header Cache-Control no-cache;
+    }
+
+    location / {
+        root   /frontend;
+        index  index.html index.htm;
+    }
+
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}

@@ -14,8 +14,6 @@ repos:
       - id: no-commit-to-branch
         args:
           - --branch
-          - master
-          - --branch
           - main
       - id: mixed-line-ending
       - id: trailing-whitespace
