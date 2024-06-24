@@ -30,4 +30,4 @@ sqlalchemy==2.0.20; python_version >= '3.7'
 typing-extensions==4.7.1; python_version >= '3.7'
 urllib3==2.0.4; python_version >= '3.7'
 waitress==2.1.2
-werkzeug==2.3.7; python_version >= '3.8'
+werkzeug==3.0.3; python_version >= '3.8'
