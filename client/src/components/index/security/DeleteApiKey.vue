@@ -2,7 +2,7 @@
     <b-modal ref="deleteApiKeyModal" id="delete-api-key-modal" title="Are you sure?" hide-footer>
         <div class="text-right">
             <b-button @click="deleteApiKey(apiKeyId)" variant="outline-danger">Yes, delete this API key</b-button>
-            <b-button @click="$refs.deleteApiKeyModal.hide()" variant="outline-secondary">Cancel</b-button>
+            <b-button class="ml-2" @click="$refs.deleteApiKeyModal.hide()" variant="outline-secondary">Cancel</b-button>
         </div>
     </b-modal>
 </template>

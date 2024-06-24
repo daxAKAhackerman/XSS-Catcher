@@ -11,6 +11,7 @@
           >Yes, delete this entry</b-button
         >
         <b-button
+          class="ml-2"
           @click="$refs.deleteClientModal.hide()"
           variant="outline-secondary"
           >Cancel</b-button

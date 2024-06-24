@@ -1,19 +1,14 @@
 <template>
-  <b-container>
-    <HeaderRow :user="user" />
+  <b-container fluid>
+    <HeaderRow :user="user" @logout="logout()"/>
     <br />
     <b-row>
       <b-col offset-sm="1" sm="10">
-        <Navigation
-          @get-clients="getClients($event)"
-          :user_is_admin="user.is_admin"
-          @logout="logout()"
-        />
-        <br />
         <ClientTable
           :clients="clients"
           :totalRows="totalRows"
           :user="user"
+          @get-clients="getClients($event)"
           @view-client="viewed_client = $event"
           @view-stored="
             viewed_client = $event;
@@ -85,7 +80,6 @@ import ManageUsers from "./manageUsers/ManageUsers";
 import Settings from "./settings/SettingsModal";
 import DeleteClient from "./DeleteClient";
 import ClientTable from "./ClientTable";
-import Navigation from "./NavigationRow";
 import HeaderRow from "./HeaderRow";
 
 const axiosRefresh = axios.create();
@@ -104,7 +98,6 @@ export default {
     Settings,
     DeleteClient,
     ClientTable,
-    Navigation,
     HeaderRow,
   },
   data() {

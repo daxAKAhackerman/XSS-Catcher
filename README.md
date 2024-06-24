@@ -126,7 +126,6 @@ $ make start
 - [BootstrapVue](https://bootstrap-vue.org/)
 - [FingerprintJS](https://github.com/fingerprintjs/fingerprintjs)
 - [html2canvas](https://github.com/niklasvh/html2canvas)
-- [Bootswatch Slate theme](https://bootswatch.com/slate/)
 - [vue-code-highlight](https://github.com/elisiondesign/vue-code-highlight)
 - [vue-json-pretty](https://github.com/leezng/vue-json-pretty)
 

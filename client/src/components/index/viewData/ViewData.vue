@@ -135,13 +135,14 @@
             type="button"
             v-b-tooltip.hover
             title="View details"
-            variant="outline-info"
+            variant="outline-success"
             v-b-modal.view-details-modal
             @click="xss_detail_id = row.item.xss_id"
           >
             <b-icon-info style="width: 20px; height: 20px"></b-icon-info>
           </b-button>
           <b-button
+            class="ml-2"
             v-if="owner_id === user_id || is_admin"
             v-b-tooltip.hover
             title="Delete data"
