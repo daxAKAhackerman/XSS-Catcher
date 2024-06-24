@@ -34,7 +34,7 @@ export default {
                 },
                 {
                     key: "action",
-                    label: "Action",
+                    label: "",
                     class: "text-right",
                 },
             ],

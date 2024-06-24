@@ -15,7 +15,7 @@
       ></b-form-textarea>
       <b-button
         id="copy-button"
-        variant="outline-secondary"
+        variant="outline-success"
         v-clipboard:copy="xss_payload"
         class="copy-button"
         ><b-icon-files></b-icon-files
@@ -24,13 +24,13 @@
         >Copy to clipboard</b-tooltip
       >
       <b-button-group size="sm" class="transform-button-group">
-        <b-button @click="urlSafe()" variant="outline-secondary"
+        <b-button @click="urlSafe()" variant="outline-success"
           >URL safe</b-button
         >
-        <b-button @click="urlEncode()" variant="outline-secondary"
+        <b-button @click="urlEncode()" variant="outline-success"
           >URL encode</b-button
         >
-        <b-button @click="htmlEncode()" variant="outline-secondary"
+        <b-button @click="htmlEncode()" variant="outline-success"
           >HTML encode</b-button
         >
       </b-button-group>
@@ -42,7 +42,7 @@
       v-model="xss_type"
       :options="options.xss_type"
       buttons
-      button-variant="outline-primary"
+      button-variant="outline-success"
     ></b-form-radio-group>
     <hr />
     <p>Code type</p>
@@ -51,7 +51,7 @@
       v-model="code_type"
       :options="options.code_type"
       buttons
-      button-variant="outline-primary"
+      button-variant="outline-success"
     ></b-form-radio-group>
     <hr />
     <p>Data to gather</p>
@@ -61,7 +61,7 @@
       v-model="to_gather"
       :options="options.to_gather"
       buttons
-      button-variant="outline-primary"
+      button-variant="outline-success"
     ></b-form-checkbox-group>
     <br />
     <br />
@@ -71,7 +71,7 @@
       v-model="all"
       :options="options.all"
       buttons
-      button-variant="outline-primary"
+      button-variant="outline-success"
     ></b-form-checkbox-group>
     <hr />
     <p>Tags</p>
@@ -92,8 +92,8 @@
     </b-popover>
     <br />
     <div class="text-right">
-      <b-button @click="getPayload()" variant="outline-info">Generate</b-button>
-      <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+      <b-button @click="getPayload()" variant="outline-success">Generate</b-button>
+      <b-button class="ml-2" @click="cleanup()" variant="outline-secondary">Cancel</b-button>
     </div>
   </b-modal>
 </template>
@@ -218,11 +218,6 @@ export default {
   width: 50%;
 }
 
-.btn-outline-primary:not(:disabled):not(.disabled):active,
-.btn-outline-primary:not(:disabled):not(.disabled).active,
-.show > .btn-outline-primary.dropdown-toggle {
-  background-color: #5bc0de !important;
-}
 .copy-button {
   position: absolute;
   top: 4px;
@@ -238,6 +233,12 @@ export default {
 .payload-textarea {
   position: relative;
 }
+.payload-textarea textarea {
+  color: var(--success-green) !important;
+  background-color: var(--light-grey) !important;
+  border-color: var(--success-green) !important;
+}
+
 .transform-button-group {
   position: absolute !important;
   bottom: 20px;

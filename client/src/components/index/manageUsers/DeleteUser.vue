@@ -3,7 +3,7 @@
     <b-form v-on:submit.prevent>
       <div class="text-right">
         <b-button @click="deleteUser()" variant="outline-danger">Yes, delete this user</b-button>
-        <b-button @click="$refs.deleteUserModal.hide()" variant="outline-secondary">Cancel</b-button>
+        <b-button class="ml-2" @click="$refs.deleteUserModal.hide()" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
   </b-modal>

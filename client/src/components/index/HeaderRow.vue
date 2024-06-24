@@ -23,3 +23,8 @@ export default {
   props: ["user"],
 };
 </script>
+<style>
+.nav-link.dropdown-toggle {
+  font-weight: bold !important;
+}
+</style>

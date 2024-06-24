@@ -1,7 +1,7 @@
 <template>
-  <b-modal ref="securityModal" id="security-modal" title="Security" hide-footer @hidden="cleanup()"
+  <b-modal ref="securityModal" id="security-modal" title="Security" size="lg" hide-footer @hidden="cleanup()"
     @show="showApiKeysSection && listApiKeys()" :visible="showSecurityModal">
-    <h4>Change password</h4>
+    <h3>Change password</h3>
     <br />
     <b-form v-on:submit.prevent>
       <b-form-group id="input-group-op" label="Old password:" label-cols="3" label-for="input-field-op">
@@ -19,13 +19,13 @@
           required></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="changePassword()" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+        <b-button @click="changePassword()" variant="outline-success">Save</b-button>
+        <b-button class="ml-2" @click="cleanup()" variant="outline-secondary">Cancel</b-button>
       </div>
     </b-form>
     <div v-if="show_mfa_section">
       <hr />
-      <h4>Multi Factor Authentication</h4>
+      <h3>Multi Factor Authentication</h3>
       <br />
       <b-button v-if="mfa_set" @click="unsetMfa()" block variant="outline-danger">Disable MFA</b-button>
       <b-button v-else @click="generateMfaQrCode()" block variant="outline-success">Generate MFA QR code</b-button>
@@ -36,21 +36,21 @@
           <div class="text-center">
             <p>{{ mfa_secret }}</p>
           </div>
-          <b-form-group id="input-group-otp" label="OTP:" label-cols="3" label-for="input-field-otp">
+          <b-form-group id="input-group-otp" label="One-time password:" label-cols="3" label-for="input-field-otp">
             <b-form-input @keyup.enter="setMfa()" v-model="otp" id="input-field-otp" autocomplete="off"
               required></b-form-input>
           </b-form-group>
 
           <div class="text-right">
-            <b-button @click="setMfa()" variant="outline-info">Save</b-button>
-            <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+            <b-button @click="setMfa()" variant="outline-success">Save</b-button>
+            <b-button class="ml-2" @click="cleanup()" variant="outline-secondary">Cancel</b-button>
           </div>
         </b-form>
       </div>
     </div>
     <div v-if="showApiKeysSection">
       <hr />
-      <h4>API keys</h4>
+      <h3>API keys</h3>
       <br />
       <ApiKeysTable :apiKeys="apiKeys" @list-api-keys="listApiKeys()" />
       <ShowApiKey :apiKey="newApiKey" @list-api-keys="listApiKeys()" @cleanup-new-api-key="newApiKey = undefined"/>

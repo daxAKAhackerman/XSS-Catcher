@@ -54,7 +54,7 @@
             style="word-wrap: break-word"
           >
             <div v-if="data_name == 'screenshot'">
-              <h4>{{ data_name }}</h4>
+              <h3>{{ data_name }}</h3>
               <p>
                 <a href="#" v-b-toggle="'collapse-screenshot'"
                   >[Click to view screenshot...]</a
@@ -74,7 +74,7 @@
               <p></p>
             </div>
             <div v-else-if="data_name == 'fingerprint'">
-              <h4>{{ data_name }}</h4>
+              <h3>{{ data_name }}</h3>
               <p>
                 <a href="#" v-b-toggle="'collapse-fingerprint'"
                   >[Click to view fingerprint...]</a
@@ -95,7 +95,7 @@
               <p></p>
             </div>
             <div v-else-if="data_name == 'dom'">
-              <h4>{{ data_name }}</h4>
+              <h3>{{ data_name }}</h3>
               <p>
                 <a href="#" v-b-toggle="'collapse-dom'"
                   >[Click to view DOM...]</a
@@ -121,14 +121,14 @@
                 data_name == 'session_storage'
               "
             >
-              <h4>{{ data_name }}</h4>
+              <h3>{{ data_name }}</h3>
               <div v-for="(item, key) in data_value" v-bind:key="key">
                 <code>{{ key }} => {{ item }}</code>
               </div>
               <p></p>
             </div>
             <div v-else>
-              <h4>{{ data_name }}</h4>
+              <h3>{{ data_name }}</h3>
               <p>
                 <code>{{ data_value }}</code>
               </p>

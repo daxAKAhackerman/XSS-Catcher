@@ -48,12 +48,12 @@
         <template v-slot:cell(action)="row">
           <b-button @click="$emit('generate-payload', row.item)" v-b-modal.get-payload-modal type="button"
             variant="outline-success">Generate payload</b-button>
-          <b-button v-if="row.item.owner_id === user.id || user.is_admin" v-b-tooltip.hover title="Delete client"
+          <b-button class="ml-2" v-if="row.item.owner_id === user.id || user.is_admin" v-b-tooltip.hover title="Delete client"
             @click="$emit('delete-client', row.item.id)" v-b-modal.delete-client-modal type="button"
             variant="outline-danger">
             <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
           </b-button>
-          <b-button v-else disabled type="button" variant="outline-danger">
+          <b-button class="ml-2" v-else disabled type="button" variant="outline-danger">
             <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
           </b-button>
         </template>

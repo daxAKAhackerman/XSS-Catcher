@@ -1,73 +1,45 @@
 <template>
-  <b-modal
-    ref="viewXSSModal"
-    id="view-XSS-modal"
-    title="Triggered XSS"
-    hide-footer
-    size="lg"
-    @show="getXSSList()"
-    @hide="cleanup()"
-  >
+  <b-modal ref="viewXSSModal" id="view-XSS-modal" title="Triggered XSS" hide-footer size="lg" @show="getXSSList()"
+    @hide="cleanup()">
     <b-row>
-      <b-col offset-sm="8" sm="4">
+      <b-col sm="4">
         <b-input-group>
-          <b-form-input
-            size="sm"
-            v-model="search"
-            type="search"
-            placeholder="Search"
-          ></b-form-input>
+          <b-form-input size="sm" v-model="search" type="search" placeholder="Search"></b-form-input>
           <b-input-group-append>
-            <b-button
-              variant="outline-secondary"
-              size="sm"
-              :disabled="!search"
-              @click="search = ''"
-              >Clear</b-button
-            >
+            <b-button variant="outline-secondary" size="sm" :disabled="!search" @click="search = ''">Clear</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-col>
+      <b-col class="ml-auto d-flex">
+        <div class="d-flex align-items-center ml-auto">
+          Rows per page
+          <div class="row-per-page-select ml-2">
+            <b-form-select size="sm" v-model="perPage" :options="[
+    { value: 5, text: '5' },
+    { value: 10, text: '10' },
+    { value: 25, text: '25' },
+  ]"></b-form-select>
+          </div>
+        </div>
+      </b-col>
     </b-row>
     <br />
-    <b-table
-      :filterIncludedFields="filterOn"
-      @filtered="onFiltered"
-      :current-page="currentPage"
-      :per-page="perPage"
-      :sort-by.sync="sortBy"
-      :items="dataXSS"
-      :fields="fields"
-      :filter="search"
-      :sort-desc.sync="sortDesc"
-      :sort-direction="sortDirection"
-      hover
-    >
+    <b-table :filterIncludedFields="filterOn" @filtered="onFiltered" :current-page="currentPage" :per-page="perPage"
+      :sort-by.sync="sortBy" :items="dataXSS" :fields="fields" :filter="search" :sort-desc.sync="sortDesc"
+      :sort-direction="sortDirection" hover>
       <template v-slot:cell(timestamp)="row">{{
-        convertTimestamp(row.item.timestamp)
-      }}</template>
+    convertTimestamp(row.item.timestamp)
+  }}</template>
       <template v-slot:cell(tags)="row">
         <b-badge variant="info" v-for="tag in row.item.tags" :key="tag">{{
-          tag
-        }}</b-badge>
+    tag
+  }}</b-badge>
       </template>
       <template v-slot:cell(action)="row">
-        <b-button
-          type="button"
-          variant="outline-info"
-          v-b-modal.view-details-modal
-          @click="xss_id = row.item.id"
-          >View details</b-button
-        >
-        <b-button
-          v-if="owner_id === user_id || is_admin"
-          v-b-tooltip.hover
-          title="Delete XSS"
-          @click="to_delete = row.item.id"
-          v-b-modal.delete-xss-modal
-          type="button"
-          variant="outline-danger"
-        >
+        <b-button type="button" variant="outline-success" v-b-modal.view-details-modal @click="xss_id = row.item.id">View
+          details</b-button>
+        <b-button class="ml-2" v-if="owner_id === user_id || is_admin" v-b-tooltip.hover title="Delete XSS"
+          @click="to_delete = row.item.id" v-b-modal.delete-xss-modal type="button" variant="outline-danger">
           <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
         </b-button>
       </template>
@@ -75,24 +47,7 @@
 
     <b-row>
       <b-col sm="3">
-        <b-pagination
-          v-model="currentPage"
-          :total-rows="totalRows"
-          :per-page="perPage"
-        ></b-pagination>
-      </b-col>
-      <b-col offset-sm="6" sm="3">
-        <b-form-select
-          size="sm"
-          v-model="perPage"
-          :options="[
-            { value: 5, text: '-- Per page --' },
-            { value: 5, text: '5' },
-            { value: 10, text: '10' },
-            { value: 25, text: '25' },
-          ]"
-          >-- Per page --</b-form-select
-        >
+        <b-pagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"></b-pagination>
       </b-col>
     </b-row>
 
@@ -140,7 +95,7 @@ export default {
         {
           key: "action",
           sortable: false,
-          label: "Action",
+          label: "",
           class: "text-right",
         },
       ],
