@@ -6,7 +6,7 @@
   <br>
 </h1>
 <h4 align="center">A blind XSS detection and XSS data capture framework that runs on <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>, <a href="https://vuejs.org/" target="_blank">VueJS</a> and <a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>.</h4>
-XSS Catcher is a simple application that facilitates blind Cross-Site Scripting attacks and attacks that aim to gather data (e.g. cookies, session/local storage, screenshots, etc.).
+XSS Catcher is an intuitive tool that automates blind Cross-Site Scripting (XSS) attacks and data gathering, including screenshots. It features a user-friendly payload generator for creating customizable XSS payloads and offers robust functionalities like webhook and email notifications, multi-factor authentication, and multi-user access. Designed to be straightforward, it integrates easily with platforms such as Slack and Discord, captures comprehensive data including cookies, local storage, and session storage, and provides detailed insights like HTTP headers and DOM snapshots. Additionally, it supports API keys for advanced automation, streamlining XSS testing and making complex attack scenarios more accessible and manageable.
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
@@ -38,7 +38,18 @@ XSS Catcher is a simple application that facilitates blind Cross-Site Scripting 
 
 ## Installation
 
-To clone and run this application, you'll need [Git](https://git-scm.com), [Docker](https://docs.docker.com/engine/), [Docker Compose](https://docs.docker.com/compose/) and [make](https://www.gnu.org/software/make/). From your command line:
+The easiest way of running Simple One Time Secret is by using the Dockerhub image (you'll need [Docker](https://docs.docker.com/engine/)):
+
+```bash
+# Running the app by exposing it on port 8080
+$ docker run -p 8080:80 daxhackerman/xss-catcher
+
+# By default, the container has no persistence. If you need some, you can setup a volume
+$ docker volume create xsscatcher-db
+$ docker run -p 8080:80 -v xsscatcher-db:/var/lib/postgresql/14/main/ -d --name xsscatcher daxhackerman/xss-catcher
+```
+
+If you wish to build the image yourself, you'll need [Git](https://git-scm.com), and optionally [make](https://www.gnu.org/software/make/). From your command line:
 
 ```bash
 # Clone this repository
@@ -47,37 +58,25 @@ $ git clone https://github.com/daxAKAhackerman/XSS-Catcher.git
 # Go into the repository
 $ cd XSS-Catcher
 
-# Start the application
-$ make start
-```
+# All of the following commands are using make. If you are on a system where make is not available, simply have a look into the Makefile and manually run the required commands (under build, start or stop)
 
-## Update
+# If you've never run the application, build it
+$ make
 
-```bash
-# Pull the repository
-$ git pull
-
-# Before running an update, it is recommended to make a copy of your database in case something unexpected happens
-$ cp -r /var/lib/docker/volumes/xss-catcher_xss-db/ /var/lib/docker/volumes/xss-catcher_xss-db-bak/
-
-# Update the application
-$ make update
-```
-
-## Start/Stop containers
-
-```bash
-# Start the containers
+# Start the application. It will listen to port 8080.
 $ make start
 
-# Stop the containers
+# Stop the application when you're done
 $ make stop
+
+# You can update the application when needed
+$ git pull && make stop; make && make start
 ```
 
 ## First login
 
 - Default credentials to connect to the Web interface are **admin:xss**
-- Default Web port is **8888**
+- Default Web port when run through the Makefile is **8080**
 
 ## Demo
 
@@ -92,32 +91,6 @@ The Postman collections can be found here: https://www.postman.com/maintenance-a
 ### JavaScript mixed content error
 
 In order to avoid JavaScript mixed content errors when the XSS payload is triggered, it is highly recommended to put XSS Catcher behind a reverse proxy providing valid TLS certificates.
-
-### I accidentally deleted the `.db_password` file that contained my database password
-
-You can set a new database password by following these steps:
-
-```bash
-# While XSS Catcher is running, attach to the database container
-$ docker exec -it xss-catcher_db_1 bash
-
-# Log into the PostgreSQL database
-$ psql -U user xss
-
-# Set a new password for the user "user"
-$ \password user
-
-# Exit PostgreSQL and the container
-$ exit
-$ exit
-
-# Create a new file in the XSS Catcher directory named ".db_password" with the following content
-POSTGRES_PASSWORD=YOUR_NEW_PASSWORD
-
-# Stop the application and start it again
-$ make stop
-$ make start
-```
 
 ## Credits
 
@@ -136,7 +109,6 @@ Usage of this tool for attacking targets without prior mutual consent is illegal
 ## You may also like...
 
 - [Simple One Time Secret](https://github.com/daxAKAhackerman/simple-one-time-secret) - Generate single use, expiring links to share sensitive information
-- [Source Map Decoder](https://github.com/daxAKAhackerman/source-map-decoder) - Quickly decode source maps
 
 ---
 
