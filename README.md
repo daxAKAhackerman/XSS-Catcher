@@ -38,7 +38,7 @@ XSS Catcher is an intuitive tool that automates blind Cross-Site Scripting (XSS)
 
 ## Installation
 
-The easiest way of running Simple One Time Secret is by using the Dockerhub image (you'll need [Docker](https://docs.docker.com/engine/)):
+The easiest way of running XSS Catcher is by using the Dockerhub image (you'll need [Docker](https://docs.docker.com/engine/)):
 
 ```bash
 # Running the app by exposing it on port 8080
