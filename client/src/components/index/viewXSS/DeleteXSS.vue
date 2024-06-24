@@ -1,17 +1,10 @@
 <template>
-  <b-modal
-    ref="deleteXSSModal"
-    id="delete-xss-modal"
-    title="Are you sure?"
-    hide-footer
-  >
+  <b-modal ref="deleteXSSModal" id="delete-xss-modal" title="Are you sure?" hide-footer>
     <b-form v-on:submit.prevent>
-      <b-button @click="deleteXSS()" variant="outline-danger"
-        >Yes, delete this entry</b-button
-      >
-      <b-button @click="$refs.deleteXSSModal.hide()" variant="outline-secondary"
-        >Cancel</b-button
-      >
+      <div class="text-right">
+        <b-button @click="deleteXSS()" variant="outline-danger">Yes, delete this entry</b-button>
+        <b-button class="ml-2" @click="$refs.deleteXSSModal.hide()" variant="outline-secondary">Cancel</b-button>
+      </div>
     </b-form>
   </b-modal>
 </template>

@@ -15,7 +15,14 @@ from app.permissions import (
 )
 from flask import g
 from flask.testing import FlaskClient
-from tests.helpers import create_api_key, create_client, create_user, create_xss, login
+from tests.helpers import (
+    create_api_key,
+    create_client,
+    create_user,
+    create_xss,
+    delete_user,
+    login,
+)
 
 
 def test__permissions__given_request_context__when_user_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
@@ -37,6 +44,7 @@ def test__permissions__given_request_context__when_client_id_in_request__then_ow
     def test_fn(client_id: int):
         pass
 
+    create_user("user2")
     create_client("test")
     create_client("test2", owner_id=2)
     access_token, refresh_token = login(client_tester, "admin", "xss")
@@ -52,6 +60,7 @@ def test__permissions__given_request_context__when_xss_id_in_request__then_owner
     def test_fn(xss_id: int):
         pass
 
+    create_user("user2")
     create_client("test")
     create_client("test2", owner_id=2)
     create_xss()
@@ -70,6 +79,7 @@ def test__permissions__given_request_context__when_key_id_in_request__then_owner
     def test_fn(key_id: int):
         pass
 
+    create_user("user2")
     create_api_key()
     create_api_key(user_id=2)
 
@@ -184,7 +194,9 @@ def test___get_user_from_api_key__given_api_key__when_user_exists__then_user_ret
 
 
 def test___get_user_from_api_key__given_api_key__when_user_does_not_exist__then_raise(client_tester: FlaskClient):
+    create_user("user2")
     api_key: ApiKey = create_api_key(user_id=2)
+    delete_user("user2")
     with pytest.raises(UserLookupError):
         _get_user_from_api_key(api_key)
 

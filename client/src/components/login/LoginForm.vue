@@ -44,7 +44,7 @@
           placeholder="Enter one time password"
         ></b-form-input>
       </b-form-group>
-      <b-button @click="postLogin()" variant="outline-info">Login</b-button>
+      <b-button block @click="postLogin()" variant="outline-success">Login</b-button>
     </b-form>
   </b-card>
 </template>

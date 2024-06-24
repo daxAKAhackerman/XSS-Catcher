@@ -1,5 +1,3 @@
-import os
-
 import pytest
 from app import create_app, db
 from app.models import init_app
@@ -8,7 +6,7 @@ from flask import Flask
 
 class TestConfig:
     SECRET_KEY = "A_KEY_ONLY_USED_FOR_TESTS"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(os.path.abspath(os.path.dirname(__file__)), "app-test.db")
+    SQLALCHEMY_DATABASE_URI = "postgresql://testing:testing@localhost:5433/testing"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_ACCESS_TOKEN_EXPIRES = 300
 

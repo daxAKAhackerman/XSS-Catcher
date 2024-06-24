@@ -61,12 +61,14 @@ def test__Client_generate_uid__given_self__when_uid_exists__then_new_uid_generat
 
 @freeze_time("2000-01-01")
 def test__XSS_summary__given_self__then_summary_returned(client_tester: FlaskClient):
+    create_client("test")
     xss: XSS = create_xss(tags=["tag1"])
     assert xss.summary() == {"id": 1, "ip_addr": "127.0.0.1", "timestamp": 946684800, "tags": ["tag1"]}
 
 
 @freeze_time("2000-01-01")
 def test__XSS_to_dict__given_self__then_dict_returned(client_tester: FlaskClient):
+    create_client("test")
     xss: XSS = create_xss(tags=["tag1"], data={"TestKey": "TestValue"}, headers={"HeaderKey": "HeaderValue"})
     assert xss.to_dict() == {
         "id": 1,
@@ -80,6 +82,7 @@ def test__XSS_to_dict__given_self__then_dict_returned(client_tester: FlaskClient
 
 @freeze_time("2000-01-01")
 def test__XSS_to_dict__given_self__when_big_data__then_dict_returned_without_big_data(client_tester: FlaskClient):
+    create_client("test")
     xss: XSS = create_xss(tags=["tag1"], data={"fingerprint": "abc", "dom": "abc", "screenshot": "abc"}, headers={"HeaderKey": "HeaderValue"})
     assert xss.to_dict() == {
         "id": 1,

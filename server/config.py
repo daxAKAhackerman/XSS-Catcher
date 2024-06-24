@@ -4,15 +4,10 @@ import string
 
 
 def get_db_url() -> str:
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    sqlite_db_path = os.path.join(basedir, "app.db")
-
     if os.getenv("FLASK_DEBUG"):
-        return f"sqlite:///{sqlite_db_path}"
+        return "postgresql://postgres:postgres@localhost:5432/postgres"
     else:
-        with open(os.getenv("POSTGRES_PASSWORD_FILE"), "r") as file:
-            pg_password = file.readline().rstrip()
-        return f'postgresql://{os.getenv("POSTGRES_USER")}:{pg_password}@{os.getenv("POSTGRES_HOSTNAME")}/{os.getenv("POSTGRES_DB")}'
+        return f'postgresql://postgres@/{os.getenv("POSTGRES_DB", "postgres")}'
 
 
 class Config:

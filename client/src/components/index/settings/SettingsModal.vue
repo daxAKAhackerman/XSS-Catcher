@@ -31,17 +31,14 @@
           placeholder="Leave unchanged to keep saved password"></b-form-input>
       </b-form-group>
 
-      <b-form-group id="input-group-starttls" label="STARTTLS: " label-cols="3" label-for="input-field-starttls">
-        <b-form-checkbox style="margin-top: 13px" @change="settings.ssl_tls = false" v-model="settings.starttls"
-          id="input-field-starttls"></b-form-checkbox>
+      <b-form-group id="input-group-encryption-protocol" label="Encryption protocol: " label-cols="3"
+        label-for="input-field-encryption-protocol">
+        <b-form-radio-group id="input-field-encryption-protocol" v-model="encryption_protocol"
+          :options="encryption_protocol_radio" block buttons button-variant="outline-success"></b-form-radio-group>
       </b-form-group>
 
-      <b-form-group id="input-group-ssl_tls" label="SSL/TLS: " label-cols="3" label-for="input-field-ssl_tls">
-        <b-form-checkbox style="margin-top: 13px" @change="settings.starttls = false" v-model="settings.ssl_tls"
-          id="input-field-ssl_tls"></b-form-checkbox>
-      </b-form-group>
       <b-form-group id="input-group-status" label="SMTP status: " label-cols="3" label-for="input-field-status">
-        <p v-if="settings.smtp_status === null" class="new-config" id="input-field-status">
+        <p v-if="settings.smtp_status === null" class="bad-config" id="input-field-status">
           <b>NOT CONFIGURED OR NOT TESTED</b>
         </p>
         <p v-else-if="settings.smtp_status === true" class="good-config" id="input-field-status">
@@ -59,7 +56,7 @@
             placeholder="Recipient"></b-form-input>
           <b-input-group-append>
             <b-button v-b-tooltip.hover title="Don't forget to save before testing!" @click="testSettings()"
-              variant="outline-warning">Test</b-button>
+              variant="outline-success">Test</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
@@ -70,7 +67,7 @@
       <b-form-group id="input-group-webhook-type" label="Webhook format: " label-cols="3"
         label-for="input-field-webhook-type">
         <b-form-radio-group id="input-field-webhook-type" v-model="settings.webhook_type" :options="webhook_types_radio"
-          block buttons button-variant="outline-primary"></b-form-radio-group>
+          block buttons button-variant="outline-success"></b-form-radio-group>
       </b-form-group>
       <b-form-group id="input-group-webhook" label="Default webhook URL: " label-cols="3"
         label-for="input-field-webhook"><b-input-group>
@@ -78,14 +75,14 @@
             v-model="settings.webhook_url"></b-form-input>
           <b-input-group-append>
             <b-button v-b-tooltip.hover title="Don't forget to save before testing!" @click="testWebhook()"
-              variant="outline-warning">Test</b-button>
+              variant="outline-success">Test</b-button>
           </b-input-group-append>
         </b-input-group>
       </b-form-group>
     </b-form>
     <div class="text-right">
-      <b-button @click="patchSettings()" variant="outline-info">Save</b-button>
-      <b-button @click="cleanup()" variant="outline-secondary">Cancel</b-button>
+      <b-button @click="patchSettings()" variant="outline-success">Save</b-button>
+      <b-button class="ml-2" @click="cleanup()" variant="outline-secondary">Cancel</b-button>
     </div>
   </b-modal>
 </template>
@@ -105,6 +102,12 @@ export default {
         { text: "Discord", value: 1 },
         { text: "Automation", value: 2 },
       ],
+      encryption_protocol: 0,
+      encryption_protocol_radio: [
+        { text: "None", value: 0 },
+        { text: "STARTTLS", value: 1 },
+        { text: "SSL/TSL", value: 2 },
+      ]
     }
   },
   methods: {
@@ -115,6 +118,13 @@ export default {
         .get(path)
         .then((response) => {
           this.settings = response.data
+          if (this.settings.ssl_tls) {
+            this.encryption_protocol = 2
+          } else if (this.settings.starttls) {
+            this.encryption_protocol = 1
+          } else {
+            this.encryption_protocol = 0
+          }
         })
         .catch((error) => {
           this.handleError(error)
@@ -154,8 +164,8 @@ export default {
       }
 
       payload.webhook_type = this.settings.webhook_type
-      payload.starttls = this.settings.starttls
-      payload.ssl_tls = this.settings.ssl_tls
+      payload.starttls = this.encryption_protocol === 1
+      payload.ssl_tls = this.encryption_protocol === 2
 
       axios
         .patch(path, payload)
@@ -210,18 +220,13 @@ export default {
 </script>
 
 <style>
-.new-config {
-  margin-top: 13px;
-  color: #f89406;
-}
-
 .good-config {
-  margin-top: 13px;
-  color: #62c462;
+  margin-top: 7px;
+  color: var(--success-green);
 }
 
 .bad-config {
-  margin-top: 13px;
-  color: #ee5f5b;
+  margin-top: 7px;
+  color: var(--danger-orange);
 }
 </style>

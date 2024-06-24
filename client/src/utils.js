@@ -1,7 +1,7 @@
 export const makeToast = function(message, variant, title = "Notification") {
     this.$root.$bvToast.toast(message, {
         title: title,
-        autoHideDelay: 5000,
+        autoHideDelay: 3000,
         appendToast: false,
         variant: variant
     });

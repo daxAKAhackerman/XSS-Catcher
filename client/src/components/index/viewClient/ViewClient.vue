@@ -112,10 +112,10 @@
         <b-button
           v-if="owner_id === user_id || is_admin"
           @click="patchClient()"
-          variant="outline-info"
+          variant="outline-success"
           >Save</b-button
         >
-        <b-button @click="cleanup()" variant="outline-secondary"
+        <b-button class="ml-2" @click="cleanup()" variant="outline-secondary"
           >Cancel</b-button
         >
       </div>

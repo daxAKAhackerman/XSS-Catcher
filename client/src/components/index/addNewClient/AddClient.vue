@@ -35,8 +35,8 @@
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
-        <b-button @click="postClient()" variant="outline-info">Save</b-button>
-        <b-button @click="cleanup()" variant="outline-secondary"
+        <b-button @click="postClient()" variant="outline-success">Save</b-button>
+        <b-button class="ml-2" @click="cleanup()" variant="outline-secondary"
           >Cancel</b-button
         >
       </div>
