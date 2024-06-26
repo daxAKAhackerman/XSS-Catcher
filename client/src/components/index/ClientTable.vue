@@ -48,9 +48,9 @@
         <template v-slot:cell(action)="row">
           <b-button @click="$emit('generate-payload', row.item)" v-b-modal.get-payload-modal type="button"
             variant="outline-success">Generate payload</b-button>
-          <b-button class="ml-2" v-if="row.item.owner_id === user.id || user.is_admin" v-b-tooltip.hover title="Delete client"
-            @click="$emit('delete-client', row.item.id)" v-b-modal.delete-client-modal type="button"
-            variant="outline-danger">
+          <b-button class="ml-2" v-if="row.item.owner_id === user.id || user.is_admin" v-b-tooltip.hover
+            title="Delete client" @click="$emit('delete-client', row.item.id)" v-b-modal.delete-client-modal
+            type="button" variant="outline-danger">
             <b-icon-trash style="width: 20px; height: 20px"></b-icon-trash>
           </b-button>
           <b-button class="ml-2" v-else disabled type="button" variant="outline-danger">
@@ -60,9 +60,11 @@
       </b-table>
     </b-row>
     <b-row>
-      <b-col>
-        <b-pagination class="mt-0 mb-0" v-model="currentPage" :total-rows="totalRows"
-          :per-page="perPage"></b-pagination>
+      <b-col class="d-flex">
+        <div class="ml-auto">
+          <b-pagination class="mt-0 mb-0" v-model="currentPage" :total-rows="totalRows"
+            :per-page="perPage"></b-pagination>
+        </div>
       </b-col>
     </b-row>
   </div>
