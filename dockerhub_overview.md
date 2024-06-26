@@ -8,7 +8,7 @@
 
 # Supported tags and respective `Dockerfile` links
 
--	[`3.0.0`, `latest`](https://github.com/daxAKAhackerman/XSS-Catcher/blob/v3.0.0/docker/Dockerfile)
+-	[`3.0.1`, `latest`](https://github.com/daxAKAhackerman/XSS-Catcher/blob/v3.0.1/docker/Dockerfile)
 
 # Quick reference (cont.)
 
