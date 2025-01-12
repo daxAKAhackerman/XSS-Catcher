@@ -4,20 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-Flask = "==2.3.2"
-Flask-Cors = "==3.0.10"
-Flask-JWT-Extended = "==4.5.2"
-Flask-Migrate = "==4.0.4"
-Flask-SQLAlchemy = "==3.0.3"
-requests = "==2.31.0"
-Flask-Pydantic = "==0.11.0"
-waitress = "==2.1.2"
-pydantic = {extras = ["email"], version = "==1.10.7"}
-psycopg2-binary = "==2.9.6"
-pyotp = "==2.8.0"
-pyqrcode = "==1.2.1"
-pypng = "==0.20220715.0"
-jinja2 = "==3.1.2"
+fastapi = {extras = ["standard"], version = "==0.115.6"}
+sqlmodel = "==0.0.22"
+alembic = "*"
+psycopg2-binary = "*"
+werkzeug = "*"
 
 [dev-packages]
 black = "*"
@@ -25,7 +16,7 @@ isort = "*"
 pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
-freezegun = "*"
+pipenv = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
