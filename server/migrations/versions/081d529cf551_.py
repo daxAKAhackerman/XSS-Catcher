@@ -1,10 +1,11 @@
 """empty message
 
-Revision ID: 34f6401e9695
+Revision ID: 081d529cf551
 Revises:
-Create Date: 2025-01-12 15:02:57.774538
+Create Date: 2025-01-12 21:46:39.424863
 
 """
+
 from typing import Sequence, Union
 
 import sqlalchemy as sa
@@ -12,7 +13,7 @@ import sqlmodel
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "34f6401e9695"
+revision: str = "081d529cf551"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,9 +25,9 @@ def upgrade() -> None:
         "user",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("username", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("password_hash", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("first_login", sa.Boolean(), nullable=True),
-        sa.Column("is_admin", sa.Boolean(), nullable=True),
+        sa.Column("password_hash", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("first_login", sa.Boolean(), nullable=False),
+        sa.Column("is_admin", sa.Boolean(), nullable=False),
         sa.Column("mfa_secret", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )

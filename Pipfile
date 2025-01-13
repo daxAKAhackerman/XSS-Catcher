@@ -9,6 +9,8 @@ sqlmodel = "==0.0.22"
 alembic = "*"
 psycopg2-binary = "*"
 werkzeug = "*"
+pyjwt = "*"
+pyotp = "*"
 
 [dev-packages]
 black = "*"

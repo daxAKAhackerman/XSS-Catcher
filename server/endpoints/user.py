@@ -1,40 +1,20 @@
-from database import SessionDep
+from database import DbSession
 from fastapi import APIRouter, HTTPException
-from models.user import User, UserChangePassword, UserCreate, UserCreateResponse
+from models.user import User, UserCreate, UserCreateResponse
 
 router = APIRouter()
 
 
-@router.post("", response_model=UserCreateResponse)
-def create_user(user: UserCreate, session: SessionDep):
-    if User.get_user_by_username(session, user.username):
+@router.post("/", response_model=UserCreateResponse)
+def create_user(user: UserCreate, db_session: DbSession):
+    if User.get_user_by_username(db_session, user.username):
         raise HTTPException(400, "This user already exists")
 
-    db_user = User.model_validate(user)
     password = User.generate_password()
-    db_user.set_password(password)
+    password_hash = User.hash_password(password)
+    db_user = User.model_validate({**user.model_dump(), "password_hash": password_hash, "is_admin": False, "first_login": True})
 
-    session.add(db_user)
-    session.commit()
+    db_session.add(db_user)
+    db_session.commit()
 
     return UserCreateResponse(password=password)
-
-
-# @router.post("password")
-# def change_user_password(user: UserChangePassword, session: SessionDep):
-
-
-# @bp.route("/user/password", methods=["POST"])
-# @authorization_required()
-# @validate()
-# def change_password(body: ChangePasswordModel):
-#     current_user: User = get_current_user()
-
-#     if not current_user.check_password(body.old_password):
-#         return {"msg": "Old password is incorrect"}, 400
-
-#     current_user.set_password(body.password1)
-#     current_user.first_login = False
-
-#     db.session.commit()
-#     return {"msg": "Password changed successfully"}

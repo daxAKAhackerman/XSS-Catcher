@@ -69,7 +69,7 @@ run-testing-database:
 	docker run -p 5433:5432 -d -e POSTGRES_PASSWORD=testing -e POSTGRES_DB=testing -e POSTGRES_USER=testing --rm --name xsscatcher-testing-db postgres:14.12
 
 create-migration:
-	alembic revision --autogenerate
+	cd $(SRC_SERVER_DIR) && pipenv run alembic revision --autogenerate
 
 apply-migrations:
-	alembic upgrade head
+	cd $(SRC_SERVER_DIR) && pipenv run alembic upgrade head
