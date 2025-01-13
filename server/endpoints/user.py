@@ -1,6 +1,6 @@
 from database import SessionDep
 from fastapi import APIRouter, HTTPException
-from models import User, UserCreate, UserCreateResponse
+from models.user import User, UserChangePassword, UserCreate, UserCreateResponse
 
 router = APIRouter()
 
@@ -18,3 +18,23 @@ def create_user(user: UserCreate, session: SessionDep):
     session.commit()
 
     return UserCreateResponse(password=password)
+
+
+# @router.post("password")
+# def change_user_password(user: UserChangePassword, session: SessionDep):
+
+
+# @bp.route("/user/password", methods=["POST"])
+# @authorization_required()
+# @validate()
+# def change_password(body: ChangePasswordModel):
+#     current_user: User = get_current_user()
+
+#     if not current_user.check_password(body.old_password):
+#         return {"msg": "Old password is incorrect"}, 400
+
+#     current_user.set_password(body.password1)
+#     current_user.first_login = False
+
+#     db.session.commit()
+#     return {"msg": "Password changed successfully"}

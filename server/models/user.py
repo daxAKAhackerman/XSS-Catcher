@@ -7,11 +7,7 @@ from sqlmodel import Field, Relationship, Session, SQLModel, select
 from werkzeug.security import generate_password_hash
 
 
-class UserBase(SQLModel):
-    pass
-
-
-class User(UserBase, table=True):
+class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     username: str = Field(index=True)
     password_hash: str | None = Field(default=None)
@@ -35,9 +31,15 @@ class User(UserBase, table=True):
         return session.exec(select(User).where(User.username == username)).one_or_none()
 
 
-class UserCreate(UserBase):
+class UserCreate(SQLModel):
     username: str
 
 
-class UserCreateResponse(UserBase):
+class UserCreateResponse(SQLModel):
     password: str
+
+
+class UserChangePassword(SQLModel):
+    old_password: str
+    password1: str
+    password2: str
