@@ -21,10 +21,10 @@ def login(body: Login, db_session: DbSession):
         elif not pyotp.TOTP(user.mfa_secret).verify(body.otp):
             raise HTTPException(401, "Bad OTP")
 
-    return LoginResponse(access_token=create_token(user.get_id(), TokenType.ACCESS), refresh_token=create_token(user.get_id(), TokenType.REFRESH))
+    return {"access_token": create_token(user.get_id(), TokenType.ACCESS), "refresh_token": create_token(user.get_id(), TokenType.REFRESH)}
 
 
 @router.post("/refresh", response_model=RefreshTokenResponse)
 def refresh_token(body: RefreshToken, db_session: DbSession):
     user = get_user_from_refresh_token(db_session, body.refresh_token)
-    return RefreshTokenResponse(refresh_token=create_token(user.get_id(), TokenType.REFRESH))
+    return {"refresh_token": create_token(user.get_id(), TokenType.REFRESH)}

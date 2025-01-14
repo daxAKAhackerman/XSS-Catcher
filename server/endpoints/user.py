@@ -17,4 +17,4 @@ def create_user(body: CreateUser, db_session: DbSession):
     db_session.add(db_user)
     db_session.commit()
 
-    return CreateUserResponse(password=password)
+    return {"password": password}
