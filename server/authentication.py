@@ -49,8 +49,6 @@ def validate_session(request: Request, db_session: DbSession) -> User:
     if not token:
         raise HTTPException(401)
 
-    print(token)
-
     try:
         payload = jwt.decode(token.split(" ")[-1], jwt_secret, algorithms=["HS256"])
     except jwt.exceptions.InvalidSignatureError:
@@ -63,6 +61,29 @@ def validate_session(request: Request, db_session: DbSession) -> User:
     if payload["type"] != TokenType.ACCESS:
         raise HTTPException(401)
 
+    user = User.get_user_by_id(db_session, payload["sub"])
+    if not user:
+        raise HTTPException(401)
+
+    return user
+
+
+UserSession = Annotated[User, Depends(validate_session)]
+
+
+def get_user_from_refresh_token(db_session: DbSession, refresh_token: str) -> User:
+    try:
+        payload = jwt.decode(refresh_token, jwt_secret, algorithms=["HS256"])
+    except jwt.exceptions.InvalidSignatureError:
+        raise HTTPException(401)
+
+    ts = int(datetime.datetime.now().timestamp())
+    if ts < payload["nbf"] or ts >= payload["exp"]:
+        raise HTTPException(401)
+
+    if payload["type"] != TokenType.REFRESH:
+        raise HTTPException(401)
+
     # Implement blocklist
     # if session.id in BlocklistStore.get_blocklist_from_cache().entries:
     #     raise HTTPException(401)
@@ -72,6 +93,3 @@ def validate_session(request: Request, db_session: DbSession) -> User:
         raise HTTPException(401)
 
     return user
-
-
-UserSession = Annotated[User, Depends(validate_session)]

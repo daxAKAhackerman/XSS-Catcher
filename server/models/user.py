@@ -4,6 +4,7 @@ import random
 import string
 from typing import Optional, cast
 
+import pydantic
 from sqlmodel import Field, Session, SQLModel, select
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -43,15 +44,9 @@ class User(SQLModel, table=True):
         return session.get(User, id)
 
 
-class UserCreate(SQLModel):
+class CreateUser(pydantic.BaseModel):
     username: str
 
 
-class UserCreateResponse(SQLModel):
+class CreateUserResponse(pydantic.BaseModel):
     password: str
-
-
-class UserChangePassword(SQLModel):
-    old_password: str
-    password1: str
-    password2: str

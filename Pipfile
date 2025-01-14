@@ -6,11 +6,12 @@ name = "pypi"
 [packages]
 fastapi = {extras = ["standard"], version = "==0.115.6"}
 sqlmodel = "==0.0.22"
-alembic = "*"
-psycopg2-binary = "*"
-werkzeug = "*"
-pyjwt = "*"
-pyotp = "*"
+alembic = "==1.14.0"
+psycopg2-binary = "==2.9.10"
+werkzeug = "==3.1.3"
+pyjwt = "==2.10.1"
+pyotp = "==2.9.0"
+pydantic = "==2.10.5"
 
 [dev-packages]
 black = "*"
