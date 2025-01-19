@@ -44,7 +44,7 @@ test-coverage-report:
 ### Backend
 
 run-backend:
-	cd $(SRC_SERVER_DIR) && pipenv run fastapi dev main.py
+	cd $(SRC_SERVER_DIR) && DEV=1 pipenv run fastapi dev main.py
 
 ### Frontend
 

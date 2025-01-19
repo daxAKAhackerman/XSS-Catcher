@@ -1,14 +1,14 @@
-from typing import Annotated
+from typing import Annotated, Iterator
 
 from fastapi import Depends
 from sqlmodel import Session, create_engine
 
-postgresql_url = "postgresql://postgres:postgres@localhost:5432/postgres"
+POSTGRESQL_URL = "postgresql://postgres:postgres@localhost:5432/postgres"
 
-engine = create_engine(postgresql_url)
+engine = create_engine(POSTGRESQL_URL)
 
 
-def get_session():
+def get_session() -> Iterator[Session]:
     with Session(engine) as session:
         yield session
 

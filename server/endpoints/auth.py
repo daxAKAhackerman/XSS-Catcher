@@ -1,13 +1,13 @@
 import pyotp
 import sqlalchemy
-from authentication import TokenType, UserSession, create_token, validate_token
+from authentication import SessionValidator, TokenType, UserSession, create_token
 from database import DbSession
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response, status
 from models.auth import (
     BlockedJti,
-    Login,
+    LoginRequest,
     LoginResponse,
-    RefreshToken,
+    RefreshTokenRequest,
     RefreshTokenResponse,
 )
 from models.user import User
@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(body: Login, db_session: DbSession):
+def login(body: LoginRequest, db_session: DbSession):
     user = User.get_user_by_username(db_session, body.username)
 
     if not user or not user.check_password(body.password):
@@ -35,8 +35,13 @@ def login(body: Login, db_session: DbSession):
 
 
 @router.post("/refresh", response_model=RefreshTokenResponse)
-def refresh_token(body: RefreshToken, db_session: DbSession):
-    user, token_payload = validate_token(db_session, body.refresh_token, TokenType.REFRESH)
+def refresh_token(body: RefreshTokenRequest, db_session: DbSession):
+    token_payload = SessionValidator.validate_token(db_session, body.refresh_token, TokenType.REFRESH)
+
+    user = User.get_user_by_id(db_session, token_payload["sub"])
+    if not user:
+        raise HTTPException(401)
+
     refresh_token, refresh_token_id = create_token(user.get_id(), TokenType.REFRESH)
 
     return {"refresh_token": refresh_token}
@@ -52,3 +57,5 @@ def logout(user_session: UserSession, db_session: DbSession):
         db_session.commit()
     except sqlalchemy.exc.IntegrityError:
         pass
+
+    return Response(status_code=status.HTTP_200_OK)

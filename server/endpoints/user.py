@@ -1,13 +1,18 @@
-from authentication import UserSession
+from authentication import AdminSession, UserSession
 from database import DbSession
-from fastapi import APIRouter, HTTPException
-from models.user import CreateUser, CreateUserResponse, User
+from fastapi import APIRouter, HTTPException, Response, status
+from models.user import (
+    ChangePasswordRequest,
+    CreateUserRequest,
+    CreateUserResponse,
+    User,
+)
 
 router = APIRouter()
 
 
 @router.post("/", response_model=CreateUserResponse)
-def create_user(body: CreateUser, db_session: DbSession, user_session: UserSession):
+def create_user(body: CreateUserRequest, db_session: DbSession, admin_session: AdminSession):
     if User.get_user_by_username(db_session, body.username):
         raise HTTPException(400, "This user already exists")
 
@@ -19,3 +24,19 @@ def create_user(body: CreateUser, db_session: DbSession, user_session: UserSessi
     db_session.commit()
 
     return {"password": password}
+
+
+@router.post("/password")
+def change_password(body: ChangePasswordRequest, db_session: DbSession, user_session: UserSession):
+    user, token_payload = user_session
+
+    if not user.check_password(body.old_password):
+        raise HTTPException(400, "Old password is incorrect")
+
+    user.password_hash = User.hash_password(body.password1)
+    user.first_login = False
+
+    db_session.add(user)
+    db_session.commit()
+
+    return Response(status_code=status.HTTP_200_OK)
