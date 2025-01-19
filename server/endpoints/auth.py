@@ -1,8 +1,15 @@
 import pyotp
-from authentication import TokenType, create_token, get_user_from_refresh_token
+import sqlalchemy
+from authentication import TokenType, UserSession, create_token, validate_token
 from database import DbSession
 from fastapi import APIRouter, HTTPException
-from models.auth import Login, LoginResponse, RefreshToken, RefreshTokenResponse
+from models.auth import (
+    BlockedJti,
+    Login,
+    LoginResponse,
+    RefreshToken,
+    RefreshTokenResponse,
+)
 from models.user import User
 
 router = APIRouter()
@@ -21,10 +28,27 @@ def login(body: Login, db_session: DbSession):
         elif not pyotp.TOTP(user.mfa_secret).verify(body.otp):
             raise HTTPException(401, "Bad OTP")
 
-    return {"access_token": create_token(user.get_id(), TokenType.ACCESS), "refresh_token": create_token(user.get_id(), TokenType.REFRESH)}
+    refresh_token, refresh_token_id = create_token(user.get_id(), TokenType.REFRESH)
+    access_token, access_token_id = create_token(user.get_id(), TokenType.ACCESS, refresh_token_id)
+
+    return {"access_token": access_token, "refresh_token": refresh_token}
 
 
 @router.post("/refresh", response_model=RefreshTokenResponse)
 def refresh_token(body: RefreshToken, db_session: DbSession):
-    user = get_user_from_refresh_token(db_session, body.refresh_token)
-    return {"refresh_token": create_token(user.get_id(), TokenType.REFRESH)}
+    user, token_payload = validate_token(db_session, body.refresh_token, TokenType.REFRESH)
+    refresh_token, refresh_token_id = create_token(user.get_id(), TokenType.REFRESH)
+
+    return {"refresh_token": refresh_token}
+
+
+@router.post("/logout")
+def logout(user_session: UserSession, db_session: DbSession):
+    user, token_payload = user_session
+
+    blocked_jti = BlockedJti.model_validate({"jti": token_payload["refresh_token_id"]})
+    db_session.add(blocked_jti)
+    try:
+        db_session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        pass

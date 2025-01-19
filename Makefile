@@ -60,7 +60,7 @@ run-frontend:
 ### Database
 
 run-database:
-	docker run -p 5432:5432 -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres --rm --name xsscatcher-dev-db postgres:14.12
+	docker run -p 5432:5432 -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres --name xsscatcher-dev-db postgres:14.12 || docker start xsscatcher-dev-db
 	# sleep 5
 	# cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run flask db upgrade
 	# cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run python -c "import app; tmpapp = app.create_app(); app.models.init_app(tmpapp)"

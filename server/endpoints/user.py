@@ -1,3 +1,4 @@
+from authentication import UserSession
 from database import DbSession
 from fastapi import APIRouter, HTTPException
 from models.user import CreateUser, CreateUserResponse, User
@@ -6,7 +7,7 @@ router = APIRouter()
 
 
 @router.post("/", response_model=CreateUserResponse)
-def create_user(body: CreateUser, db_session: DbSession):
+def create_user(body: CreateUser, db_session: DbSession, user_session: UserSession):
     if User.get_user_by_username(db_session, body.username):
         raise HTTPException(400, "This user already exists")
 
