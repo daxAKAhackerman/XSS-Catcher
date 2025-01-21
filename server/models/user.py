@@ -74,3 +74,7 @@ class ChangePasswordRequest(pydantic.BaseModel):
         if self.password1 != self.password2:
             raise ValueError("passwords don't match")
         return self
+
+
+class ResetPasswordResponse(pydantic.BaseModel):
+    password: str

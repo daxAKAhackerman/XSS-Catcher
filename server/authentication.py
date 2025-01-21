@@ -14,7 +14,7 @@ from models.user import User
 
 if os.getenv("DEV", "0") == "1":
     ACCESS_TOKEN_LIFETIME = 60 * 60
-    JWT_SECRET = "test_secret"
+    JWT_SECRET = "dev_secret"
 else:
     ACCESS_TOKEN_LIFETIME = 5 * 60
     JWT_SECRET = "".join(random.choice(string.ascii_letters + string.digits) for i in range(12))

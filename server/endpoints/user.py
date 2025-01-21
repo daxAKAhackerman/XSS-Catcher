@@ -5,6 +5,7 @@ from models.user import (
     ChangePasswordRequest,
     CreateUserRequest,
     CreateUserResponse,
+    ResetPasswordResponse,
     User,
 )
 
@@ -40,3 +41,19 @@ def change_password(body: ChangePasswordRequest, db_session: DbSession, user_ses
     db_session.commit()
 
     return Response(status_code=status.HTTP_200_OK)
+
+
+@router.post("/{user_id}/password", response_model=ResetPasswordResponse)
+def reset_password(user_id: int, db_session: DbSession, admin_session: AdminSession):
+    user = User.get_user_by_id(db_session, user_id)
+    if not user:
+        raise HTTPException(404)
+
+    password = User.generate_password()
+    user.password_hash = User.hash_password(password)
+    user.first_login = True
+
+    db_session.add(user)
+    db_session.commit()
+
+    return {"password": password}
