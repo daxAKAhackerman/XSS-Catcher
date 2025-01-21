@@ -5,6 +5,7 @@ from models.user import (
     ChangePasswordRequest,
     CreateUserRequest,
     CreateUserResponse,
+    GetCurrentUserResponse,
     ResetPasswordResponse,
     User,
 )
@@ -57,3 +58,10 @@ def reset_password(user_id: int, db_session: DbSession, admin_session: AdminSess
     db_session.commit()
 
     return {"password": password}
+
+
+@router.get("/current", response_model=GetCurrentUserResponse)
+def get_current_user(db_session: DbSession, user_session: UserSession):
+    user, token_payload = user_session
+
+    return {**user.model_dump(), "mfa": bool(user.mfa_secret)}

@@ -78,3 +78,11 @@ class ChangePasswordRequest(pydantic.BaseModel):
 
 class ResetPasswordResponse(pydantic.BaseModel):
     password: str
+
+
+class GetCurrentUserResponse(pydantic.BaseModel):
+    id: int
+    username: str
+    first_login: bool
+    is_admin: bool
+    mfa: bool
