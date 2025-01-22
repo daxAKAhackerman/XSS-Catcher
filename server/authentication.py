@@ -64,7 +64,7 @@ class SessionValidator:
             raise HTTPException(401)
 
         if self.require_admin is True and user.is_admin is False:
-            raise HTTPException(401)
+            raise HTTPException(403)
 
         return user, payload
 
@@ -75,6 +75,8 @@ class SessionValidator:
         except jwt.exceptions.InvalidSignatureError:
             raise HTTPException(401)
         except jwt.exceptions.DecodeError:
+            raise HTTPException(401)
+        except jwt.exceptions.ExpiredSignatureError:
             raise HTTPException(401)
 
         ts = int(datetime.datetime.now().timestamp())
