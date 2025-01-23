@@ -6,7 +6,7 @@ import string
 from typing import Optional, Self, cast
 
 import pydantic
-from sqlmodel import Field, Session, SQLModel, select
+from sqlmodel import Field, Session, SQLModel, col, func, select
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
@@ -43,6 +43,10 @@ class User(SQLModel, table=True):
     @staticmethod
     def get_user_by_id(session: Session, id: int) -> Optional[User]:
         return session.get(User, id)
+
+    @staticmethod
+    def get_user_count(session: Session) -> int:
+        return session.exec(select(func.count(col(User.id)))).one()
 
 
 class CreateUserRequest(pydantic.BaseModel):

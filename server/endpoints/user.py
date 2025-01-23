@@ -65,3 +65,23 @@ def get_current_user(db_session: DbSession, user_session: UserSession):
     user, token_payload = user_session
 
     return {**user.model_dump(), "mfa": bool(user.mfa_secret)}
+
+
+@router.delete("/{user_id}")
+def delete_user(user_id: int, db_session: DbSession, admin_session: AdminSession):
+    user, token_payload = admin_session
+
+    if User.get_user_count(db_session) <= 1:
+        raise HTTPException(400, "Can't delete the only user")
+
+    if user.id == user_id:
+        raise HTTPException(400, "Can't delete yourself")
+
+    user_to_delete = User.get_user_by_id(db_session, user_id)
+    if not user_to_delete:
+        raise HTTPException(404)
+
+    db_session.delete(user_to_delete)
+    db_session.commit()
+
+    return Response(status_code=status.HTTP_200_OK)
