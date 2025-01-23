@@ -1,14 +1,16 @@
 from authentication import AdminSession, UserSession
 from database import DbSession
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException
 from models.user import (
     ChangePasswordRequest,
     CreateUserRequest,
     CreateUserResponse,
     GetCurrentUserResponse,
     ResetPasswordResponse,
+    UpdateUserRequest,
     User,
 )
+from response import DetailResponse
 
 router = APIRouter()
 
@@ -41,7 +43,7 @@ def change_password(body: ChangePasswordRequest, db_session: DbSession, user_ses
     db_session.add(user)
     db_session.commit()
 
-    return Response(status_code=status.HTTP_200_OK)
+    return DetailResponse("Password changed successfully")
 
 
 @router.post("/{user_id}/password", response_model=ResetPasswordResponse)
@@ -84,4 +86,22 @@ def delete_user(user_id: int, db_session: DbSession, admin_session: AdminSession
     db_session.delete(user_to_delete)
     db_session.commit()
 
-    return Response(status_code=status.HTTP_200_OK)
+    return DetailResponse(f"User {user.username} deleted successfully")
+
+
+@router.patch("/{user_id}")
+def update_user(body: UpdateUserRequest, user_id: int, db_session: DbSession, admin_session: AdminSession):
+    user, token_payload = admin_session
+
+    if user.id == user_id:
+        raise HTTPException(400, "Can't demote yourself")
+
+    user_to_update = User.get_user_by_id(db_session, user_id)
+    if not user_to_update:
+        raise HTTPException(404)
+
+    user_to_update.is_admin = body.is_admin
+    db_session.add(user)
+    db_session.commit()
+
+    return DetailResponse(f"User {user_to_update.username} modified successfully")

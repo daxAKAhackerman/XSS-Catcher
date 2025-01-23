@@ -2,7 +2,7 @@ import pyotp
 import sqlalchemy
 from authentication import SessionValidator, TokenType, UserSession, create_token
 from database import DbSession
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, HTTPException
 from models.auth import (
     BlockedJti,
     LoginRequest,
@@ -11,6 +11,7 @@ from models.auth import (
     RefreshTokenResponse,
 )
 from models.user import User
+from response import DetailResponse
 
 router = APIRouter()
 
@@ -58,4 +59,4 @@ def logout(user_session: UserSession, db_session: DbSession):
     except sqlalchemy.exc.IntegrityError:
         pass
 
-    return Response(status_code=status.HTTP_200_OK)
+    return DetailResponse("Logged out successfully")

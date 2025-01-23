@@ -90,3 +90,7 @@ class GetCurrentUserResponse(pydantic.BaseModel):
     first_login: bool
     is_admin: bool
     mfa: bool
+
+
+class UpdateUserRequest(pydantic.BaseModel):
+    is_admin: bool
