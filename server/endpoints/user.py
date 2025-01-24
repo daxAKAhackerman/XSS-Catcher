@@ -5,6 +5,7 @@ from models.user import (
     ChangePasswordRequest,
     CreateUserRequest,
     CreateUserResponse,
+    GetAllUsersResponse,
     GetCurrentUserResponse,
     ResetPasswordResponse,
     UpdateUserRequest,
@@ -105,3 +106,10 @@ def update_user(body: UpdateUserRequest, user_id: int, db_session: DbSession, ad
     db_session.commit()
 
     return DetailResponse(f"User {user_to_update.username} modified successfully")
+
+
+@router.get("/", response_model=list[GetAllUsersResponse])
+def get_all_users(db_session: DbSession, user_session: UserSession):
+    users = User.get_all_users(db_session)
+
+    return [{**user.model_dump(), "mfa": bool(user.mfa_secret)} for user in users]

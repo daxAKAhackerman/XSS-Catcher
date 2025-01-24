@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 import re
 import string
-from typing import Optional, Self, cast
+from typing import Optional, Self, Sequence, cast
 
 import pydantic
 from sqlmodel import Field, Session, SQLModel, col, func, select
@@ -47,6 +47,10 @@ class User(SQLModel, table=True):
     @staticmethod
     def get_user_count(session: Session) -> int:
         return session.exec(select(func.count(col(User.id)))).one()
+
+    @staticmethod
+    def get_all_users(session: Session) -> Sequence[User]:
+        return session.exec(select(User)).all()
 
 
 class CreateUserRequest(pydantic.BaseModel):
@@ -94,3 +98,11 @@ class GetCurrentUserResponse(pydantic.BaseModel):
 
 class UpdateUserRequest(pydantic.BaseModel):
     is_admin: bool
+
+
+class GetAllUsersResponse(pydantic.BaseModel):
+    id: int
+    username: str
+    first_login: bool
+    is_admin: bool
+    mfa: bool
