@@ -20,6 +20,7 @@ pre-commit = "*"
 pytest = "*"
 pytest-cov = "*"
 pipenv = "*"
+pytest-env = "*"
 
 [requires]
 python_version = "3.12"

@@ -1,6 +1,7 @@
 from logging.config import fileConfig
 
 from alembic import context
+from database import get_db_url
 from models.auth import BlockedJti
 from models.user import User
 from sqlalchemy import engine_from_config, pool
@@ -59,7 +60,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        {**config.get_section(config.config_ini_section, {}), "sqlalchemy.url": get_db_url()},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

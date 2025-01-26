@@ -1,0 +1,42 @@
+from unittest import mock
+
+from fastapi.testclient import TestClient
+from tests.integration.conftest import create_user
+
+
+class TestLogin:
+    def test__when_login_with_valid_credentials__then_tokens_returned(self, test_client: TestClient):
+        create_user()
+
+        response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+        assert response.status_code == 200
+        assert "access_token" in response.json()
+        assert "refresh_token" in response.json()
+
+    def test__when_login_with_invalid_credentials__then_401_returned(self, test_client: TestClient):
+        response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+        assert response.status_code == 401
+
+    def test__when_user_with_mfa_but_not_provided__then_401_returned(self, test_client: TestClient):
+        create_user(mfa_secret="abc123")
+
+        response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin"})
+        assert response.status_code == 401
+
+    @mock.patch("endpoints.auth.pyotp.TOTP")
+    def test__when_user_with_valid_mfa__then_tokens_returned(self, TotpMocker: mock.MagicMock, test_client: TestClient):
+        TotpMocker.return_value.verify.return_value = True
+        create_user(mfa_secret="abc123")
+
+        response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin", "otp": "123456"})
+        assert response.status_code == 200
+        assert "access_token" in response.json()
+        assert "refresh_token" in response.json()
+
+    @mock.patch("endpoints.auth.pyotp.TOTP")
+    def test__when_user_with_invalid_mfa__then_401_returned(self, TotpMocker: mock.MagicMock, test_client: TestClient):
+        TotpMocker.return_value.verify.return_value = False
+        create_user(mfa_secret="abc123")
+
+        response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin", "otp": "123456"})
+        assert response.status_code == 401

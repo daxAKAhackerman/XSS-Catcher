@@ -2,7 +2,7 @@ SHELL := /usr/bin/env bash
 SRC_SERVER_DIR := server
 SRC_CLIENT_DIR := client
 COLLECTOR_SCRIPT_DIR := collector_script
-TEST_DIR := $(SRC_SERVER_DIR)/tests
+INTEGRATION_TEST_DIR := $(SRC_SERVER_DIR)/tests/integration
 
 .PHONY: build install lock-requirements lint test test-coverage-report run-backend build-collector-script build-frontend run-frontend run-database run-testing-database start stop init-dev
 
@@ -35,11 +35,8 @@ lint:
 	python3 -m pipenv run isort --profile black $(SRC_SERVER_DIR)
 	npm run --prefix $(SRC_CLIENT_DIR) lint
 
-test:
-	FLASK_DEBUG=1 python3 -m pipenv run pytest $(TEST_DIR)
-
-test-coverage-report:
-	FLASK_DEBUG=1 python3 -m pipenv run pytest --cov-report term-missing --cov=$(SRC_SERVER_DIR) $(TEST_DIR)
+test-integration:
+	cd $(INTEGRATION_TEST_DIR) && pipenv run pytest
 
 ### Backend
 
@@ -61,12 +58,15 @@ run-frontend:
 
 run-database:
 	docker run -p 5432:5432 -d -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -e POSTGRES_USER=postgres --name xsscatcher-dev-db postgres:14.12 || docker start xsscatcher-dev-db
-	# sleep 5
-	# cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run flask db upgrade
-	# cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run python -c "import app; tmpapp = app.create_app(); app.models.init_app(tmpapp)"
+	@echo "Waiting 5 seconds for database to start..."
+	@sleep 5
+	make apply-migrations
 
 run-testing-database:
-	docker run -p 5433:5432 -d -e POSTGRES_PASSWORD=testing -e POSTGRES_DB=testing -e POSTGRES_USER=testing --rm --name xsscatcher-testing-db postgres:14.12
+	docker run -p 5433:5432 -d -e POSTGRES_PASSWORD=testing -e POSTGRES_DB=testing -e POSTGRES_USER=testing --rm --name xsscatcher-testing-db postgres:14.12 || docker start xsscatcher-testing-db
+	@echo "Waiting 5 seconds for database to start..."
+	@sleep 5
+	TESTING=1 make apply-migrations
 
 create-migration:
 	cd $(SRC_SERVER_DIR) && pipenv run alembic revision --autogenerate
