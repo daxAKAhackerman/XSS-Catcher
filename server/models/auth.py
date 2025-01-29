@@ -31,4 +31,4 @@ class RefreshTokenRequest(pydantic.BaseModel):
 
 
 class RefreshTokenResponse(pydantic.BaseModel):
-    refresh_token: str
+    access_token: str

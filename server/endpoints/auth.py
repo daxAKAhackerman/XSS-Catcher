@@ -43,9 +43,9 @@ def refresh_token(body: RefreshTokenRequest, db_session: DbSession):
     if not user:
         raise HTTPException(401)
 
-    refresh_token, refresh_token_id = create_token(user.get_id(), TokenType.REFRESH)
+    access_token, access_token_id = create_token(user.get_id(), TokenType.ACCESS)
 
-    return {"refresh_token": refresh_token}
+    return {"access_token": access_token}
 
 
 @router.post("/logout")

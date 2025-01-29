@@ -1,7 +1,7 @@
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from tests.integration.conftest import create_user
+from tests.integration.conftest import create_user, delete_user, login
 
 
 class TestLogin:
@@ -39,4 +39,22 @@ class TestLogin:
         create_user(mfa_secret="abc123")
 
         response = test_client.post("/api/auth/login", json={"username": "admin", "password": "admin", "otp": "123456"})
+        assert response.status_code == 401
+
+
+class TestRefreshToken:
+    def test__when_refresh_token_valid__then_access_token_returned(self, test_client: TestClient):
+        create_user()
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.post("/api/auth/refresh", json={"refresh_token": refresh_token})
+        assert response.status_code == 200
+        assert "access_token" in response.json()
+
+    def test__when_refresh_token_valid_but_user_does_not_exist__then_401_returned(self, test_client: TestClient):
+        user = create_user()
+        access_token, refresh_token, bearear_auth = login(test_client)
+        delete_user(user)
+
+        response = test_client.post("/api/auth/refresh", json={"refresh_token": refresh_token})
         assert response.status_code == 401
