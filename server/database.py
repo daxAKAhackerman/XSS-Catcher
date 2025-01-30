@@ -1,18 +1,10 @@
-import os
 from typing import Annotated, Iterator
 
 from fastapi import Depends
+from settings import settings
 from sqlmodel import Session, create_engine
 
-
-def get_db_url() -> str:
-    if os.getenv("TESTING"):
-        return "postgresql://testing:testing@localhost:5433/testing"
-    else:
-        return "postgresql://postgres:postgres@localhost:5432/postgres"
-
-
-engine = create_engine(get_db_url())
+engine = create_engine(settings.db_url)
 
 
 def get_session() -> Iterator[Session]:

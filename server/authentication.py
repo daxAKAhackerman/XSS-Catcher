@@ -1,7 +1,4 @@
 import datetime
-import os
-import random
-import string
 import uuid
 from enum import StrEnum
 from typing import Annotated, Any, Optional
@@ -11,16 +8,7 @@ from database import DbSession
 from fastapi import Depends, HTTPException, Request
 from models.auth import BlockedJti
 from models.user import User
-
-if os.getenv("DEV", "0") == "1":
-    ACCESS_TOKEN_LIFETIME = 60 * 60
-    JWT_SECRET = "dev_secret"
-elif os.getenv("TESTING", "0") == "1":
-    ACCESS_TOKEN_LIFETIME = 60 * 60
-    JWT_SECRET = "testing_secret"
-else:
-    ACCESS_TOKEN_LIFETIME = 5 * 60
-    JWT_SECRET = "".join(random.choice(string.ascii_letters + string.digits) for i in range(12))
+from settings import settings
 
 
 class TokenType(StrEnum):
@@ -30,7 +18,7 @@ class TokenType(StrEnum):
 
 def create_token(user_id: int, token_type: TokenType, refresh_token_id: Optional[str] = None) -> tuple[str, str]:
     ts = int(datetime.datetime.now().timestamp())
-    exp = ts + ACCESS_TOKEN_LIFETIME
+    exp = ts + settings.access_token_lifetime
     jti = str(uuid.uuid4())
 
     payload = {
@@ -45,7 +33,7 @@ def create_token(user_id: int, token_type: TokenType, refresh_token_id: Optional
     if refresh_token_id:
         payload["refresh_token_id"] = refresh_token_id
 
-    return jwt.encode(payload, JWT_SECRET, algorithm="HS256"), jti
+    return jwt.encode(payload, settings.jwt_secret, algorithm="HS256"), jti
 
 
 class SessionValidator:
@@ -74,7 +62,7 @@ class SessionValidator:
     @staticmethod
     def validate_token(db_session: DbSession, token: str, desired_type: TokenType) -> dict[str, Any]:
         try:
-            payload = jwt.decode(token.split(" ")[-1], JWT_SECRET, algorithms=["HS256"])
+            payload = jwt.decode(token.split(" ")[-1], settings.jwt_secret, algorithms=["HS256"])
         except jwt.exceptions.InvalidSignatureError:
             raise HTTPException(401)
         except jwt.exceptions.DecodeError:
