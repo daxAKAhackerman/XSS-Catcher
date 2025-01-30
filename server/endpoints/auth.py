@@ -54,9 +54,6 @@ def logout(user_session: UserSession, db_session: DbSession):
 
     blocked_jti = BlockedJti.model_validate({"jti": token_payload["refresh_token_id"]})
     db_session.add(blocked_jti)
-    try:
-        db_session.commit()
-    except sqlalchemy.exc.IntegrityError:
-        pass
+    db_session.commit()
 
     return DetailResponse("Logged out successfully")

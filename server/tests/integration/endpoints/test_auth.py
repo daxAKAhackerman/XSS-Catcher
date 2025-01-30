@@ -1,7 +1,13 @@
 from unittest import mock
 
+import jwt
 from fastapi.testclient import TestClient
-from tests.integration.conftest import create_user, delete_user, login
+from tests.integration.conftest import (
+    create_blocked_jti,
+    create_user,
+    delete_user,
+    login,
+)
 
 
 class TestLogin:

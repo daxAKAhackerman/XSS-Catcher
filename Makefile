@@ -2,7 +2,8 @@ SHELL := /usr/bin/env bash
 SRC_SERVER_DIR := server
 SRC_CLIENT_DIR := client
 COLLECTOR_SCRIPT_DIR := collector_script
-INTEGRATION_TEST_DIR := $(SRC_SERVER_DIR)/tests/integration
+TEST_DIR := $(SRC_SERVER_DIR)/tests
+INTEGRATION_TEST_DIR := $(TEST_DIR)/integration
 
 .PHONY: build install lock-requirements lint test test-coverage-report run-backend build-collector-script build-frontend run-frontend run-database run-testing-database start stop init-dev
 
@@ -36,7 +37,10 @@ lint:
 	npm run --prefix $(SRC_CLIENT_DIR) lint
 
 test-integration:
-	cd $(INTEGRATION_TEST_DIR) && pipenv run pytest
+	pipenv run pytest $(INTEGRATION_TEST_DIR)
+
+test:
+	pipenv run pytest --cov-report term-missing --cov=$(SRC_SERVER_DIR) $(TEST_DIR)
 
 ### Backend
 
