@@ -1,29 +1,41 @@
-from typing import Iterator, Optional, cast
+from typing import Generator, Iterator, Optional, cast
 
 import pytest
 from database import get_session
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from httpx._auth import Auth
+from httpx._models import Request, Response
 from models.auth import BlockedJti
 from models.user import User
-from requests.auth import AuthBase
 from sqlmodel import Session, delete
 from sqlmodel.sql.expression import Select
 
 
-class BearerAuth(AuthBase):
-    def __init__(self, token: str):
-        self.token = token
+class BearerAuth(Auth):
+    _auth_header: str
 
-    def __call__(self, r):
-        r.headers["Authorization"] = f"Bearer {self.token}"
-        return r
+    def __init__(self, token: str) -> None:
+        self._auth_header = self._build_auth_header(token)
+
+    def auth_flow(self, request: Request) -> Generator[Request, Response, None]:
+        request.headers["Authorization"] = self._auth_header
+        yield request
+
+    def _build_auth_header(self, token: str) -> str:
+        return f"Bearer {token}"
 
 
 @pytest.fixture()
-def test_client() -> Iterator[TestClient]:
+def main_app() -> Iterator[FastAPI]:
     from main import app
 
-    yield TestClient(app)
+    yield app
+
+
+@pytest.fixture()
+def test_client(main_app: FastAPI) -> Iterator[TestClient]:
+    yield TestClient(main_app)
 
 
 @pytest.fixture(autouse=True)
