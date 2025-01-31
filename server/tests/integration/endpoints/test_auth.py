@@ -66,6 +66,7 @@ class TestLogout:
         access_token, refresh_token, bearear_auth = login(test_client)
 
         response = test_client.post("/api/auth/logout", auth=bearear_auth)
+
         assert response.status_code == 200
         assert test_client.get("/api/user/current", auth=bearear_auth).status_code == 401
         assert test_client.post("/api/auth/refresh", json={"refresh_token": refresh_token}).status_code == 401

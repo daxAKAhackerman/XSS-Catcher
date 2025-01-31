@@ -23,7 +23,7 @@ def test_client(main_app: FastAPI) -> Iterator[TestClient]:
 
 
 @pytest.fixture(autouse=True)
-def setup_db() -> Iterator[Session]:
+def db_session() -> Iterator[Session]:
     session = next(get_session())
     yield session
 

@@ -1,5 +1,4 @@
 import pyotp
-import sqlalchemy
 from authentication import SessionValidator, TokenType, UserSession, create_token
 from database import DbSession
 from fastapi import APIRouter, HTTPException
