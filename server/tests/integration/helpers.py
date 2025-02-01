@@ -27,6 +27,7 @@ def create_user(username: str = "admin", password: str = "admin", is_admin: bool
     user = User(username=username, password_hash=password_hash, is_admin=is_admin, first_login=first_login, mfa_secret=mfa_secret)
     session.add(user)
     session.commit()
+    session.refresh(user)
 
     return user
 
