@@ -1,10 +1,10 @@
 from typing import Generator, Optional
 
-from database import get_session
 from fastapi.testclient import TestClient
 from httpx._auth import Auth
 from httpx._models import Request, Response
 from models.user import User
+from sqlmodel import Session
 
 
 class BearerAuth(Auth):
@@ -21,8 +21,9 @@ class BearerAuth(Auth):
         return f"Bearer {token}"
 
 
-def create_user(username: str = "admin", password: str = "admin", is_admin: bool = True, first_login: bool = False, mfa_secret: Optional[str] = None) -> User:
-    session = next(get_session())
+def create_user(
+    session: Session, username: str = "admin", password: str = "admin", is_admin: bool = True, first_login: bool = False, mfa_secret: Optional[str] = None
+) -> User:
     password_hash = User.hash_password(password)
     user = User(username=username, password_hash=password_hash, is_admin=is_admin, first_login=first_login, mfa_secret=mfa_secret)
     session.add(user)
@@ -32,8 +33,7 @@ def create_user(username: str = "admin", password: str = "admin", is_admin: bool
     return user
 
 
-def delete_user(user: User) -> None:
-    session = next(get_session())
+def delete_user(session: Session, user: User) -> None:
     session.delete(user)
     session.commit()
 

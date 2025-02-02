@@ -22,7 +22,7 @@ def test_client(main_app: FastAPI) -> Iterator[TestClient]:
     yield TestClient(main_app)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(autouse=True, scope="function")
 def db_session() -> Iterator[Session]:
     session = next(get_session())
     yield session
@@ -30,3 +30,4 @@ def db_session() -> Iterator[Session]:
     session.exec(cast(Select, delete(User)))
     session.exec(cast(Select, delete(BlockedJti)))
     session.commit()
+    session.flush()
