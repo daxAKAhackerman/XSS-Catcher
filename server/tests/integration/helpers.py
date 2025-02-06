@@ -7,6 +7,10 @@ from models.user import User
 from sqlmodel import Session
 
 
+class CannotLoginException(Exception):
+    pass
+
+
 class BearerAuth(Auth):
     _auth_header: str
 
@@ -40,6 +44,11 @@ def delete_user(session: Session, user: User) -> None:
 
 def login(client: TestClient, username: str = "admin", password: str = "admin") -> tuple[str, str, BearerAuth]:
     response = client.post("/api/auth/login", json={"username": username, "password": password})
-    response_json = response.json()
 
+    try:
+        response.raise_for_status()
+    except:
+        raise CannotLoginException(response.text)
+
+    response_json = response.json()
     return response_json["access_token"], response_json["refresh_token"], BearerAuth(response_json["access_token"])

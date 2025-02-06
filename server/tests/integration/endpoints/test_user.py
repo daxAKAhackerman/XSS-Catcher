@@ -1,8 +1,9 @@
 from typing import cast
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session
-from tests.integration.helpers import create_user, login
+from tests.integration.helpers import CannotLoginException, create_user, login
 
 
 class TestCreateUser:
@@ -74,3 +75,42 @@ class TestGetCurrentUser:
 
         assert response.status_code == 200
         assert response.json() == {"first_login": False, "id": user.id, "is_admin": True, "mfa": False, "username": "admin"}
+
+
+class TestDeleteUser:
+    def test__then_user_deleted(self, test_client: TestClient, db_session: Session):
+        create_user(db_session)
+        user = create_user(db_session, username="dax")
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.delete(f"/api/user/{user.id}", auth=bearear_auth)
+
+        assert response.status_code == 200
+        with pytest.raises(CannotLoginException):
+            login(test_client, "dax")
+
+    def test__when_only_user__then_400_returned(self, test_client: TestClient, db_session: Session):
+        user = create_user(db_session)
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.delete(f"/api/user/{user.id}", auth=bearear_auth)
+
+        assert response.status_code == 400
+
+    def test__when_deleting_self__then_400_returned(self, test_client: TestClient, db_session: Session):
+        user = create_user(db_session)
+        create_user(db_session, username="dax")
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.delete(f"/api/user/{user.id}", auth=bearear_auth)
+
+        assert response.status_code == 400
+
+    def test__when_user_does_not_exist__then_404_returned(self, test_client: TestClient, db_session: Session):
+        create_user(db_session)
+        user = create_user(db_session, username="dax")
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.delete(f"/api/user/{cast(int, user.id) + 1}", auth=bearear_auth)
+
+        assert response.status_code == 404
