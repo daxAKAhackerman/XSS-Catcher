@@ -114,3 +114,32 @@ class TestDeleteUser:
         response = test_client.delete(f"/api/user/{cast(int, user.id) + 1}", auth=bearear_auth)
 
         assert response.status_code == 404
+
+
+class TestUpdateUser:
+    def test__then_user_updated(self, test_client: TestClient, db_session: Session):
+        create_user(db_session)
+        user = create_user(db_session, username="dax")
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.patch(f"/api/user/{user.id}", json={"is_admin": False}, auth=bearear_auth)
+
+        assert response.status_code == 200
+        db_session.refresh(user)
+        assert user.is_admin is False
+
+    def test__when_is_current_user__then_400_returned(self, test_client: TestClient, db_session: Session):
+        user = create_user(db_session)
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.patch(f"/api/user/{user.id}", json={"is_admin": False}, auth=bearear_auth)
+
+        assert response.status_code == 400
+
+    def test__when_user_does_not_exist__then_404_returned(self, test_client: TestClient, db_session: Session):
+        user = create_user(db_session)
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.patch(f"/api/user/{cast(int, user.id) + 10}", json={"is_admin": False}, auth=bearear_auth)
+
+        assert response.status_code == 404
