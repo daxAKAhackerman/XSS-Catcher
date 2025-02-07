@@ -143,3 +143,18 @@ class TestUpdateUser:
         response = test_client.patch(f"/api/user/{cast(int, user.id) + 10}", json={"is_admin": False}, auth=bearear_auth)
 
         assert response.status_code == 404
+
+
+class TestGetAllUsers:
+    def test__then_all_users_returned(self, test_client: TestClient, db_session: Session):
+        admin_user = create_user(db_session)
+        dax_user = create_user(db_session, username="dax")
+        access_token, refresh_token, bearear_auth = login(test_client)
+
+        response = test_client.get("/api/user", auth=bearear_auth)
+
+        assert response.status_code == 200
+        assert response.json() == [
+            {"first_login": False, "id": admin_user.id, "is_admin": True, "mfa": False, "username": "admin"},
+            {"first_login": False, "id": dax_user.id, "is_admin": True, "mfa": False, "username": "dax"},
+        ]
