@@ -11,7 +11,7 @@ from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-base_model = db.make_declarative_base(Model)
+base_model = db._make_declarative_base(Model)
 
 
 class Client(base_model):
