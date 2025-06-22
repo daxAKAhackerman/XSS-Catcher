@@ -62,7 +62,6 @@ def test__client_patch__given_name__when_name_already_exists__then_400_returned(
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch(f"/api/client/{client1.id}", json={"name": client2.name}, headers={"Authorization": f"Bearer {access_token}"})
     assert client1.name == "test"
-    print(response.json)
     assert response.json == {"msg": "Another client already uses this name"}
     assert response.status_code == 400
 
