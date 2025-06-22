@@ -1,5 +1,5 @@
 # Build the frontend
-FROM node:16.18-alpine3.15 as build
+FROM node:16.18-alpine3.15 AS build
 
 COPY ./client /build
 COPY ./collector_script /collector_script
@@ -14,7 +14,7 @@ RUN npm run build
 FROM ubuntu:22.04
 
 # Install dependencies
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y software-properties-common python3 python3-launchpadlib gnupg curl postgresql-client nginx supervisor postgresql
 RUN add-apt-repository -y ppa:deadsnakes/ppa
 RUN apt-get update && apt-get install -y python3.10
@@ -30,7 +30,7 @@ COPY --from=build /build/dist /frontend
 COPY ./docker/default /etc/nginx/sites-available/default
 
 # Setup Flask
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONDONTWRITEBYTECODE=1
 WORKDIR /backend
 COPY ./server /backend
 RUN python3.10 -m pip install -r requirements.txt --ignore-installed --no-compile --no-cache-dir

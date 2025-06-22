@@ -4,18 +4,25 @@ SRC_CLIENT_DIR := client
 COLLECTOR_SCRIPT_DIR := collector_script
 TEST_DIR := $(SRC_SERVER_DIR)/tests
 
-.PHONY: build install lock-requirements lint test test-coverage-report run-backend build-collector-script build-frontend run-frontend run-database run-testing-database start stop init-dev
+.PHONY: default install build-image build-collector-script build-frontend lock-requirements lint test test-coverage-report run-backend run-frontend run-database run-testing-database start stop
 
-build:
-	docker volume create xsscatcher-db
-	docker build -t xsscatcher -f docker/Dockerfile .
+default: build-image
 
 install:
-	python3 -m pip install pipenv -U
 	python3 -m pipenv install --dev
 	python3 -m pipenv run pre-commit install
 	npm install --prefix $(SRC_CLIENT_DIR)
 	npm install --prefix $(COLLECTOR_SCRIPT_DIR)
+
+build-image:
+	docker volume create xsscatcher-db
+	docker build -t xsscatcher -f docker/Dockerfile .
+
+build-collector-script:
+		cd $(COLLECTOR_SCRIPT_DIR) && npx webpack
+
+build-frontend:
+		npm run --prefix $(SRC_CLIENT_DIR) build
 
 lock-requirements:
 	pipenv requirements > $(SRC_SERVER_DIR)/requirements.txt
@@ -32,13 +39,7 @@ test-coverage-report:
 	FLASK_DEBUG=1 python3 -m pipenv run pytest --cov-report term-missing --cov=$(SRC_SERVER_DIR) $(TEST_DIR)
 
 run-backend:
-	cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run flask run
-
-build-collector-script:
-	cd $(COLLECTOR_SCRIPT_DIR) && npx webpack
-
-build-frontend:
-	npm run --prefix $(SRC_CLIENT_DIR) build
+	cd $(SRC_SERVER_DIR) && FLASK_DEBUG=1 python3 -m pipenv run python run_dev.py
 
 run-frontend:
 	npm run --prefix $(SRC_CLIENT_DIR) serve
