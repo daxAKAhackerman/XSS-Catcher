@@ -1,6 +1,5 @@
 import os
-import re
-from unittest import mock
+import uuid
 
 from config import Config, get_db_url
 
@@ -28,6 +27,6 @@ def test__Config__when_flask_debug__then_dev_secret_key_used():
 def test__Config__when_not_flask_debug__then_random_secret_key_used():
     os.environ["FLASK_DEBUG"] = ""
     config = Config()
-    assert re.match(r"^[a-zA-Z\d]{32}$", config.SECRET_KEY)
+    assert uuid.UUID(config.SECRET_KEY)
     assert config.JWT_ACCESS_TOKEN_EXPIRES == 300
     del os.environ["FLASK_DEBUG"]

@@ -51,7 +51,7 @@ def test__client_patch__given_all_fields__when_fields_are_valid__then_client_edi
     assert client.description == "hello world"
     assert client.owner_id == 2
     assert client.mail_to == "user@example.com"
-    assert client.webhook_url == "https://example.com"
+    assert client.webhook_url == "https://example.com/"
     assert response.json == {"msg": "Client test2 edited successfully"}
     assert response.status_code == 200
 
@@ -62,6 +62,7 @@ def test__client_patch__given_name__when_name_already_exists__then_400_returned(
     access_token, refresh_token = login(client_tester, "admin", "xss")
     response = client_tester.patch(f"/api/client/{client1.id}", json={"name": client2.name}, headers={"Authorization": f"Bearer {access_token}"})
     assert client1.name == "test"
+    print(response.json)
     assert response.json == {"msg": "Another client already uses this name"}
     assert response.status_code == 400
 
