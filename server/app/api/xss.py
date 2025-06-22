@@ -3,7 +3,6 @@ import json
 from typing import List, Tuple
 
 from app import db
-from app.api import bp
 from app.api.models import (
     DATA_TO_GATHER,
     ClientLootGetModel,
@@ -12,10 +11,13 @@ from app.api.models import (
 )
 from app.models import XSS, Client
 from app.permissions import authorization_required, permissions
+from flask import Blueprint
 from flask_pydantic import validate
 
+xss_bp = Blueprint("xss", __name__, url_prefix="/api/xss")
 
-@bp.route("/xss/generate", methods=["POST"])
+
+@xss_bp.route("/generate", methods=["POST"])
 @authorization_required()
 @validate()
 def xss_generate(body: XssGenerateModel):
@@ -116,7 +118,7 @@ def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, 
     return tags_query_param, joined_and_trimmed_selected_payloads
 
 
-@bp.route("/xss/<int:xss_id>", methods=["GET"])
+@xss_bp.route("/<int:xss_id>", methods=["GET"])
 @authorization_required()
 def client_xss_get(xss_id: int):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
@@ -124,7 +126,7 @@ def client_xss_get(xss_id: int):
     return xss.to_dict()
 
 
-@bp.route("/xss/<int:xss_id>", methods=["DELETE"])
+@xss_bp.route("/<int:xss_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def xss_delete(xss_id: int):
@@ -136,7 +138,7 @@ def xss_delete(xss_id: int):
     return {"msg": "XSS deleted successfully"}
 
 
-@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["GET"])
+@xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @authorization_required()
 def xss_loot_get(xss_id: int, loot_type: str):
     xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
@@ -146,7 +148,7 @@ def xss_loot_get(xss_id: int, loot_type: str):
     return {"data": xss_data[loot_type]}
 
 
-@bp.route("/xss/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
+@xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def xss_loot_delete(xss_id: int, loot_type: str):
@@ -162,7 +164,7 @@ def xss_loot_delete(xss_id: int, loot_type: str):
     return {"msg": "Data deleted successfully"}
 
 
-@bp.route("/xss", methods=["GET"])
+@xss_bp.route("", methods=["GET"])
 @authorization_required()
 @validate()
 def client_xss_get_all(query: ClientXssGetAllModel):
@@ -180,7 +182,7 @@ def client_xss_get_all(query: ClientXssGetAllModel):
     return xss_list
 
 
-@bp.route("/xss/data", methods=["GET"])
+@xss_bp.route("/data", methods=["GET"])
 @authorization_required()
 @validate()
 def client_loot_get(query: ClientLootGetModel):

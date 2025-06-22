@@ -1,18 +1,20 @@
 import logging
 
 from app import db
-from app.api import bp
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.models import Settings
 from app.notifications import EmailTestNotification, WebhookTestNotification
 from app.permissions import authorization_required, permissions
+from flask import Blueprint
 from flask_pydantic import validate
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+settings_bp = Blueprint("settings", __name__, url_prefix="/api/settings")
 
-@bp.route("/settings", methods=["GET"])
+
+@settings_bp.route("", methods=["GET"])
 @authorization_required()
 @permissions(all_of=["admin"])
 def settings_get():
@@ -21,7 +23,7 @@ def settings_get():
     return settings.to_dict()
 
 
-@bp.route("/settings", methods=["PATCH"])
+@settings_bp.route("", methods=["PATCH"])
 @authorization_required()
 @permissions(all_of=["admin"])
 @validate()
@@ -100,7 +102,7 @@ def settings_patch(body: SettingsPatchModel):
     return {"msg": "Configuration saved successfully"}
 
 
-@bp.route("/settings/smtp_test", methods=["POST"])
+@settings_bp.route("/smtp_test", methods=["POST"])
 @authorization_required()
 @permissions(all_of=["admin"])
 @validate()
@@ -119,7 +121,7 @@ def smtp_test_post(body: SmtpTestPostModel):
         return {"msg": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. "}, 400
 
 
-@bp.route("/settings/webhook_test", methods=["POST"])
+@settings_bp.route("/webhook_test", methods=["POST"])
 @authorization_required()
 @permissions(all_of=["admin"])
 @validate()

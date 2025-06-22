@@ -3,17 +3,18 @@ import logging
 import time
 
 from app import db
-from app.api import bp
 from app.models import XSS, Client, Settings
 from app.notifications import EmailXssNotification, WebhookXssNotification
-from flask import request
+from flask import Blueprint, request
 from flask_cors import cross_origin
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+x_bp = Blueprint("x", __name__, url_prefix="/api/x")
 
-@bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
+
+@x_bp.route("/<flavor>/<uid>", methods=["GET", "POST"])
 @cross_origin()
 def catch_xss(flavor: str, uid: str):
     client: Client = db.session.query(Client).filter_by(uid=uid).one_or_none()
@@ -37,7 +38,7 @@ def catch_xss(flavor: str, uid: str):
     tags = []
 
     for param, value in parameters.items():
-        if not value in ["", "{}", "[]"]:
+        if value not in ["", "{}", "[]"]:
             if param == "cookies":
                 if "cookies" not in data.keys():
                     data["cookies"] = {}

@@ -5,7 +5,6 @@ from typing import List
 import pyotp
 import pyqrcode
 from app import db
-from app.api import bp
 from app.api.models import (
     ChangePasswordModel,
     RegisterModel,
@@ -14,10 +13,13 @@ from app.api.models import (
 )
 from app.models import ApiKey, User
 from app.permissions import authorization_required, get_current_user, permissions
+from flask import Blueprint
 from flask_pydantic import validate
 
+user_bp = Blueprint("users", __name__, url_prefix="/api/user")
 
-@bp.route("/user", methods=["POST"])
+
+@user_bp.route("", methods=["POST"])
 @authorization_required()
 @permissions(all_of=["admin"])
 @validate()
@@ -35,7 +37,7 @@ def register(body: RegisterModel):
     return {"password": password}
 
 
-@bp.route("/user/password", methods=["POST"])
+@user_bp.route("/password", methods=["POST"])
 @authorization_required()
 @validate()
 def change_password(body: ChangePasswordModel):
@@ -51,7 +53,7 @@ def change_password(body: ChangePasswordModel):
     return {"msg": "Password changed successfully"}
 
 
-@bp.route("/user/<int:user_id>/password", methods=["POST"])
+@user_bp.route("/<int:user_id>/password", methods=["POST"])
 @authorization_required()
 @permissions(all_of=["admin"])
 def reset_password(user_id: int):
@@ -65,7 +67,7 @@ def reset_password(user_id: int):
     return {"password": password}
 
 
-@bp.route("/user/current", methods=["GET"])
+@user_bp.route("/current", methods=["GET"])
 @authorization_required()
 def user_get():
     current_user: User = get_current_user()
@@ -73,7 +75,7 @@ def user_get():
     return current_user.to_dict()
 
 
-@bp.route("/user/<int:user_id>", methods=["DELETE"])
+@user_bp.route("/<int:user_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(all_of=["admin"])
 def user_delete(user_id: int):
@@ -93,7 +95,7 @@ def user_delete(user_id: int):
     return {"msg": f"User {user.username} deleted successfully"}
 
 
-@bp.route("/user/<int:user_id>", methods=["PATCH"])
+@user_bp.route("/<int:user_id>", methods=["PATCH"])
 @authorization_required()
 @permissions(all_of=["admin"])
 @validate()
@@ -111,7 +113,7 @@ def user_patch(user_id: int, body: UserPatchModel):
     return {"msg": f"User {user.username} modified successfully"}
 
 
-@bp.route("/user", methods=["GET"])
+@user_bp.route("", methods=["GET"])
 @authorization_required()
 def user_get_all():
     users: List[User] = db.session.query(User).all()
@@ -119,7 +121,7 @@ def user_get_all():
     return [user.to_dict() for user in users]
 
 
-@bp.route("/user/mfa", methods=["GET"])
+@user_bp.route("/mfa", methods=["GET"])
 @authorization_required()
 def get_mfa():
     current_user: User = get_current_user()
@@ -135,7 +137,7 @@ def get_mfa():
     return {"secret": secret, "qr_code": base64_qr_code}
 
 
-@bp.route("/user/mfa", methods=["POST"])
+@user_bp.route("/mfa", methods=["POST"])
 @authorization_required()
 @validate()
 def set_mfa(body: SetMfaModel):
@@ -150,7 +152,7 @@ def set_mfa(body: SetMfaModel):
     return {"msg": "MFA set successfully"}
 
 
-@bp.route("/user/<int:user_id>/mfa", methods=["DELETE"])
+@user_bp.route("/<int:user_id>/mfa", methods=["DELETE"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def delete_mfa(user_id: int):
@@ -163,7 +165,7 @@ def delete_mfa(user_id: int):
     return {"msg": f"MFA removed for user {user.username}"}
 
 
-@bp.route("/user/apikey", methods=["POST"])
+@user_bp.route("/apikey", methods=["POST"])
 @authorization_required()
 def create_api_key():
     current_user: User = get_current_user()
@@ -178,7 +180,7 @@ def create_api_key():
     return api_key.to_dict()
 
 
-@bp.route("/user/apikey/<int:key_id>", methods=["DELETE"])
+@user_bp.route("/apikey/<int:key_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def delete_api_key(key_id: int):
@@ -190,7 +192,7 @@ def delete_api_key(key_id: int):
     return {"msg": "API key deleted successfully"}
 
 
-@bp.route("/user/<int:user_id>/apikey", methods=["GET"])
+@user_bp.route("/<int:user_id>/apikey", methods=["GET"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def list_api_keys(user_id: int):

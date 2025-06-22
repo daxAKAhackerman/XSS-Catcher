@@ -6,15 +6,12 @@ from typing import Any, Optional
 
 from app import db, jwt
 from flask import Flask
-from flask_sqlalchemy.model import Model
 from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
-base_model = db._make_declarative_base(Model)
 
-
-class Client(base_model):
+class Client(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     uid: Mapped[str] = mapped_column(String(6), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
@@ -24,6 +21,9 @@ class Client(base_model):
 
     xss: Mapped[list["XSS"]] = relationship("XSS", backref="client", lazy="dynamic")
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
     def summary(self) -> dict[str, Any]:
         xss: list[XSS] = db.session.query(XSS).filter_by(client_id=self.id).all()
@@ -64,7 +64,7 @@ class Client(base_model):
         self.uid = uid
 
 
-class XSS(base_model):
+class XSS(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     ip_addr: Mapped[str] = mapped_column(String(39), nullable=False)
     timestamp: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -74,6 +74,9 @@ class XSS(base_model):
     tags: Mapped[Optional[str]] = mapped_column(Text)
 
     client_id: Mapped[int] = mapped_column(Integer, ForeignKey("client.id"))
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
     def summary(self) -> dict[str, Any]:
         data = {"id": self.id, "ip_addr": self.ip_addr, "timestamp": self.timestamp, "tags": json.loads(self.tags or "[]")}
@@ -98,11 +101,14 @@ class XSS(base_model):
         return data
 
 
-class ApiKey(base_model):
+class ApiKey(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     key: Mapped[str] = mapped_column(String(36), unique=True, nullable=False)
 
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def generate_key() -> str:
@@ -115,7 +121,7 @@ class ApiKey(base_model):
         return {"id": self.id, "key": len(self.key[:-8]) * "*" + self.key[-8:]}
 
 
-class User(base_model):
+class User(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
@@ -125,6 +131,9 @@ class User(base_model):
 
     client: Mapped[list[Client]] = relationship("Client", backref="owner", lazy="dynamic")
     api_key: Mapped[list[ApiKey]] = relationship("ApiKey", backref="owner", lazy="dynamic")
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
     @staticmethod
     def generate_password() -> str:
@@ -142,7 +151,7 @@ class User(base_model):
         return check_password_hash(self.password_hash, password)
 
 
-class Settings(base_model):
+class Settings(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     smtp_host: Mapped[Optional[str]] = mapped_column(Text)
     smtp_port: Mapped[Optional[int]] = mapped_column(Integer)
@@ -155,6 +164,9 @@ class Settings(base_model):
     mail_to: Mapped[Optional[str]] = mapped_column(Text)
     webhook_url: Mapped[Optional[str]] = mapped_column(Text)
     webhook_type: Mapped[Optional[int]] = mapped_column(Integer)
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
     def to_dict(self) -> dict[str, Any]:
         data = {
@@ -172,9 +184,12 @@ class Settings(base_model):
         return data
 
 
-class BlockedJti(base_model):
+class BlockedJti(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     jti: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
 
 
 @jwt.user_lookup_loader
