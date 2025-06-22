@@ -12,10 +12,10 @@ def get_db_url() -> str:
 
 
 class Config:
-    SECRET_KEY = str(uuid.uuid4())
-    SQLALCHEMY_DATABASE_URI = get_db_url()
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_ACCESS_TOKEN_EXPIRES = 300
+    SECRET_KEY: str = str(uuid.uuid4())
+    SQLALCHEMY_DATABASE_URI: str = get_db_url()
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    JWT_ACCESS_TOKEN_EXPIRES: int = 300
 
     def __init__(self) -> None:
         if os.getenv("FLASK_DEBUG"):
