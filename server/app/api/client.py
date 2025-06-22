@@ -1,14 +1,16 @@
 from typing import List
 
 from app import db
-from app.api import bp
 from app.api.models import ClientPatchModel, ClientPostModel
 from app.models import XSS, Client, User
 from app.permissions import authorization_required, get_current_user, permissions
+from flask import Blueprint
 from flask_pydantic import validate
 
+client_bp = Blueprint("client", __name__, url_prefix="/api/client")
 
-@bp.route("/client", methods=["POST"])
+
+@client_bp.route("", methods=["POST"])
 @authorization_required()
 @validate()
 def client_post(body: ClientPostModel):
@@ -24,7 +26,7 @@ def client_post(body: ClientPostModel):
     return {"msg": f"New client {new_client.name} created successfully"}, 201
 
 
-@bp.route("/client/<int:client_id>", methods=["GET"])
+@client_bp.route("/<int:client_id>", methods=["GET"])
 @authorization_required()
 def client_get(client_id: int):
     client: Client = db.session.query(Client).filter_by(id=client_id).first_or_404()
@@ -32,7 +34,7 @@ def client_get(client_id: int):
     return client.to_dict()
 
 
-@bp.route("/client/<int:client_id>", methods=["PATCH"])
+@client_bp.route("/<int:client_id>", methods=["PATCH"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 @validate()
@@ -71,7 +73,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
     return {"msg": f"Client {client.name} edited successfully"}
 
 
-@bp.route("/client/<int:client_id>", methods=["DELETE"])
+@client_bp.route("/<int:client_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(one_of=["admin", "owner"])
 def client_delete(client_id: int):
@@ -83,7 +85,7 @@ def client_delete(client_id: int):
     return {"msg": f"Client {client.name} deleted successfully"}
 
 
-@bp.route("/client", methods=["GET"])
+@client_bp.route("", methods=["GET"])
 @authorization_required()
 def client_get_all():
     clients: List[Client] = db.session.query(Client).order_by(Client.id.desc()).all()
