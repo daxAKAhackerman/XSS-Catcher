@@ -29,7 +29,7 @@ class Client(db.Model):
         xss: list[XSS] = db.session.query(XSS).filter_by(client_id=self.id).all()
         loot_amount = 0
         for hit in xss:
-            loot_amount += len(json.loads(hit.data or "{}"))
+            loot_amount += len(json.loads(hit.data))
         data = {
             "owner_id": self.owner_id,
             "id": self.id,
@@ -69,9 +69,9 @@ class XSS(db.Model):
     ip_addr: Mapped[str] = mapped_column(String(39), nullable=False)
     timestamp: Mapped[int] = mapped_column(Integer, nullable=False)
     xss_type: Mapped[str] = mapped_column(String(9), nullable=False)
-    headers: Mapped[Optional[str]] = mapped_column(Text)
-    data: Mapped[Optional[str]] = mapped_column(Text)
-    tags: Mapped[Optional[str]] = mapped_column(Text)
+    headers: Mapped[str] = mapped_column(Text)
+    data: Mapped[str] = mapped_column(Text)
+    tags: Mapped[str] = mapped_column(Text)
 
     client_id: Mapped[int] = mapped_column(Integer, ForeignKey("client.id"))
 
@@ -79,17 +79,17 @@ class XSS(db.Model):
         super().__init__(*args, **kwargs)
 
     def summary(self) -> dict[str, Any]:
-        data = {"id": self.id, "ip_addr": self.ip_addr, "timestamp": self.timestamp, "tags": json.loads(self.tags or "[]")}
+        data = {"id": self.id, "ip_addr": self.ip_addr, "timestamp": self.timestamp, "tags": json.loads(self.tags)}
         return data
 
     def to_dict(self) -> dict[str, Any]:
         data = {
             "id": self.id,
-            "headers": json.loads(self.headers or "{}"),
+            "headers": json.loads(self.headers),
             "ip_addr": self.ip_addr,
-            "data": json.loads(self.data or "{}"),
+            "data": json.loads(self.data),
             "timestamp": self.timestamp,
-            "tags": json.loads(self.tags or "[]"),
+            "tags": json.loads(self.tags),
         }
         if "fingerprint" in data["data"].keys():
             data["data"]["fingerprint"] = ""
