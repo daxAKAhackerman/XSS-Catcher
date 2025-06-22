@@ -1,7 +1,7 @@
 import re
-from typing import List, Literal, Optional, Union
+from typing import List, Literal, Optional
 
-from pydantic import AnyHttpUrl, BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 
@@ -9,54 +9,55 @@ DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "
 class LoginModel(BaseModel):
     username: str
     password: str
-    otp: Optional[str] = Field(regex=r"\d{6}")
+    otp: Optional[str] = Field(default=None, pattern=r"\d{6}")
 
 
 class ClientPostModel(BaseModel):
-    name: str = Field(..., min_length=1, max_length=32)
-    description: str = Field(..., max_length=128)
+    name: str = Field(min_length=1, max_length=32)
+    description: str = Field(max_length=128)
 
 
 class ClientPatchModel(BaseModel):
-    name: Optional[str] = Field(min_length=1, max_length=32)
-    description: Optional[str] = Field(max_length=128)
-    owner: Optional[int]
-    mail_to: Union[EmailStr, None, Literal[""]]
-    webhook_url: Union[AnyHttpUrl, None, Literal[""]]
+    name: Optional[str] = Field(default=None, min_length=1, max_length=32)
+    description: Optional[str] = Field(default=None, max_length=128)
+    owner: Optional[int] = None
+    mail_to: Optional[str] = None
+    webhook_url: Optional[str] = None
 
 
 class SettingsPatchModel(BaseModel):
-    smtp_host: Optional[str] = Field(max_length=256)
-    smtp_port: Optional[int] = Field(gt=0, lt=65536)
-    starttls: Optional[bool]
-    ssl_tls: Optional[bool]
-    mail_from: Optional[EmailStr]
-    mail_to: Union[EmailStr, None, Literal[""]]
-    smtp_user: Optional[str] = Field(max_length=128)
-    smtp_pass: Optional[str] = Field(max_length=128)
-    webhook_url: Union[AnyHttpUrl, None, Literal[""]]
-    webhook_type: Optional[Literal[0, 1, 2]]
+    smtp_host: Optional[str] = Field(default=None, max_length=256)
+    smtp_port: Optional[int] = Field(default=None, gt=0, lt=65536)
+    starttls: Optional[bool] = None
+    ssl_tls: Optional[bool] = None
+    mail_from: Optional[str] = None
+    mail_to: Optional[str] = None
+    smtp_user: Optional[str] = Field(default=None, max_length=128)
+    smtp_pass: Optional[str] = Field(default=None, max_length=128)
+    webhook_url: Optional[str] = None
+    webhook_type: Optional[Literal[0, 1, 2]] = None
 
 
 class SmtpTestPostModel(BaseModel):
-    mail_to: EmailStr
+    mail_to: str
 
 
 class WebhookTestPostModel(BaseModel):
-    webhook_url: AnyHttpUrl
+    webhook_url: str
 
 
 class RegisterModel(BaseModel):
-    username: str = Field(..., min_length=1, max_length=128)
+    username: str = Field(min_length=1, max_length=128)
 
 
 class ChangePasswordModel(BaseModel):
-    password1: str = Field(..., min_length=8)
+    password1: str = Field(min_length=8)
     password2: str
     old_password: str
 
-    @validator("password1")
-    def password_complexity(cls, v, values, **kwargs):
+    @field_validator("password1", mode="after")
+    @classmethod
+    def password_complexity(cls, v: str) -> str:
         if not re.search(r"\d", v):
             raise ValueError("password must contain a number")
         if not re.search(r"[a-z]", v):
@@ -65,11 +66,11 @@ class ChangePasswordModel(BaseModel):
             raise ValueError("password must contain an upper case letter")
         return v
 
-    @validator("password2")
-    def password_match(cls, v, values, **kwargs):
-        if "password1" in values and v != values["password1"]:
+    @model_validator(mode="after")
+    def password_match(self):
+        if self.password1 != self.password2:
             raise ValueError("passwords don't match")
-        return v
+        return self
 
 
 class UserPatchModel(BaseModel):
@@ -78,14 +79,14 @@ class UserPatchModel(BaseModel):
 
 class XssGenerateModel(BaseModel):
     client_id: int
-    url: AnyHttpUrl
+    url: str
     xss_type: Literal["r", "s"]
     code_type: Literal["html", "js"]
     to_gather: List[str]
     tags: List[str]
     custom_js: str
 
-    @validator("to_gather")
+    @field_validator("to_gather", mode="after")
     def to_gather_validator(cls, v, values, **kwargs):
         for value in v:
             if value not in DATA_TO_GATHER:
@@ -94,8 +95,8 @@ class XssGenerateModel(BaseModel):
 
 
 class ClientXssGetAllModel(BaseModel):
-    client_id: Optional[int]
-    type: Optional[Literal["reflected", "stored"]]
+    client_id: Optional[int] = None
+    type: Optional[Literal["reflected", "stored"]] = None
 
 
 class ClientLootGetModel(BaseModel):
@@ -103,5 +104,5 @@ class ClientLootGetModel(BaseModel):
 
 
 class SetMfaModel(BaseModel):
-    secret: str = Field(..., regex=r"[A-Z2-7]{32}")
-    otp: str = Field(..., regex=r"\d{6}")
+    secret: str = Field(pattern=r"[A-Z2-7]{32}")
+    otp: str = Field(pattern=r"\d{6}")
