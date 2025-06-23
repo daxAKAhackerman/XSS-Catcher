@@ -25,9 +25,6 @@ repos:
       - id: forbid-new-submodules
       - id: forbid-submodules
       - id: mixed-line-ending
-      - id: name-tests-test
-        args:
-          - --pytest-test-first
       - id: no-commit-to-branch
       - id: trailing-whitespace
       - id: detect-aws-credentials

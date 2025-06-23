@@ -20,7 +20,7 @@ def client_post(body: ClientPostModel):
         return {"msg": "Client already exists"}, 400
 
     new_client = Client(name=body.name, description=body.description, owner_id=current_user.id)
-    new_client.generate_uid()
+    new_client.set_uid()
     db.session.add(new_client)
     db.session.commit()
     return {"msg": f"New client {new_client.name} created successfully"}, 201

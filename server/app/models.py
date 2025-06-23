@@ -20,7 +20,7 @@ class Client(db.Model):
     webhook_url: Mapped[Optional[str]] = mapped_column(Text)
 
     xss: Mapped[list["XSS"]] = relationship("XSS", backref="client", lazy="dynamic")
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
+    owner_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey("user.id"))
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
