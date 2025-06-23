@@ -17,7 +17,7 @@ jwt = JWTManager()
 cors = CORS()
 
 
-def create_app(config_class=Config):
+def create_app(config_class: type = Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
