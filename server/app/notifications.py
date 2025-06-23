@@ -9,7 +9,7 @@ from typing import Any, cast
 
 import requests
 from app import db
-from app.models import XSS, Client, Settings, User
+from app.schemas import XSS, Client, Settings, User
 from jinja2 import Environment, FileSystemLoader
 
 
@@ -123,9 +123,13 @@ class WebhookNotification:
 
     @property
     def message(self) -> dict[str, Any]:
-        message_map = {WebhookType.AUTOMATION: self.automation_message, WebhookType.DISCORD: self.discord_message, WebhookType.SLACK: self.slack_message}
-
-        return message_map[WebhookType(self.webhook_type)]
+        match self.webhook_type:
+            case WebhookType.SLACK:
+                return self.slack_message
+            case WebhookType.DISCORD:
+                return self.discord_message
+            case _:
+                return self.automation_message
 
     @property
     def slack_message(self) -> dict[str, Any]:  # pragma: no cover

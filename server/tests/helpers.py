@@ -3,7 +3,7 @@ import time
 from typing import Any, Optional
 
 from app import db
-from app.models import XSS, ApiKey, BlockedJti, Client, Settings, User
+from app.schemas import XSS, ApiKey, BlockedJti, Client, Settings, User
 from flask.testing import FlaskClient
 
 

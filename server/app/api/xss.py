@@ -9,8 +9,8 @@ from app.api.models import (
     ClientXssGetAllModel,
     XssGenerateModel,
 )
-from app.models import XSS, Client
 from app.permissions import authorization_required, permissions
+from app.schemas import XSS, Client
 from flask import Blueprint
 from flask_pydantic import validate
 

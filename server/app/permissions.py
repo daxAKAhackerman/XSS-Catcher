@@ -4,7 +4,7 @@ from typing import Callable, List, Optional
 
 import flask_jwt_extended
 from app import db
-from app.models import XSS, ApiKey, Client, User
+from app.schemas import XSS, ApiKey, Client, User
 from flask import current_app, g, request
 
 

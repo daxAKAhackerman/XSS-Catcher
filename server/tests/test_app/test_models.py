@@ -3,7 +3,7 @@ import uuid
 from unittest import mock
 
 from app import db
-from app.models import (
+from app.schemas import (
     XSS,
     ApiKey,
     BlockedJti,
@@ -54,7 +54,7 @@ class TestClient:
         client.set_uid()
         assert re.match(r"^[A-Za-z\d]{6}$", client.uid)
 
-    @mock.patch("app.models.random.choice")
+    @mock.patch("app.schemas.random.choice")
     def test__set_uid__given_self__when_uid_exists__then_new_uid_set(self, choice_mocker: mock.MagicMock, client_tester: FlaskClient):
         choice_mocker.side_effect = ["a", "a", "a", "a", "a", "a", "b", "b", "b", "b", "b", "b"]
         create_client(name="test", uid="aaaaaa")
@@ -98,7 +98,7 @@ class TestXSS:
 
 
 class TestApiKey:
-    @mock.patch("app.models.uuid.uuid4", return_value=uuid.UUID("11111111-1111-4111-a111-111111111111", version=4))
+    @mock.patch("app.schemas.uuid.uuid4", return_value=uuid.UUID("11111111-1111-4111-a111-111111111111", version=4))
     def test__generate_key__then_return_uuid(self, uuid4_mocker: mock.MagicMock, client_tester: FlaskClient):
         assert ApiKey.generate_key() == "11111111-1111-4111-a111-111111111111"
 
@@ -112,14 +112,14 @@ class TestApiKey:
 
 
 class TestUser:
-    @mock.patch("app.models.generate_password_hash")
+    @mock.patch("app.schemas.generate_password_hash")
     def test__set_password__given_password__then_password_changed(self, generate_password_hash_mocker: mock.MagicMock, client_tester: FlaskClient):
         user = User()
         user.set_password("test")
         generate_password_hash_mocker.assert_called_once_with("test")
         assert user.password_hash is generate_password_hash_mocker.return_value
 
-    @mock.patch("app.models.check_password_hash")
+    @mock.patch("app.schemas.check_password_hash")
     def test__check_password__given_password__then_password_checked(self, check_password_hash_mocker: mock.MagicMock, client_tester: FlaskClient):
         user: User = create_user("test")
         password_check = user.check_password("test")

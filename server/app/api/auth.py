@@ -1,8 +1,8 @@
 import pyotp
 from app import db
 from app.api.models import LoginModel
-from app.models import BlockedJti, User
 from app.permissions import authorization_required, get_current_user
+from app.schemas import BlockedJti, User
 from flask import Blueprint
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt
 from flask_pydantic import validate

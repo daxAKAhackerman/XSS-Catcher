@@ -2,8 +2,8 @@ from typing import List
 
 from app import db
 from app.api.models import ClientPatchModel, ClientPostModel
-from app.models import XSS, Client, User
 from app.permissions import authorization_required, get_current_user, permissions
+from app.schemas import XSS, Client, User
 from flask import Blueprint
 from flask_pydantic import validate
 

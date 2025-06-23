@@ -1,6 +1,6 @@
 import pytest
 from app import create_app, db
-from app.models import init_app
+from app.schemas import init_app
 from flask import Flask
 
 

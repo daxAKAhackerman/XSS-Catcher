@@ -2,9 +2,9 @@ import logging
 
 from app import db
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
-from app.models import Settings
 from app.notifications import EmailTestNotification, WebhookTestNotification
 from app.permissions import authorization_required, permissions
+from app.schemas import Settings
 from flask import Blueprint
 from flask_pydantic import validate
 

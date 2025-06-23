@@ -3,8 +3,8 @@ import logging
 import time
 
 from app import db
-from app.models import XSS, Client, Settings
 from app.notifications import EmailXssNotification, WebhookXssNotification
+from app.schemas import XSS, Client, Settings
 from flask import Blueprint, request
 from flask_cors import cross_origin
 

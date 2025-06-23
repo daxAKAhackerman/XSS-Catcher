@@ -11,8 +11,8 @@ from app.api.models import (
     SetMfaModel,
     UserPatchModel,
 )
-from app.models import ApiKey, User
 from app.permissions import authorization_required, get_current_user, permissions
+from app.schemas import ApiKey, User
 from flask import Blueprint
 from flask_pydantic import validate
 
