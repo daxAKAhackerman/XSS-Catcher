@@ -1,7 +1,10 @@
+from typing import Iterator
+
 import pytest
 from app import create_app, db
 from app.schemas import init_app
 from flask import Flask
+from flask.testing import FlaskClient
 
 
 class TestConfig:
@@ -12,12 +15,13 @@ class TestConfig:
 
 
 @pytest.fixture()
-def app():
+def app(request: pytest.FixtureRequest) -> Iterator[Flask]:
     app = create_app(config_class=TestConfig)
     with app.app_context():
         db.create_all()
 
-        init_app(app)
+        if "no_db_init" not in request.keywords:
+            init_app(app)
 
         yield app
 
@@ -26,22 +30,5 @@ def app():
 
 
 @pytest.fixture()
-def client_tester(app: Flask):
+def client_tester(app: Flask) -> FlaskClient:
     return app.test_client()
-
-
-@pytest.fixture()
-def app_no_init():
-    app = create_app(config_class=TestConfig)
-    with app.app_context():
-        db.create_all()
-
-        yield app
-
-        db.session.remove()
-        db.drop_all()
-
-
-@pytest.fixture()
-def client_tester_no_init(app_no_init: Flask):
-    return app_no_init.test_client()

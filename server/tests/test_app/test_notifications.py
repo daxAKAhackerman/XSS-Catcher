@@ -15,7 +15,7 @@ from app.notifications import (
 from app.schemas import XSS, Client, Settings
 from flask.testing import FlaskClient
 from freezegun import freeze_time
-from tests.helpers import create_client, create_xss, set_settings
+from tests.helpers import Helpers
 
 
 class TestEmailNotification:
@@ -31,20 +31,20 @@ class TestEmailNotification:
             yield email_notification_message_mocker
 
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        set_settings(mail_from="xss-catcher@hackerman.ca")
+        Helpers.set_settings(mail_from="xss-catcher@hackerman.ca")
         email_notification = EmailNotification()
 
         assert email_notification.email_from == "xss-catcher@hackerman.ca"
 
     def test____init____given_self__when_no_mail_from__then_raise(self, client_tester: FlaskClient):
-        set_settings()
+        Helpers.set_settings()
 
         with pytest.raises(Exception):
             EmailNotification()
 
     @mock.patch("app.notifications.ssl")
     def test__send__when_ssl_tls_and_auth__then_email_sent(self, ssl_mocker: mock.MagicMock, smtplib_mocker: mock.MagicMock, client_tester: FlaskClient):
-        settings: Settings = set_settings(
+        settings: Settings = Helpers.set_settings(
             smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com", ssl_tls=True, smtp_user="test", smtp_pass="password"
         )
 
@@ -64,7 +64,7 @@ class TestEmailNotification:
         )
 
     def test__send__when_starttls_and_auth__then_mail_sent(self, smtplib_mocker: mock.MagicMock, client_tester: FlaskClient):
-        settings: Settings = set_settings(
+        settings: Settings = Helpers.set_settings(
             smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com", starttls=True, smtp_user="test", smtp_pass="password"
         )
 
@@ -85,7 +85,7 @@ class TestEmailNotification:
         )
 
     def test__send__given_self__when_no_host_or_port__then_raise(self, client_tester: FlaskClient):
-        set_settings(mail_from="test@example.com")
+        Helpers.set_settings(mail_from="test@example.com")
 
         email_notification = EmailNotification()
         email_notification.email_to = "test@test.com"
@@ -96,9 +96,9 @@ class TestEmailNotification:
 
 class TestEmailXssNotification:
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
-        client: Client = create_client(name="test", mail_to="test@test.com")
-        xss: XSS = create_xss(client_id=client.id)
+        settings: Settings = Helpers.set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
+        client: Client = Helpers.create_client(name="test", mail_to="test@test.com")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         email_xss_notification = EmailXssNotification(xss=xss)
 
@@ -108,9 +108,9 @@ class TestEmailXssNotification:
         assert email_xss_notification.xss is xss
 
     def test____init____given_self__when_no_mail_to__then_raise(self, client_tester: FlaskClient):
-        set_settings(mail_from="xss-catcher@hackerman.ca")
-        client: Client = create_client(name="test")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings(mail_from="xss-catcher@hackerman.ca")
+        client: Client = Helpers.create_client(name="test")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         with pytest.raises(Exception):
             EmailXssNotification(xss=xss)
@@ -121,9 +121,9 @@ class TestEmailXssNotification:
     def test__message__given_self__then_message_returned(
         self, FileSystemLoader_mocker: mock.MagicMock, Environment_mocker: mock.MagicMock, client_tester: FlaskClient
     ):
-        set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com", mail_to="test@test.com")
-        client: Client = create_client(name="test")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com", mail_to="test@test.com")
+        client: Client = Helpers.create_client(name="test")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         render_mocker = Environment_mocker.return_value.get_template.return_value.render
         render_mocker.return_value = "<h1>Test</h1>"
@@ -146,7 +146,7 @@ class TestEmailXssNotification:
 
 class TestEmailTestNotification:
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        settings: Settings = set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
+        settings: Settings = Helpers.set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
 
         email_test_notification = EmailTestNotification(email_to="test@test.com")
 
@@ -155,7 +155,7 @@ class TestEmailTestNotification:
         assert email_test_notification.email_to == "test@test.com"
 
     def test__message__given_self__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
+        Helpers.set_settings(smtp_host="127.0.0.1", smtp_port=25, mail_from="test@example.com")
 
         email_test_notification = EmailTestNotification(email_to="test@test.com")
 
@@ -167,14 +167,14 @@ class TestEmailTestNotification:
 
 class TestWebhookNotification:
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        settings: Settings = set_settings(webhook_type=0)
+        settings: Settings = Helpers.set_settings(webhook_type=0)
         webhook_notification = WebhookNotification()
 
         assert webhook_notification.settings is settings
         assert webhook_notification.webhook_type == 0
 
     def test____init____given_self__when_no_webhook_type__then_raise(self, client_tester: FlaskClient):
-        set_settings(webhook_type=None)
+        Helpers.set_settings(webhook_type=None)
 
         with pytest.raises(Exception):
             WebhookNotification()
@@ -186,7 +186,7 @@ class TestWebhookNotification:
         message_func: str,
         client_tester: FlaskClient,
     ):
-        set_settings(webhook_type=webhook_type)
+        Helpers.set_settings(webhook_type=webhook_type)
 
         with mock.patch(f"app.notifications.WebhookNotification.{message_func}", new_callable=mock.PropertyMock) as mocker:
             assert WebhookNotification().message is mocker.return_value
@@ -194,7 +194,7 @@ class TestWebhookNotification:
     @mock.patch("app.notifications.requests")
     @mock.patch("app.notifications.WebhookNotification.slack_message", new_callable=mock.PropertyMock, return_value={"text": "This is a test"})
     def test__send__given_self__then_webhook_sent(self, slack_message_mocker: mock.PropertyMock, requests_mocker: mock.MagicMock, client_tester: FlaskClient):
-        set_settings()
+        Helpers.set_settings()
         webhook_notification = WebhookNotification()
         webhook_notification.webhook_url = "http://localhost"
         webhook_notification.send()
@@ -207,9 +207,9 @@ class TestWebhookNotification:
 
 class TestWebhookXssNotification:
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        settings: Settings = set_settings()
-        client: Client = create_client(name="test", webhook_url="http://localhost")
-        xss: XSS = create_xss(client_id=client.id)
+        settings: Settings = Helpers.set_settings()
+        client: Client = Helpers.create_client(name="test", webhook_url="http://localhost")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         webhook_xss_notification = WebhookXssNotification(xss=xss)
         assert webhook_xss_notification.webhook_url == "http://localhost"
@@ -218,18 +218,18 @@ class TestWebhookXssNotification:
         assert webhook_xss_notification.client is client
 
     def test____init____given_self__when_missing_webhook_url__then_raise(self, client_tester: FlaskClient):
-        set_settings()
-        client: Client = create_client(name="test")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings()
+        client: Client = Helpers.create_client(name="test")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         with pytest.raises(Exception):
             WebhookXssNotification(xss=xss)
 
     @freeze_time("2000-01-01")
     def test__slack_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(webhook_url="http://localhost")
-        client: Client = create_client(name="test")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings(webhook_url="http://localhost")
+        client: Client = Helpers.create_client(name="test")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         webhook_xss_notification = WebhookXssNotification(xss=xss)
         assert webhook_xss_notification.message == {
@@ -253,9 +253,9 @@ class TestWebhookXssNotification:
 
     @freeze_time("2000-01-01")
     def test__discord_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(webhook_url="http://localhost", webhook_type=1)
-        client: Client = create_client(name="test")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings(webhook_url="http://localhost", webhook_type=1)
+        client: Client = Helpers.create_client(name="test")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         webhook_xss_notification = WebhookXssNotification(xss=xss)
         assert webhook_xss_notification.discord_message == {
@@ -276,9 +276,9 @@ class TestWebhookXssNotification:
 
     @freeze_time("2000-01-01")
     def test__automation_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(webhook_url="http://localhost", webhook_type=2)
-        client: Client = create_client(name="test", uid="aaaaaa")
-        xss: XSS = create_xss(client_id=client.id)
+        Helpers.set_settings(webhook_url="http://localhost", webhook_type=2)
+        client: Client = Helpers.create_client(name="test", uid="aaaaaa")
+        xss: XSS = Helpers.create_xss(client_id=client.id)
 
         webhook_xss_notification = WebhookXssNotification(xss=xss)
         assert webhook_xss_notification.message == {
@@ -299,26 +299,26 @@ class TestWebhookXssNotification:
 
 class TestWebhookTestNotification:
     def test____init____given_self__then_attributes_set(self, client_tester: FlaskClient):
-        set_settings()
+        Helpers.set_settings()
         webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
         assert webhook_test_notification.webhook_url == "http://localhost"
 
     def test__slack_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings()
+        Helpers.set_settings()
         webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
         assert webhook_test_notification.slack_message == {
             "text": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."
         }
 
     def test__discord_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(webhook_type=1)
+        Helpers.set_settings(webhook_type=1)
         webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
         assert webhook_test_notification.discord_message == {
             "content": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."
         }
 
     def test__automation_message__then_message_returned(self, client_tester: FlaskClient):
-        set_settings(webhook_type=1)
+        Helpers.set_settings(webhook_type=1)
         webhook_test_notification = WebhookTestNotification(webhook_url="http://localhost")
         assert webhook_test_notification.automation_message == {
             "msg": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."

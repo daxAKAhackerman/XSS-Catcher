@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 from app import db
-from app.models import ApiKey, User
 from app.permissions import (
     UserLookupError,
     _get_api_key_from_request,
@@ -13,16 +12,10 @@ from app.permissions import (
     get_current_user,
     permissions,
 )
+from app.schemas import ApiKey, User
 from flask import g
 from flask.testing import FlaskClient
-from tests.helpers import (
-    create_api_key,
-    create_client,
-    create_user,
-    create_xss,
-    delete_user,
-    login,
-)
+from tests.helpers import Helpers
 
 
 def test__permissions__given_request_context__when_user_id_in_request__then_owner_permission_enforced(client_tester: FlaskClient):
@@ -31,7 +24,7 @@ def test__permissions__given_request_context__when_user_id_in_request__then_owne
     def test_fn(user_id: int):
         pass
 
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(user_id=1) == None
@@ -44,10 +37,10 @@ def test__permissions__given_request_context__when_client_id_in_request__then_ow
     def test_fn(client_id: int):
         pass
 
-    create_user("user2")
-    create_client("test")
-    create_client("test2", owner_id=2)
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    Helpers.create_user("user2")
+    Helpers.create_client("test")
+    Helpers.create_client("test2", owner_id=2)
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(client_id=1) == None
@@ -60,13 +53,13 @@ def test__permissions__given_request_context__when_xss_id_in_request__then_owner
     def test_fn(xss_id: int):
         pass
 
-    create_user("user2")
-    create_client("test")
-    create_client("test2", owner_id=2)
-    create_xss()
-    create_xss(client_id=2)
+    Helpers.create_user("user2")
+    Helpers.create_client("test")
+    Helpers.create_client("test2", owner_id=2)
+    Helpers.create_xss()
+    Helpers.create_xss(client_id=2)
 
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(xss_id=1) == None
@@ -79,11 +72,11 @@ def test__permissions__given_request_context__when_key_id_in_request__then_owner
     def test_fn(key_id: int):
         pass
 
-    create_user("user2")
-    create_api_key()
-    create_api_key(user_id=2)
+    Helpers.create_user("user2")
+    Helpers.create_api_key()
+    Helpers.create_api_key(user_id=2)
 
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(key_id=1) == None
@@ -96,7 +89,7 @@ def test__permissions__given_request_context__when_all_of_used__then_all_permiss
     def test_fn(user_id: int):
         pass
 
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(user_id=1) == None
@@ -109,10 +102,10 @@ def test__permissions__given_request_context__when_one_of_used__then_one_permiss
     def test_fn(user_id: int):
         pass
 
-    create_user("test")
+    Helpers.create_user("test")
 
-    access_token, refresh_token = login(client_tester, "admin", "xss")
-    test_access_token, test_refresh_token = login(client_tester, "test", "test")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
+    test_access_token, test_refresh_token = Helpers.login(client_tester, "test", "test")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         assert test_fn(user_id=2) == None
@@ -125,7 +118,7 @@ def test__authorization_required__given_request_context__when_api_key_present__t
     def test_fn():
         pass
 
-    api_key: ApiKey = create_api_key()
+    api_key: ApiKey = Helpers.create_api_key()
     user: User = db.session.query(User).filter_by(id=1).one()
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {api_key.key}"}
@@ -139,7 +132,7 @@ def test__authorization_required__given_request_context__when_jwt_present__then_
         pass
 
     user: User = db.session.query(User).filter_by(id=1).one()
-    access_token, refresh_token = login(client_tester, "admin", "xss")
+    access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {access_token}"}
         test_fn()
@@ -179,7 +172,7 @@ def test___get_api_key_from_request__when_value_is_not_uuid__return_none(client_
 
 
 def test___get_api_key_from_request__when_valid_api_key__return_none(client_tester: FlaskClient):
-    api_key: ApiKey = create_api_key()
+    api_key: ApiKey = Helpers.create_api_key()
 
     with client_tester.application.test_request_context() as request_context:
         request_context.request.headers = {"Authorization": f"Bearer {api_key.key}"}
@@ -187,16 +180,16 @@ def test___get_api_key_from_request__when_valid_api_key__return_none(client_test
 
 
 def test___get_user_from_api_key__given_api_key__when_user_exists__then_user_returned(client_tester: FlaskClient):
-    api_key: ApiKey = create_api_key()
+    api_key: ApiKey = Helpers.create_api_key()
     user: User = db.session.query(User).filter_by(id=1).one()
 
     assert _get_user_from_api_key(api_key) is user
 
 
 def test___get_user_from_api_key__given_api_key__when_user_does_not_exist__then_raise(client_tester: FlaskClient):
-    create_user("user2")
-    api_key: ApiKey = create_api_key(user_id=2)
-    delete_user("user2")
+    Helpers.create_user("user2")
+    api_key: ApiKey = Helpers.create_api_key(user_id=2)
+    Helpers.delete_user("user2")
     with pytest.raises(UserLookupError):
         _get_user_from_api_key(api_key)
 
