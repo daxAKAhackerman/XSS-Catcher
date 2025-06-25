@@ -23,98 +23,98 @@ def test__catch_xss__given_existant_user_id__then_200_returned(client_tester: Fl
 def test__catch_xss__given_reflected_xss__then_correct_type_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.get(f"/api/x/r/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert xss.xss_type == "reflected"
 
 
 def test__catch_xss__given_stored_xss__then_correct_type_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.get(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert xss.xss_type == "stored"
 
 
 def test__catch_xss__given_x_forwarded_for_header__then_correct_ip_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.get(f"/api/x/s/{client.uid}", headers={"X-Forwarded-For": "1.1.1.1"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert xss.ip_addr == "1.1.1.1"
 
 
 def test__catch_xss__given_no_x_forwarded_for_header__then_correct_ip_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.get(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert xss.ip_addr == "127.0.0.1"
 
 
 def test__catch_xss__given_query_string_parameters__then_data_captured(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.get(f"/api/x/s/{client.uid}?param=value")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"param": "value"}
 
 
 def test__catch_xss__given_json_data__then_data_captured(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"param": "value"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"param": "value"}
 
 
 def test__catch_xss__given_form_data__then_data_captured(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", data={"param": "value"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"param": "value"}
 
 
 def test__catch_xss__given_headers__then_headers_captured(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", headers={"Header-Name": "HeaderValue"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.headers)["Header-Name"] == "HeaderValue"
 
 
 def test__catch_xss__given_empty_data__then_not_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"cookies": ""})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {}
 
 
 def test__catch_xss__given_cookies__then_cookies_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"cookies": "Cookie1=Value1; Cookie2=Value2"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"cookies": {"Cookie1": "Value1", "Cookie2": "Value2"}}
 
 
 def test__catch_xss__given_local_storage__then_local_storage_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"local_storage": json.dumps({"Param1": "Value1", "Param2": "Value2"})})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"local_storage": {"Param1": "Value1", "Param2": "Value2"}}
 
 
 def test__catch_xss__given_session_storage__then_session_storage_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"session_storage": json.dumps({"Param1": "Value1", "Param2": "Value2"})})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"session_storage": {"Param1": "Value1", "Param2": "Value2"}}
 
 
 def test__catch_xss__given_dom__then_dom_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"dom": "<body><h1>Hello World</h1></body>"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.data) == {"dom": "<html>\n<body><h1>Hello World</h1></body>\n</html>"}
 
 
 def test__catch_xss__given_tags__then_tags_stored(client_tester: FlaskClient):
     client: Client = Helpers.create_client("test")
     client_tester.post(f"/api/x/s/{client.uid}", json={"tags": "tag1,tag2"})
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     assert json.loads(xss.tags) == ["tag1", "tag2"]
 
 
@@ -123,7 +123,7 @@ def test__catch_xss__given_xss__when_global_mail_to_configured__then_mail_sent(E
     client: Client = Helpers.create_client("test")
     settings: Settings = Helpers.set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca", mail_to="test@example.com")
     client_tester.post(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     EmailXssNotification_mocker.assert_called_once_with(xss=xss)
     EmailXssNotification_mocker.return_value.send.assert_called_once
     assert settings.smtp_status is True
@@ -134,7 +134,7 @@ def test__catch_xss__given_xss__when_client_mail_to_configured__then_mail_sent(E
     client: Client = Helpers.create_client("test", mail_to="test@example.com")
     settings: Settings = Helpers.set_settings(smtp_host="127.0.0.1", smtp_port="25", mail_from="dax@hackerman.ca")
     client_tester.post(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     EmailXssNotification_mocker.assert_called_once_with(xss=xss)
     EmailXssNotification_mocker.return_value.send.assert_called_once
     assert settings.smtp_status is True
@@ -157,7 +157,7 @@ def test__catch_xss__given_xss__when_global_webhook_configured__then_webhook_sen
     client: Client = Helpers.create_client("test")
     Helpers.set_settings(webhook_url="http://test.com")
     client_tester.post(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     WebhookXssNotification_mocker.assert_called_once_with(xss=xss)
     WebhookXssNotification_mocker.return_value.send.assert_called_once()
 
@@ -166,7 +166,7 @@ def test__catch_xss__given_xss__when_global_webhook_configured__then_webhook_sen
 def test__catch_xss__given_xss__when_client_webhook_configured__then_webhook_sent(WebhookXssNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     client: Client = Helpers.create_client("test", webhook_url="http://test.com")
     client_tester.post(f"/api/x/s/{client.uid}")
-    xss: XSS = db.session.query(XSS).one()
+    xss: XSS = db.session.execute(db.select(XSS)).scalar_one()
     WebhookXssNotification_mocker.assert_called_once_with(xss=xss)
     WebhookXssNotification_mocker.return_value.send.assert_called_once()
 

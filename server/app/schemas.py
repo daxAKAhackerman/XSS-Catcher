@@ -26,7 +26,7 @@ class Client(db.Model):
         super().__init__(*args, **kwargs)
 
     def summary(self) -> dict[str, Any]:
-        xss: list[XSS] = db.session.query(XSS).filter_by(client_id=self.id).all()
+        xss: list[XSS] = list(db.session.execute(db.select(XSS).filter_by(client_id=self.id)).scalars().all())
         loot_amount = 0
         for hit in xss:
             loot_amount += len(json.loads(hit.data))
@@ -34,15 +34,17 @@ class Client(db.Model):
             "owner_id": self.owner_id,
             "id": self.id,
             "name": self.name,
-            "reflected": db.session.query(XSS).filter_by(client_id=self.id, xss_type="reflected").count(),
-            "stored": db.session.query(XSS).filter_by(client_id=self.id, xss_type="stored").count(),
+            "reflected": db.session.execute(
+                db.select(db.func.count()).select_from(XSS).where(XSS.client_id == self.id).where(XSS.xss_type == "reflected")
+            ).scalar(),
+            "stored": db.session.execute(db.select(db.func.count()).select_from(XSS).where(XSS.client_id == self.id).where(XSS.xss_type == "stored")).scalar(),
             "data": loot_amount,
         }
         return data
 
     def to_dict(self) -> dict[str, Any]:
         if self.owner_id is not None:
-            owner_username = db.session.query(User).filter_by(id=self.owner_id).one().username
+            owner_username = db.session.execute(db.select(User).filter_by(id=self.owner_id)).scalar_one().username
         else:
             owner_username = None
         data = {
@@ -59,7 +61,7 @@ class Client(db.Model):
         characters = string.ascii_letters + string.digits
         uid = "".join(random.choice(characters) for i in range(6))
 
-        while db.session.query(Client).filter_by(uid=uid).one_or_none() is not None:
+        while db.session.execute(db.select(Client).filter_by(uid=uid)).scalar_one_or_none() is not None:
             uid = "".join(random.choice(characters) for i in range(6))
         self.uid = uid
 
@@ -194,7 +196,7 @@ class BlockedJti(db.Model):
 
 @jwt.user_lookup_loader
 def user_loader_callback(jwt_header: dict[str, Any], jwt_payload: dict[str, Any]) -> Optional[User]:
-    return db.session.query(User).filter_by(username=jwt_payload["sub"]).one_or_none()
+    return db.session.execute(db.select(User).filter_by(username=jwt_payload["sub"])).scalar_one_or_none()
 
 
 @jwt.token_in_blocklist_loader
@@ -202,13 +204,14 @@ def check_if_token_in_blocklist(jwt_header: dict[str, Any], jwt_payload: dict[st
     if jwt_payload["type"] == "access":
         return False
     else:
-        blocked_jti = db.session.query(BlockedJti).filter_by(jti=jwt_payload["jti"]).one_or_none()
+        blocked_jti = db.session.execute(db.select(BlockedJti).filter_by(jti=jwt_payload["jti"])).scalar_one_or_none()
         return bool(blocked_jti)
 
 
 def init_app(app: Flask) -> None:
     with app.app_context():
-        if db.session.query(User).count() != 0:
+        user_count = db.session.execute(db.select(db.func.count()).select_from(User)).scalar()
+        if user_count is not None and user_count != 0:
             print("[-] User creation not needed")
         else:
             user = User(username="admin", is_admin=True, first_login=True)
@@ -217,16 +220,17 @@ def init_app(app: Flask) -> None:
             db.session.commit()
             print("[+] Initial user created")
 
-        if db.session.query(Settings).count() != 0:
+        settings_count = db.session.execute(db.select(db.func.count()).select_from(Settings)).scalar()
+        if settings_count is not None and settings_count != 0:
             print("[-] Settings initialization not needed")
         else:
             settings = Settings()
             db.session.add(settings)
             db.session.commit()
             print("[+] Settings initialization successful")
-        if db.session.query(BlockedJti).count() == 0:
+        if db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 0:
             print("[-] JWT blocklist reset not needed")
         else:
-            db.session.query(BlockedJti).delete()
+            db.session.execute(db.delete(BlockedJti))
             db.session.commit()
             print("[+] JWT blocklist reset successful")

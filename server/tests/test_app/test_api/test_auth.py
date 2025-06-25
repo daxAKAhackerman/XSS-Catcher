@@ -27,7 +27,7 @@ def test__login__given_credentials__when_credentials_are_valid__then_200_returne
 
 
 def test__login__given_credentials__when_mfa_configured__then_200_returned(client_tester: FlaskClient):
-    user: User = db.session.query(User).filter_by(id=1).one()
+    user: User = db.session.execute(db.select(User).filter_by(id=1)).scalar_one()
     user.mfa_secret = "ABC123"
     db.session.commit()
     response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss"})
@@ -39,7 +39,7 @@ def test__login__given_credentials__when_mfa_configured__then_200_returned(clien
 def test__login__given_credentials__when_invalid_mfa__then_400_returned(pyotp_mocker: mock.MagicMock, client_tester: FlaskClient):
     pyotp_mocker.TOTP.return_value.verify.return_value = False
 
-    user: User = db.session.query(User).filter_by(id=1).one()
+    user: User = db.session.execute(db.select(User).filter_by(id=1)).scalar_one()
     user.mfa_secret = "ABC123"
     db.session.commit()
     response = client_tester.post("/api/auth/login", json={"username": "admin", "password": "xss", "otp": "123123"})
@@ -57,6 +57,6 @@ def test__refresh__given_refresh_token__then_new_token_returned(client_tester: F
 def test__logout__given_jti__then_added_to_blocklist(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/auth/logout", headers={"Authorization": f"Bearer {refresh_token}"})
-    assert db.session.query(BlockedJti).count() == 1
+    assert db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 1
     assert response.json == {"msg": "Logged out successfully"}
     assert response.status_code == 200

@@ -3,7 +3,7 @@ import logging
 from app import db
 from app.api.models import SettingsPatchModel, SmtpTestPostModel, WebhookTestPostModel
 from app.notifications import EmailTestNotification, WebhookTestNotification
-from app.permissions import authorization_required, permissions
+from app.permissions import Permission, authorization_required, permissions
 from app.schemas import Settings
 from flask import Blueprint
 from flask_pydantic import validate
@@ -16,19 +16,19 @@ settings_bp = Blueprint("settings", __name__, url_prefix="/api/settings")
 
 @settings_bp.route("", methods=["GET"])
 @authorization_required()
-@permissions(all_of=["admin"])
+@permissions(all_of={Permission.ADMIN})
 def settings_get():
-    settings: Settings = db.session.query(Settings).one_or_none()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
 
     return settings.to_dict()
 
 
 @settings_bp.route("", methods=["PATCH"])
 @authorization_required()
-@permissions(all_of=["admin"])
+@permissions(all_of={Permission.ADMIN})
 @validate()
 def settings_patch(body: SettingsPatchModel):
-    settings: Settings = db.session.query(Settings).one_or_none()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
 
     if body.smtp_host is not None:
         if body.smtp_host == "":
@@ -104,10 +104,10 @@ def settings_patch(body: SettingsPatchModel):
 
 @settings_bp.route("/smtp_test", methods=["POST"])
 @authorization_required()
-@permissions(all_of=["admin"])
+@permissions(all_of={Permission.ADMIN})
 @validate()
 def smtp_test_post(body: SmtpTestPostModel):
-    settings: Settings = db.session.query(Settings).one_or_none()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
 
     try:
         EmailTestNotification(email_to=body.mail_to).send()
@@ -123,7 +123,7 @@ def smtp_test_post(body: SmtpTestPostModel):
 
 @settings_bp.route("/webhook_test", methods=["POST"])
 @authorization_required()
-@permissions(all_of=["admin"])
+@permissions(all_of={Permission.ADMIN})
 @validate()
 def webhook_test_post(body: WebhookTestPostModel):
     try:

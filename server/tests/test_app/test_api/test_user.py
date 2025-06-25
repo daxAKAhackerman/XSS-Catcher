@@ -9,7 +9,7 @@ from tests.helpers import Helpers
 def test__register__given_username__when_username_already_taken__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user", json={"username": "admin"}, headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).count() == 1
+    assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 1
     assert response.json == {"msg": "This user already exists"}
     assert response.status_code == 400
 
@@ -18,7 +18,7 @@ def test__register__given_username__when_username_already_taken__then_400_return
 def test__register__given_username__then_user_created(generate_password_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user", json={"username": "dax"}, headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).filter_by(username="dax").one() is not None
+    assert db.session.execute(db.select(User).filter_by(username="dax")).scalar_one() is not None
     assert response.json == {"password": "random_password"}
     assert response.status_code == 200
 
@@ -43,7 +43,7 @@ def test__change_password__given_password__then_password_changed(client_tester: 
         json={"password1": "Password123", "password2": "Password123", "old_password": "xss"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    user: User = db.session.query(User).filter_by(username="admin").one()
+    user: User = db.session.execute(db.select(User).filter_by(username="admin")).scalar_one()
     assert user.check_password("Password123")
     assert response.json == {"msg": "Password changed successfully"}
     assert response.status_code == 200
@@ -93,7 +93,7 @@ def test__change_password__given_password__when_passwords_dont_match__then_400_r
 def test__reset_password__given_user_id__then_password_is_reset(generate_password_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user/1/password", headers={"Authorization": f"Bearer {access_token}"})
-    user: User = db.session.query(User).filter_by(username="admin").one()
+    user: User = db.session.execute(db.select(User).filter_by(username="admin")).scalar_one()
     assert user.check_password("random_password")
     assert response.json == {"password": "random_password"}
     assert response.status_code == 200
@@ -109,7 +109,7 @@ def test__user_get__given_request__user_returned(client_tester: FlaskClient):
 def test__user_delete__given_user_id__when_only_one_user__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete("/api/user/1", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).count() == 1
+    assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 1
     assert response.json == {"msg": "Can't delete the only user"}
     assert response.status_code == 400
 
@@ -118,7 +118,7 @@ def test__user_delete__given_user_id__when_deleting_yourself__then_400_returned(
     Helpers.create_user("dax")
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete("/api/user/1", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).count() == 2
+    assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 2
     assert response.json == {"msg": "Can't delete yourself"}
     assert response.status_code == 400
 
@@ -127,7 +127,7 @@ def test__user_delete__given_user_id__then_user_deleted(client_tester: FlaskClie
     user: User = Helpers.create_user("dax")
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/user/{user.id}", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(User).filter_by(id=user.id).one_or_none() is None
+    assert db.session.execute(db.select(User).filter_by(id=user.id)).scalar_one_or_none() is None
     assert response.json == {"msg": f"User {user.username} deleted successfully"}
     assert response.status_code == 200
 
@@ -135,7 +135,7 @@ def test__user_delete__given_user_id__then_user_deleted(client_tester: FlaskClie
 def test__user_patch__given_request__when_trying_to_demote_yourself__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/user/1", json={"is_admin": False}, headers={"Authorization": f"Bearer {access_token}"})
-    user: User = db.session.query(User).filter_by(id=1).one()
+    user: User = db.session.execute(db.select(User).filter_by(id=1)).scalar_one()
     assert user.is_admin is True
     assert response.json == {"msg": "Can't demote yourself"}
     assert response.status_code == 400
@@ -185,7 +185,7 @@ def test__set_mfa__given_otp__when_good_otp__then_200_returned(pyotp_mocker: moc
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user/mfa", json={"secret": "A" * 32, "otp": "123123"}, headers={"Authorization": f"Bearer {access_token}"})
 
-    user: User = db.session.query(User).filter_by(id=1).one()
+    user: User = db.session.execute(db.select(User).filter_by(id=1)).scalar_one()
     assert user.mfa_secret == "A" * 32
     assert response.json == {"msg": "MFA set successfully"}
     assert response.status_code == 200
@@ -194,7 +194,7 @@ def test__set_mfa__given_otp__when_good_otp__then_200_returned(pyotp_mocker: moc
 def test__delete_mfa__given_user_id__then_200_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
 
-    user: User = db.session.query(User).filter_by(id=1).one()
+    user: User = db.session.execute(db.select(User).filter_by(id=1)).scalar_one()
     user.mfa_secret = "A" * 32
     db.session.commit()
 
@@ -209,7 +209,7 @@ def test__create_api_key__given_request__then_api_key_created(generate_key_mocke
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user/apikey", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert db.session.query(ApiKey).count() == 1
+    assert db.session.execute(db.select(db.func.count()).select_from(ApiKey)).scalar() == 1
     assert response.json == {"id": 1, "key": "11111111-1111-4111-a111-111111111111"}
 
 
@@ -220,7 +220,7 @@ def test__create_api_key__given_request__when_already_5_api_keys__then_400_retur
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/user/apikey", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert db.session.query(ApiKey).count() == 5
+    assert db.session.execute(db.select(db.func.count()).select_from(ApiKey)).scalar() == 5
     assert response.json == {"msg": "You already have 5 API keys"}
 
 
@@ -230,7 +230,7 @@ def test__delete_api_key__given_key_id__then_key_deleted(client_tester: FlaskCli
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/user/apikey/{api_key.id}", headers={"Authorization": f"Bearer {access_token}"})
 
-    assert db.session.query(ApiKey).count() == 0
+    assert db.session.execute(db.select(db.func.count()).select_from(ApiKey)).scalar() == 0
     assert response.json == {"msg": "API key deleted successfully"}
 
 

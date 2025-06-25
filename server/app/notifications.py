@@ -25,7 +25,7 @@ class EmailNotification:
     settings: Settings
 
     def __init__(self) -> None:
-        self.settings: Settings = db.session.query(Settings).one()
+        self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
         if self.settings.mail_from is None:
             raise Exception("Cannot initialize EmailNotification without mail_from setting")
         else:
@@ -115,7 +115,7 @@ class WebhookNotification:
     webhook_url: str
 
     def __init__(self) -> None:
-        self.settings: Settings = db.session.query(Settings).one()
+        self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
         if self.settings.webhook_type is None:
             raise Exception("Cannot initialize WebhookNotification without webhook_type setting")
         else:

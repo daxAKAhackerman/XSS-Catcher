@@ -9,7 +9,7 @@ from app.api.models import (
     ClientXssGetAllModel,
     XssGenerateModel,
 )
-from app.permissions import authorization_required, permissions
+from app.permissions import Permission, authorization_required, permissions
 from app.schemas import XSS, Client
 from flask import Blueprint
 from flask_pydantic import validate
@@ -21,7 +21,7 @@ xss_bp = Blueprint("xss", __name__, url_prefix="/api/xss")
 @authorization_required()
 @validate()
 def xss_generate(body: XssGenerateModel):
-    client: Client = db.session.query(Client).filter_by(id=body.client_id).first_or_404()
+    client: Client = db.first_or_404(db.select(Client).filter_by(id=body.client_id))
 
     if body.code_type == "html":
         if set(body.to_gather) & {"fingerprint", "dom", "screenshot"} or body.custom_js:
@@ -121,16 +121,16 @@ def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, 
 @xss_bp.route("/<int:xss_id>", methods=["GET"])
 @authorization_required()
 def client_xss_get(xss_id: int):
-    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
+    xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     return xss.to_dict()
 
 
 @xss_bp.route("/<int:xss_id>", methods=["DELETE"])
 @authorization_required()
-@permissions(one_of=["admin", "owner"])
+@permissions(any_of={Permission.ADMIN, Permission.OWNER})
 def xss_delete(xss_id: int):
-    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
+    xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     db.session.delete(xss)
     db.session.commit()
@@ -141,7 +141,7 @@ def xss_delete(xss_id: int):
 @xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @authorization_required()
 def xss_loot_get(xss_id: int, loot_type: str):
-    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
+    xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     xss_data = json.loads(xss.data)
 
@@ -150,9 +150,9 @@ def xss_loot_get(xss_id: int, loot_type: str):
 
 @xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @authorization_required()
-@permissions(one_of=["admin", "owner"])
+@permissions(any_of={Permission.ADMIN, Permission.OWNER})
 def xss_loot_delete(xss_id: int, loot_type: str):
-    xss: XSS = db.session.query(XSS).filter_by(id=xss_id).first_or_404()
+    xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     xss_data = json.loads(xss.data)
     xss_data.pop(loot_type, None)
@@ -175,7 +175,7 @@ def client_xss_get_all(query: ClientXssGetAllModel):
     if query.type is not None:
         filter_expression["xss_type"] = query.type
 
-    xss: List[XSS] = db.session.query(XSS).filter_by(**filter_expression).all()
+    xss: List[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
 
     xss_list = [hit.summary() for hit in xss]
 
@@ -192,7 +192,7 @@ def client_loot_get(query: ClientLootGetModel):
     if query.client_id is not None:
         filter_expression["client_id"] = query.client_id
 
-    xss: List[XSS] = db.session.query(XSS).filter_by(**filter_expression).all()
+    xss: List[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
 
     for hit in xss:
         loot_entry = {"xss_id": hit.id, "tags": json.loads(hit.tags), "data": {}}

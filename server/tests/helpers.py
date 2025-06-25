@@ -38,13 +38,13 @@ class Helpers:
 
     @staticmethod
     def delete_user(username: str) -> None:
-        user = db.session.query(User).filter_by(username=username).one_or_none()
+        user = db.session.execute(db.select(User).filter_by(username=username)).scalar_one_or_none()
         db.session.delete(user)
         db.session.commit()
 
     @staticmethod
     def set_settings(*args, **kwargs) -> Settings:
-        current_settings = db.session.query(Settings).one()
+        current_settings = db.session.execute(db.select(Settings)).scalar_one()
         db.session.delete(current_settings)
         effective_settings = {"id": 1, "starttls": False, "ssl_tls": False, "webhook_type": 0, **kwargs}
         settings = Settings(**effective_settings)

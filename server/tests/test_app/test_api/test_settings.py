@@ -27,7 +27,7 @@ def test__settings_get__given_request__then_settings_returned(client_tester: Fla
 def test__settings_patch__given_smtp_host__when_smtp_port_missing__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1"}, headers={"Authorization": f"Bearer {access_token}"})
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_host is None
     assert response.json == {"msg": "Missing SMTP port"}
     assert response.status_code == 400
@@ -40,7 +40,7 @@ def test__settings_patch__given_both_starttls_and_ssl_tls__then_400_returned(cli
         json={"starttls": True, "ssl_tls": True, "smtp_host": "127.0.0.1", "smtp_port": 465, "mail_from": "test@example.com"},
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.starttls is False
     assert settings.ssl_tls is False
     assert response.json == {"msg": "Cannot use STARTTLS and SSL/TLS at the same time"}
@@ -50,7 +50,7 @@ def test__settings_patch__given_both_starttls_and_ssl_tls__then_400_returned(cli
 def test__settings_patch__given_smtp_host__when_mail_from_missing__then_400_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.patch("/api/settings", json={"smtp_host": "127.0.0.1", "smtp_port": 465}, headers={"Authorization": f"Bearer {access_token}"})
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_host is None
     assert response.json == {"msg": "Missing sender address"}
     assert response.status_code == 400
@@ -73,7 +73,7 @@ def test__settings_patch__given_all_fields__when_fields_are_valid__then_settings
         },
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_host == "127.0.0.1"
     assert settings.smtp_port == 465
     assert settings.mail_to == "mail_to@example.com"
@@ -101,7 +101,7 @@ def test__settings_patch__given_all_smtp_fields_but_smtp_host__then_all_smtp_set
         },
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_host is None
     assert settings.smtp_port is None
     assert settings.mail_to is None
@@ -123,7 +123,7 @@ def test__settings_patch__given_smtp_pass__when_smtp_user_missing__then_credenti
         },
         headers={"Authorization": f"Bearer {access_token}"},
     )
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_pass is None
 
 
@@ -177,7 +177,7 @@ def test__settings_patch__given_empty_smtp_host__then_smtp_configuration_reset(c
 def test__smtp_test_post__given_mail_to__then_configuration_successfully_tested(EmailTestNotification_mocker: mock.MagicMock, client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     EmailTestNotification_mocker.assert_called_once_with(email_to="test@example.com")
     EmailTestNotification_mocker.return_value.send.assert_called_once()
     assert settings.smtp_status is True
@@ -191,7 +191,7 @@ def test__smtp_test_post__given_mail_to__when_send_test_mail_fails__then_configu
 ):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/settings/smtp_test", json={"mail_to": "test@example.com"}, headers={"Authorization": f"Bearer {access_token}"})
-    settings: Settings = db.session.query(Settings).one()
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
     assert settings.smtp_status is False
     assert response.json == {"msg": "Could not send test email. Please review your SMTP configuration and don't forget to save it before testing it. "}
     assert response.status_code == 400

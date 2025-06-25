@@ -133,7 +133,7 @@ class TestUser:
 
 class TestSettings:
     def test__to_dict__given_self__then_dict_returned(self, client_tester: FlaskClient):
-        settings: Settings = db.session.query(Settings).one()
+        settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
         assert settings.to_dict() == {
             "smtp_host": None,
             "smtp_port": None,
@@ -151,7 +151,7 @@ class TestSettings:
 class TestUserLoaderCallback:
     def test__given_jwt__then_user_returned(self, client_tester: FlaskClient):
         user: User = user_loader_callback({}, {"sub": "admin"})
-        admin: User = db.session.query(User).filter_by(username="admin").one()
+        admin: User = db.session.execute(db.select(User).filter_by(username="admin")).scalar_one()
         assert user is admin
 
 
@@ -168,21 +168,21 @@ class TestCheckIfTokenInBlocklist:
 
 class TestInitApp:
     def test__given_app__when_already_init__then_do_nothing(self, client_tester: FlaskClient):
-        assert db.session.query(User).count() == 1
-        assert db.session.query(Settings).count() == 1
-        assert db.session.query(BlockedJti).count() == 0
+        assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(Settings)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 0
         init_app(client_tester.application)
-        assert db.session.query(User).count() == 1
-        assert db.session.query(Settings).count() == 1
-        assert db.session.query(BlockedJti).count() == 0
+        assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(Settings)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 0
 
     @pytest.mark.no_db_init
     def test__given_app__when_need_init__then_db_modified(self, client_tester: FlaskClient):
         Helpers.create_blocked_jti("abc123")
-        assert db.session.query(User).count() == 0
-        assert db.session.query(Settings).count() == 0
-        assert db.session.query(BlockedJti).count() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 0
+        assert db.session.execute(db.select(db.func.count()).select_from(Settings)).scalar() == 0
+        assert db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 1
         init_app(client_tester.application)
-        assert db.session.query(User).count() == 1
-        assert db.session.query(Settings).count() == 1
-        assert db.session.query(BlockedJti).count() == 0
+        assert db.session.execute(db.select(db.func.count()).select_from(User)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(Settings)).scalar() == 1
+        assert db.session.execute(db.select(db.func.count()).select_from(BlockedJti)).scalar() == 0

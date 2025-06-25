@@ -208,7 +208,7 @@ def test__xss_delete__given_xss_id__then_xss_deleted(client_tester: FlaskClient)
     xss: XSS = Helpers.create_xss()
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/xss/{xss.id}", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(XSS).count() == 0
+    assert db.session.execute(db.select(db.func.count()).select_from(XSS)).scalar() == 0
     assert response.json == {"msg": "XSS deleted successfully"}
     assert response.status_code == 200
 

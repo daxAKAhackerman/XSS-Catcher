@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pyotp
 from app import db
 from app.api.models import LoginModel
@@ -19,7 +21,7 @@ def login(body: LoginModel):
     if current_user:
         return {"msg": "Already logged in"}, 400
 
-    user: User = db.session.query(User).filter_by(username=body.username).one_or_none()
+    user: Optional[User] = db.session.execute(db.select(User).filter_by(username=body.username)).scalar_one_or_none()
     if user is None or not user.check_password(body.password):
         return {"msg": "Bad username or password"}, 403
 

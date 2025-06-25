@@ -8,7 +8,7 @@ def test__client_post__given_client_info__when_client_already_exists__then_400_r
     client = Helpers.create_client("test")
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/client", json={"name": client.name, "description": ""}, headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(Client).count() == 1
+    assert db.session.execute(db.select(db.func.count()).select_from(Client)).scalar() == 1
     assert response.json == {"msg": "Client already exists"}
     assert response.status_code == 400
 
@@ -16,7 +16,7 @@ def test__client_post__given_client_info__when_client_already_exists__then_400_r
 def test__client_post__given_client_info__when_info_is_valid__then_201_returned(client_tester: FlaskClient):
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.post("/api/client", json={"name": "test", "description": ""}, headers={"Authorization": f"Bearer {access_token}"})
-    client: Client = db.session.query(Client).one()
+    client: Client = db.session.execute(db.select(Client)).scalar_one()
     assert client.name == "test"
     assert client.description == ""
     assert response.json == {"msg": "New client test created successfully"}
@@ -95,7 +95,7 @@ def test__client_delete__given_client_id__then_client_deleted(client_tester: Fla
     client = Helpers.create_client("test")
     access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
     response = client_tester.delete(f"/api/client/{client.id}", headers={"Authorization": f"Bearer {access_token}"})
-    assert db.session.query(Client).count() == 0
+    assert db.session.execute(db.select(db.func.count()).select_from(Client)).scalar() == 0
     assert response.json == {"msg": "Client test deleted successfully"}
     assert response.status_code == 200
 
