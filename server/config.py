@@ -11,14 +11,23 @@ def get_db_url() -> str:
         return "postgresql://postgres@/postgres"
 
 
-class Config:
-    SECRET_KEY: str = str(uuid.uuid4())
-    SQLALCHEMY_DATABASE_URI: str = get_db_url()
+class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SQLALCHEMY_DATABASE_URI = get_db_url()
+
+
+class ProdConfig(BaseConfig):
+    SECRET_KEY = str(uuid.uuid4())
     JWT_ACCESS_TOKEN_EXPIRES: int = 300
 
-    def __init__(self) -> None:
-        if os.getenv("FLASK_DEBUG"):
-            # Prevent the cookie from going bad every time the server restarts and make it valid for a longer time
-            self.SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV"
-            self.JWT_ACCESS_TOKEN_EXPIRES = 3600
+
+class DevConfig(BaseConfig):
+    SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV"
+    JWT_ACCESS_TOKEN_EXPIRES = 3600
+
+
+def get_config() -> type:
+    if os.getenv("FLASK_DEBUG"):
+        return DevConfig
+    else:
+        return ProdConfig

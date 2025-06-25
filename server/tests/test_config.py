@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from config import Config, get_db_url
+from config import get_config, get_db_url
 
 
 class TestGetDbUrl:
@@ -16,17 +16,17 @@ class TestGetDbUrl:
         del os.environ["FLASK_DEBUG"]
 
 
-class TestConfig:
-    def test____init____when_flask_debug__then_dev_secret_key_used(self):
+class TestGetConfig:
+    def test__when_flask_debug__then_dev_secret_key_used(self):
         os.environ["FLASK_DEBUG"] = "1"
-        config = Config()
+        config = get_config()
         assert config.SECRET_KEY == "A_KEY_ONLY_USED_FOR_DEV"
         assert config.JWT_ACCESS_TOKEN_EXPIRES == 3600
         del os.environ["FLASK_DEBUG"]
 
-    def test____init____when_not_flask_debug__then_random_secret_key_used(self):
+    def test__when_not_flask_debug__then_random_secret_key_used(self):
         os.environ["FLASK_DEBUG"] = ""
-        config = Config()
+        config = get_config()
         assert uuid.UUID(config.SECRET_KEY)
         assert config.JWT_ACCESS_TOKEN_EXPIRES == 300
         del os.environ["FLASK_DEBUG"]
