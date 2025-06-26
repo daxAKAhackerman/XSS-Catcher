@@ -23,8 +23,6 @@ def create_app(config_class: Optional[type] = None):
     app = Flask(__name__)
     app.config.from_object(config_class or get_config())
 
-    print(app.config.get("SECRET_KEY"))
-
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
