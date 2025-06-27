@@ -292,7 +292,7 @@ class TestWebhookXssNotification:
                 "captured_data": [],
                 "captured_headers": [],
             },
-            "client": {"id": 1, "uid": "aaaaaa", "name": "test", "description": ""},
+            "client": {"id": 1, "uid": "aaaaaa", "name": "test", "description": None},
             "user": {"id": 1, "username": "admin", "admin": True},
         }
 

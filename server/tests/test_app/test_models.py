@@ -27,22 +27,29 @@ class TestClient:
         assert client.summary() == {"owner_id": 1, "id": 1, "name": "test", "reflected": 0, "stored": 1, "data": 2}
 
     def test__to_dict__given_self__then_dict_returned(self, client_tester: FlaskClient):
-        client: Client = Helpers.create_client("test", mail_to="test@example.com", webhook_url="http://127.0.0.1")
+        client: Client = Helpers.create_client("test", mail_to="test@example.com", webhook_url="http://127.0.0.1", description="hello world")
         assert client.to_dict() == {
             "owner": "admin",
             "id": 1,
             "name": "test",
-            "description": "",
+            "description": "hello world",
             "mail_to": "test@example.com",
             "webhook_url": "http://127.0.0.1",
         }
 
     def test__to_dict__given_self__when_owner_does_not_exist__then_dict_returned_with_nobody_owner(self, client_tester: FlaskClient):
         user = Helpers.create_user("test")
-        client: Client = Helpers.create_client("test", mail_to="test@example.com", webhook_url="http://127.0.0.1", owner_id=2)
+        client: Client = Helpers.create_client("test", mail_to="test@example.com", webhook_url="http://127.0.0.1", owner_id=2, description="hello world")
         db.session.delete(user)
         db.session.commit()
-        assert client.to_dict() == {"owner": None, "id": 1, "name": "test", "description": "", "mail_to": "test@example.com", "webhook_url": "http://127.0.0.1"}
+        assert client.to_dict() == {
+            "owner": None,
+            "id": 1,
+            "name": "test",
+            "description": "hello world",
+            "mail_to": "test@example.com",
+            "webhook_url": "http://127.0.0.1",
+        }
 
     def test__set_uid__given_self__then_uid_set(self, client_tester: FlaskClient):
         client = Client()
