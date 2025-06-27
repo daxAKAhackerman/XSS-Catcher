@@ -1,7 +1,5 @@
-from typing import List
-
 from app import db
-from app.api.models import ClientPatchModel, ClientPostModel
+from app.api.models import UNDEFINED, ClientPatchModel, ClientPostModel
 from app.permissions import (
     Permission,
     authorization_required,
@@ -18,7 +16,7 @@ client_bp = Blueprint("client", __name__, url_prefix="/api/client")
 @client_bp.route("", methods=["POST"])
 @authorization_required()
 @validate()
-def client_post(body: ClientPostModel):
+def create_client(body: ClientPostModel):
     current_user: User = get_current_user()
 
     client_count = db.session.execute(db.select(db.func.count()).select_from(Client).where(Client.name == body.name)).scalar()
@@ -34,7 +32,7 @@ def client_post(body: ClientPostModel):
 
 @client_bp.route("/<int:client_id>", methods=["GET"])
 @authorization_required()
-def client_get(client_id: int):
+def get_client(client_id: int):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=client_id))
 
     return client.to_dict()
@@ -44,35 +42,27 @@ def client_get(client_id: int):
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
 @validate()
-def client_patch(client_id: int, body: ClientPatchModel):
+def edit_client(client_id: int, body: ClientPatchModel):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=client_id))
 
     if body.name is not None:
         if body.name != client.name and db.session.execute(db.select(Client).filter_by(name=body.name)).scalar_one_or_none() is not None:
-            db.session.remove()
             return {"msg": "Another client already uses this name"}, 400
         client.name = body.name
 
-    if body.description is not None:
-        client.description = body.description
-
     if body.owner is not None:
         if db.session.execute(db.select(User).filter_by(id=body.owner)).scalar_one_or_none() is None:
-            db.session.remove()
             return {"msg": "This user does not exist"}, 400
         client.owner_id = body.owner
 
-    if body.mail_to is not None:
-        if body.mail_to == "":
-            client.mail_to = None
-        else:
-            client.mail_to = body.mail_to
+    if body.description is not UNDEFINED:
+        client.description = body.description
 
-    if body.webhook_url is not None:
-        if body.webhook_url == "":
-            client.webhook_url = None
-        else:
-            client.webhook_url = body.webhook_url
+    if body.mail_to is not UNDEFINED:
+        client.mail_to = body.mail_to
+
+    if body.webhook_url is not UNDEFINED:
+        client.webhook_url = body.webhook_url
 
     db.session.commit()
 
@@ -82,7 +72,7 @@ def client_patch(client_id: int, body: ClientPatchModel):
 @client_bp.route("/<int:client_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
-def client_delete(client_id: int):
+def delete_client(client_id: int):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=client_id))
     db.session.execute(db.delete(XSS).where(XSS.client_id == client_id))
     db.session.delete(client)
@@ -93,6 +83,6 @@ def client_delete(client_id: int):
 
 @client_bp.route("", methods=["GET"])
 @authorization_required()
-def client_get_all():
-    clients: List[Client] = list(db.session.execute(db.select(Client).order_by(Client.id.desc())).scalars().all())
+def get_all_clients():
+    clients: list[Client] = list(db.session.execute(db.select(Client).order_by(Client.id.desc())).scalars().all())
     return [client.summary() for client in clients]

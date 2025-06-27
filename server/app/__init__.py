@@ -42,4 +42,8 @@ def create_app(config_class: Optional[type] = None):
     app.register_blueprint(x_bp)
     app.register_blueprint(xss_bp)
 
+    @app.teardown_appcontext
+    def shutdown_session(exception=None):
+        db.session.remove()
+
     return app

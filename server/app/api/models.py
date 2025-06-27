@@ -4,6 +4,7 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
+UNDEFINED = "__UNDEFINED__"
 
 
 class LoginModel(BaseModel):
@@ -14,15 +15,15 @@ class LoginModel(BaseModel):
 
 class ClientPostModel(BaseModel):
     name: str = Field(min_length=1, max_length=32)
-    description: str = Field(max_length=128)
+    description: Optional[str] = None
 
 
 class ClientPatchModel(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=32)
-    description: Optional[str] = Field(default=None, max_length=128)
     owner: Optional[int] = None
-    mail_to: Optional[str] = None
-    webhook_url: Optional[str] = None
+    description: Optional[str] = UNDEFINED
+    mail_to: Optional[str] = UNDEFINED
+    webhook_url: Optional[str] = UNDEFINED
 
 
 class SettingsPatchModel(BaseModel):

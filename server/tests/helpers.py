@@ -18,8 +18,15 @@ class Helpers:
             raise Exception("Login helper response did not contain valid JSON")
 
     @staticmethod
-    def create_client(name: str, owner_id: int = 1, webhook_url: Optional[str] = None, mail_to: Optional[str] = None, uid: Optional[str] = None) -> Client:
-        client = Client(name=name, description="", owner_id=owner_id, webhook_url=webhook_url, mail_to=mail_to)
+    def create_client(
+        name: str,
+        owner_id: int = 1,
+        webhook_url: Optional[str] = None,
+        mail_to: Optional[str] = None,
+        uid: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> Client:
+        client = Client(name=name, description=description, owner_id=owner_id, webhook_url=webhook_url, mail_to=mail_to)
         if uid:
             client.uid = uid
         else:

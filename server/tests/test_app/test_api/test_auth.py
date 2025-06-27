@@ -59,7 +59,7 @@ class TestLogin:
         assert response.status_code == 200
 
 
-class TestRefresh:
+class TestRefreshToken:
     def test__given_refresh_token__then_new_token_returned(self, client_tester: FlaskClient):
         access_token, refresh_token = Helpers.login(client_tester, "admin", "xss")
         response = client_tester.post("/api/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})

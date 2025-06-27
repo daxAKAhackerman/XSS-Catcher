@@ -36,7 +36,7 @@ def login(body: LoginModel):
 
 @auth_bp.route("/refresh", methods=["POST"])
 @authorization_required(refresh=True)
-def refresh():
+def refresh_token():
     current_user: User = get_current_user()
     return {"access_token": create_access_token(identity=current_user.username)}
 
