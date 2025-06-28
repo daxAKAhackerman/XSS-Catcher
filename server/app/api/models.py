@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 UNDEFINED = "__UNDEFINED__"
+UNDEFINED_TYPE = Literal["__UNDEFINED__"]
 
 
 class LoginModel(BaseModel):
@@ -13,12 +14,12 @@ class LoginModel(BaseModel):
     otp: Optional[str] = Field(default=None, pattern=r"\d{6}")
 
 
-class ClientPostModel(BaseModel):
+class CreateClientModel(BaseModel):
     name: str = Field(min_length=1, max_length=32)
     description: Optional[str] = None
 
 
-class ClientPatchModel(BaseModel):
+class EditClientModel(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=32)
     owner: Optional[int] = None
     description: Optional[str] = UNDEFINED
@@ -26,24 +27,24 @@ class ClientPatchModel(BaseModel):
     webhook_url: Optional[str] = UNDEFINED
 
 
-class SettingsPatchModel(BaseModel):
-    smtp_host: Optional[str] = Field(default=None, max_length=256)
-    smtp_port: Optional[int] = Field(default=None, gt=0, lt=65536)
-    starttls: Optional[bool] = None
-    ssl_tls: Optional[bool] = None
-    mail_from: Optional[str] = None
-    mail_to: Optional[str] = None
-    smtp_user: Optional[str] = Field(default=None, max_length=128)
-    smtp_pass: Optional[str] = Field(default=None, max_length=128)
-    webhook_url: Optional[str] = None
-    webhook_type: Optional[Literal[0, 1, 2]] = None
+class EditSettingsModel(BaseModel):
+    smtp_host: Optional[str] = UNDEFINED
+    smtp_port: Optional[int | UNDEFINED_TYPE] = Field(default=UNDEFINED, ge=1, le=65535)
+    starttls: Optional[bool | UNDEFINED_TYPE] = UNDEFINED
+    ssl_tls: Optional[bool | UNDEFINED_TYPE] = UNDEFINED
+    mail_from: Optional[str] = UNDEFINED
+    mail_to: Optional[str] = UNDEFINED
+    smtp_user: Optional[str] = UNDEFINED
+    smtp_pass: Optional[str] = UNDEFINED
+    webhook_url: Optional[str] = UNDEFINED
+    webhook_type: Optional[Literal[0, 1, 2] | UNDEFINED_TYPE] = UNDEFINED
 
 
-class SmtpTestPostModel(BaseModel):
+class TestSmtpSettingsModel(BaseModel):
     mail_to: str
 
 
-class WebhookTestPostModel(BaseModel):
+class TestWebhookSettingsModel(BaseModel):
     webhook_url: str
 
 

@@ -1,5 +1,5 @@
 from app import db
-from app.api.models import UNDEFINED, ClientPatchModel, ClientPostModel
+from app.api.models import UNDEFINED, CreateClientModel, EditClientModel
 from app.permissions import (
     Permission,
     authorization_required,
@@ -16,7 +16,7 @@ client_bp = Blueprint("client", __name__, url_prefix="/api/client")
 @client_bp.route("", methods=["POST"])
 @authorization_required()
 @validate()
-def create_client(body: ClientPostModel):
+def create_client(body: CreateClientModel):
     current_user: User = get_current_user()
 
     client_count = db.session.execute(db.select(db.func.count()).select_from(Client).where(Client.name == body.name)).scalar()
@@ -42,7 +42,7 @@ def get_client(client_id: int):
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
 @validate()
-def edit_client(client_id: int, body: ClientPatchModel):
+def edit_client(client_id: int, body: EditClientModel):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=client_id))
 
     if body.name is not None:
