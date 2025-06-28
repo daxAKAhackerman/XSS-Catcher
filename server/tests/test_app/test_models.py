@@ -29,7 +29,7 @@ class TestClient:
     def test__to_dict__given_self__then_dict_returned(self, client_tester: FlaskClient):
         client: Client = Helpers.create_client("test", mail_to="test@example.com", webhook_url="http://127.0.0.1", description="hello world")
         assert client.to_dict() == {
-            "owner": "admin",
+            "owner_id": 1,
             "id": 1,
             "name": "test",
             "description": "hello world",
@@ -43,7 +43,7 @@ class TestClient:
         db.session.delete(user)
         db.session.commit()
         assert client.to_dict() == {
-            "owner": None,
+            "owner_id": None,
             "id": 1,
             "name": "test",
             "description": "hello world",

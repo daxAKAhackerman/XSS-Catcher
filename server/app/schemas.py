@@ -43,12 +43,8 @@ class Client(db.Model):
         return data
 
     def to_dict(self) -> dict[str, Any]:
-        if self.owner_id is not None:
-            owner_username = db.session.execute(db.select(User).filter_by(id=self.owner_id)).scalar_one().username
-        else:
-            owner_username = None
         data = {
-            "owner": owner_username,
+            "owner_id": self.owner_id,
             "id": self.id,
             "name": self.name,
             "description": self.description,

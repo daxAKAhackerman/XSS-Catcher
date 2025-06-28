@@ -33,7 +33,7 @@ class TestGetClient:
             "id": client.id,
             "mail_to": client.mail_to,
             "name": client.name,
-            "owner": "admin",
+            "owner_id": 1,
             "webhook_url": client.webhook_url,
         }
         assert response.status_code == 200
