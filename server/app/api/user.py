@@ -21,6 +21,9 @@ from app.schemas import ApiKey, User
 from flask import Blueprint
 from flask_pydantic import validate
 
+MEDIUM_GREY = "#1f1f1f"
+TEXT_BLUE = "#9cdcfe"
+
 user_bp = Blueprint("users", __name__, url_prefix="/api/user")
 
 
@@ -139,7 +142,7 @@ def get_mfa():
 
     qr_code = pyqrcode.create(secret_provisioning_uri)
     in_memory_image = io.BytesIO()
-    qr_code.png(in_memory_image, scale=3, module_color="#9cdcfe", background="#1f1f1f")
+    qr_code.png(in_memory_image, scale=3, module_color=TEXT_BLUE, background=MEDIUM_GREY)
     base64_qr_code = base64.b64encode(in_memory_image.getvalue()).decode("ascii")
 
     return {"secret": secret, "qr_code": base64_qr_code}
