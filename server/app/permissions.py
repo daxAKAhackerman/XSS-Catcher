@@ -8,7 +8,6 @@ import jwt
 from app import db
 from app.schemas import XSS, ApiKey, Client, User
 from flask import current_app, g, request
-from werkzeug.exceptions import HTTPException
 
 
 class Permission(StrEnum):
@@ -16,7 +15,7 @@ class Permission(StrEnum):
     OWNER = "owner"
 
 
-class InvalidApiKeyException(HTTPException):
+class InvalidApiKeyException(Exception):
     pass
 
 
@@ -68,7 +67,7 @@ def _validate_api_key(key: str) -> None:
     if api_key is not None:
         g._api_key_user = {"loaded_user": api_key.owner}
     else:
-        raise InvalidApiKeyException
+        raise InvalidApiKeyException()
 
 
 def get_current_user() -> User:

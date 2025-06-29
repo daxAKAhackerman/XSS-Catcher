@@ -2,6 +2,7 @@ import re
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
+from werkzeug.exceptions import BadRequest
 
 DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 UNDEFINED = "__UNDEFINED__"
@@ -49,7 +50,7 @@ class TestWebhookSettingsModel(BaseModel):
 
 
 class RegisterModel(BaseModel):
-    username: str = Field(min_length=1, max_length=128)
+    username: str = Field(min_length=1)
 
 
 class ChangePasswordModel(BaseModel):
@@ -61,22 +62,22 @@ class ChangePasswordModel(BaseModel):
     @classmethod
     def password_complexity(cls, v: str) -> str:
         if not re.search(r"\d", v):
-            raise ValueError("password must contain a number")
+            raise BadRequest("password must contain a number")
         if not re.search(r"[a-z]", v):
-            raise ValueError("password must contain a lower case letter")
+            raise BadRequest("password must contain a lower case letter")
         if not re.search(r"[A-Z]", v):
-            raise ValueError("password must contain an upper case letter")
+            raise BadRequest("password must contain an upper case letter")
         return v
 
     @model_validator(mode="after")
     def password_match(self):
         if self.password1 != self.password2:
-            raise ValueError("passwords don't match")
+            raise BadRequest("passwords don't match")
         return self
 
 
 class UserPatchModel(BaseModel):
-    is_admin: bool
+    is_admin: bool | UNDEFINED_TYPE = UNDEFINED
 
 
 class XssGenerateModel(BaseModel):
@@ -92,7 +93,7 @@ class XssGenerateModel(BaseModel):
     def to_gather_validator(cls, v, values, **kwargs):
         for value in v:
             if value not in DATA_TO_GATHER:
-                raise ValueError(f"values in to_gather must be in {DATA_TO_GATHER}")
+                raise BadRequest(f"values in to_gather must be in {DATA_TO_GATHER}")
         return v
 
 

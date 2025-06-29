@@ -1,11 +1,11 @@
 import base64
 import io
-from typing import List
 
 import pyotp
 import pyqrcode
 from app import db
 from app.api.models import (
+    UNDEFINED,
     ChangePasswordModel,
     RegisterModel,
     SetMfaModel,
@@ -74,7 +74,7 @@ def reset_password(user_id: int):
 
 @user_bp.route("/current", methods=["GET"])
 @authorization_required()
-def user_get():
+def get_user():
     current_user: User = get_current_user()
 
     return current_user.to_dict()
@@ -83,7 +83,7 @@ def user_get():
 @user_bp.route("/<int:user_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(all_of={Permission.ADMIN})
-def user_delete(user_id: int):
+def delete_user(user_id: int):
     current_user: User = get_current_user()
 
     user_count = db.session.execute(db.select(db.func.count()).select_from(User)).scalar()
@@ -105,7 +105,7 @@ def user_delete(user_id: int):
 @authorization_required()
 @permissions(all_of={Permission.ADMIN})
 @validate()
-def user_patch(user_id: int, body: UserPatchModel):
+def edit_user(user_id: int, body: UserPatchModel):
     current_user: User = get_current_user()
 
     if current_user.id == user_id:
@@ -113,7 +113,9 @@ def user_patch(user_id: int, body: UserPatchModel):
 
     user: User = db.first_or_404(db.select(User).filter_by(id=user_id))
 
-    user.is_admin = body.is_admin
+    if body.is_admin is not UNDEFINED and isinstance(body.is_admin, bool):
+        user.is_admin = body.is_admin
+
     db.session.commit()
 
     return {"msg": f"User {user.username} modified successfully"}
@@ -121,8 +123,8 @@ def user_patch(user_id: int, body: UserPatchModel):
 
 @user_bp.route("", methods=["GET"])
 @authorization_required()
-def user_get_all():
-    users: List[User] = list(db.session.execute(db.select(User)).scalars().all())
+def get_all_users():
+    users: list[User] = list(db.session.execute(db.select(User)).scalars().all())
 
     return [user.to_dict() for user in users]
 
@@ -137,7 +139,7 @@ def get_mfa():
 
     qr_code = pyqrcode.create(secret_provisioning_uri)
     in_memory_image = io.BytesIO()
-    qr_code.png(in_memory_image, scale=3)
+    qr_code.png(in_memory_image, scale=3, module_color="#9cdcfe", background="#1f1f1f")
     base64_qr_code = base64.b64encode(in_memory_image.getvalue()).decode("ascii")
 
     return {"secret": secret, "qr_code": base64_qr_code}
@@ -203,6 +205,6 @@ def delete_api_key(key_id: int):
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
 def list_api_keys(user_id: int):
-    api_keys: List[ApiKey] = list(db.session.execute(db.select(ApiKey).filter_by(owner_id=user_id)).scalars().all())
+    api_keys: list[ApiKey] = list(db.session.execute(db.select(ApiKey).filter_by(owner_id=user_id)).scalars().all())
 
     return [api_key.to_obfuscated_dict() for api_key in api_keys]

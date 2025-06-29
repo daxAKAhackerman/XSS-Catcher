@@ -11,6 +11,7 @@ import requests
 from app import db
 from app.schemas import XSS, Client, Settings, User
 from jinja2 import Environment, FileSystemLoader
+from werkzeug.exceptions import InternalServerError
 
 
 class WebhookType(IntEnum):
@@ -27,17 +28,17 @@ class EmailNotification:
     def __init__(self) -> None:
         self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
         if self.settings.mail_from is None:
-            raise Exception("Cannot initialize EmailNotification without mail_from setting")
+            raise InternalServerError("Cannot initialize EmailNotification without mail_from setting")
         else:
             self.email_from = self.settings.mail_from
 
     @property
     def message(self) -> Any:  # pragma: no cover
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def send(self) -> None:
         if self.settings.smtp_host is None or self.settings.smtp_port is None:
-            raise Exception("Cannot send EmailNotification without smtp_host and smtp_port settings")
+            raise InternalServerError("Cannot send EmailNotification without smtp_host and smtp_port settings")
 
         user = self.settings.smtp_user
         password = self.settings.smtp_pass
@@ -69,7 +70,7 @@ class EmailXssNotification(EmailNotification):
         if email_to := self.client.mail_to or self.settings.mail_to:
             self.email_to = email_to
         else:
-            raise Exception("Cannot initialize EmailXssNotification without global or client mail_to setting")
+            raise InternalServerError("Cannot initialize EmailXssNotification without global or client mail_to setting")
 
     @property
     def message(self) -> MIMEMultipart:
@@ -117,7 +118,7 @@ class WebhookNotification:
     def __init__(self) -> None:
         self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
         if self.settings.webhook_type is None:
-            raise Exception("Cannot initialize WebhookNotification without webhook_type setting")
+            raise InternalServerError("Cannot initialize WebhookNotification without webhook_type setting")
         else:
             self.webhook_type = self.settings.webhook_type
 
@@ -133,15 +134,15 @@ class WebhookNotification:
 
     @property
     def slack_message(self) -> dict[str, Any]:  # pragma: no cover
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @property
     def discord_message(self) -> dict[str, Any]:  # pragma: no cover
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @property
     def automation_message(self) -> dict[str, Any]:  # pragma: no cover
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def send(self) -> None:
         requests.post(url=self.webhook_url, json=self.message)
@@ -160,7 +161,7 @@ class WebhookXssNotification(WebhookNotification):
         if webhook_url := self.client.webhook_url or self.settings.webhook_url:
             self.webhook_url = webhook_url
         else:
-            raise Exception("Cannot initialize WebhookXssNotification without global or client webhook_url setting")
+            raise InternalServerError("Cannot initialize WebhookXssNotification without global or client webhook_url setting")
 
     @property
     def slack_message(self) -> dict[str, Any]:
