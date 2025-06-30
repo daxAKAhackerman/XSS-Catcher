@@ -2,7 +2,6 @@ from typing import Optional
 
 from config import get_config
 from flask import Flask
-from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -16,7 +15,6 @@ class BaseModel(DeclarativeBase):
 db = SQLAlchemy(model_class=BaseModel)
 migrate = Migrate()
 jwt = JWTManager()
-cors = CORS()
 
 
 def create_app(config_class: Optional[type] = None):
@@ -26,7 +24,6 @@ def create_app(config_class: Optional[type] = None):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    cors.init_app(app, resources={r"/x/*": {"origins": "*"}})
 
     from app.api.auth import auth_bp
     from app.api.client import client_bp
