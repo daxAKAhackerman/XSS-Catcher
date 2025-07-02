@@ -1,10 +1,10 @@
 import json
 import logging
 import time
-from enum import StrEnum
 from typing import Optional
 
 from app import db
+from app.api.models import XssType
 from app.notifications import EmailXssNotification, WebhookXssNotification
 from app.schemas import XSS, Client, Settings
 from flask import Blueprint, request
@@ -14,11 +14,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 x_bp = Blueprint("x", __name__, url_prefix="/api/x")
-
-
-class XssType(StrEnum):
-    REFLECTED = "reflected"
-    STORED = "stored"
 
 
 @x_bp.route("/<flavor>/<uid>", methods=["GET", "POST"])

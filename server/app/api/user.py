@@ -7,9 +7,9 @@ from app import db
 from app.api.models import (
     UNDEFINED,
     ChangePasswordModel,
+    EditUserModel,
     RegisterModel,
     SetMfaModel,
-    UserPatchModel,
 )
 from app.permissions import (
     Permission,
@@ -108,7 +108,7 @@ def delete_user(user_id: int):
 @authorization_required()
 @permissions(all_of={Permission.ADMIN})
 @validate()
-def edit_user(user_id: int, body: UserPatchModel):
+def edit_user(user_id: int, body: EditUserModel):
     current_user: User = get_current_user()
 
     if current_user.id == user_id:

@@ -1,4 +1,5 @@
 import re
+from enum import StrEnum
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -7,6 +8,21 @@ from werkzeug.exceptions import BadRequest
 DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 UNDEFINED = "__UNDEFINED__"
 UNDEFINED_TYPE = Literal["__UNDEFINED__"]
+
+
+class XssType(StrEnum):
+    REFLECTED = "reflected"
+    STORED = "stored"
+
+
+class ShortXssType(StrEnum):
+    REFLECTED = "r"
+    STORED = "s"
+
+
+class CodeType(StrEnum):
+    HTML = "html"
+    JAVASCRIPT = "js"
 
 
 class LoginModel(BaseModel):
@@ -76,15 +92,15 @@ class ChangePasswordModel(BaseModel):
         return self
 
 
-class UserPatchModel(BaseModel):
+class EditUserModel(BaseModel):
     is_admin: bool | UNDEFINED_TYPE = UNDEFINED
 
 
-class XssGenerateModel(BaseModel):
+class GenerateXssPayloadModel(BaseModel):
     client_id: int
     url: str
-    xss_type: Literal["r", "s"]
-    code_type: Literal["html", "js"]
+    xss_type: ShortXssType
+    code_type: CodeType
     to_gather: List[str]
     tags: List[str]
     custom_js: str
@@ -97,13 +113,13 @@ class XssGenerateModel(BaseModel):
         return v
 
 
-class ClientXssGetAllModel(BaseModel):
-    client_id: Optional[int] = None
-    type: Optional[Literal["reflected", "stored"]] = None
+class GetAllXssModel(BaseModel):
+    client_id: int
+    type: XssType
 
 
-class ClientLootGetModel(BaseModel):
-    client_id: Optional[int]
+class GetAllXssLootModel(BaseModel):
+    client_id: int
 
 
 class SetMfaModel(BaseModel):
