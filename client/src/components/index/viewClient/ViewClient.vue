@@ -97,15 +97,15 @@
         <b-form-select
           v-if="is_admin"
           id="input-field-owner"
-          v-model="client.owner"
-          :options="users_list"
+          v-model="client.owner_id"
+          :options="users_options"
           required
         ></b-form-select>
         <b-form-input
           v-else
           readonly
           id="input-field-owner"
-          v-model="client.owner"
+          v-model="users_by_id[client.owner_id]"
         ></b-form-input>
       </b-form-group>
       <div class="text-right">
@@ -137,13 +137,22 @@ export default {
     };
   },
   computed: {
-    users_list: {
+    users_options: {
       get() {
-        let list = [];
-        for (let value of Object.values(this.users)) {
-          list.push(value.username);
+        const users = [];
+        for (let user of Object.values(this.users)) {
+          users.push({ value: user.id, text: user.username });
         }
-        return list;
+        return users;
+      },
+    },
+    users_by_id: {
+      get() {
+        const users = {};
+        for (let user of Object.values(this.users)) {
+          users[user.id] = user.username;
+        }
+        return users;
       },
     },
   },
@@ -164,18 +173,10 @@ export default {
     patchClient() {
       const path = `${basePath}/client/${this.client_id}`;
 
-      let owner = "";
-
-      for (let value of Object.values(this.users)) {
-        if (value.username === this.client.owner) {
-          owner = value.id;
-        }
-      }
-
       const payload = {
         name: this.client.name,
         description: this.client.description,
-        owner: owner,
+        owner: this.client.owner_id,
       };
 
       if (this.client.mail_to !== null) {

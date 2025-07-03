@@ -1,27 +1,38 @@
 import json
 import logging
 import time
+from typing import Optional
 
 from app import db
-from app.api import bp
-from app.models import XSS, Client, Settings
+from app.api.models import XssType
 from app.notifications import EmailXssNotification, WebhookXssNotification
-from flask import request
+from app.schemas import XSS, Client, Settings
+from flask import Blueprint, request
 from flask_cors import cross_origin
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+x_bp = Blueprint("x", __name__, url_prefix="/api/x")
 
-@bp.route("/x/<flavor>/<uid>", methods=["GET", "POST"])
+
+@x_bp.route("/<flavor>/<uid>", methods=["GET", "POST"])
 @cross_origin()
 def catch_xss(flavor: str, uid: str):
-    client: Client = db.session.query(Client).filter_by(uid=uid).one_or_none()
+    client: Optional[Client] = db.session.execute(db.select(Client).filter_by(uid=uid)).scalar_one_or_none()
 
     if client is None:
         return {"msg": "OK"}
 
-    xss_type = "reflected" if flavor == "r" else "stored"
+    xss = _save_xss(client, flavor)
+
+    _handle_notifications(xss, client)
+
+    return {"msg": "OK"}
+
+
+def _save_xss(client: Client, flavor: str):
+    xss_type = XssType.REFLECTED if flavor == "r" else XssType.STORED
     ip_addr = request.headers["X-Forwarded-For"].split(", ")[0] if "X-Forwarded-For" in request.headers else request.remote_addr
 
     if request.method == "GET":
@@ -37,7 +48,7 @@ def catch_xss(flavor: str, uid: str):
     tags = []
 
     for param, value in parameters.items():
-        if not value in ["", "{}", "[]"]:
+        if value not in ["", "{}", "[]"]:
             if param == "cookies":
                 if "cookies" not in data.keys():
                     data["cookies"] = {}
@@ -73,9 +84,13 @@ def catch_xss(flavor: str, uid: str):
     db.session.add(xss)
     db.session.commit()
 
-    settings: Settings = db.session.query(Settings).one_or_none()
+    return xss
 
-    if settings.smtp_host is not None and (settings.mail_to is not None or xss.client.mail_to is not None):
+
+def _handle_notifications(xss: XSS, client: Client) -> None:
+    settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
+
+    if settings.smtp_host is not None and (settings.mail_to is not None or client.mail_to is not None):
         try:
             EmailXssNotification(xss=xss).send()
             settings.smtp_status = True
@@ -85,10 +100,8 @@ def catch_xss(flavor: str, uid: str):
             settings.smtp_status = False
             db.session.commit()
 
-    if settings.webhook_url is not None or xss.client.webhook_url is not None:
+    if settings.webhook_url is not None or client.webhook_url is not None:
         try:
             WebhookXssNotification(xss=xss).send()
         except Exception as e:
             logger.error(e)
-
-    return {"msg": "OK"}

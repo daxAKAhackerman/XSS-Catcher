@@ -1,22 +1,33 @@
 import os
-import random
-import string
+import uuid
 
 
 def get_db_url() -> str:
     if os.getenv("FLASK_DEBUG"):
+        # In dev, rely on username/password auth and use TCP/IP
         return "postgresql://postgres:postgres@localhost:5432/postgres"
     else:
-        return f'postgresql://postgres@/{os.getenv("POSTGRES_DB", "postgres")}'
+        # In prod, rely on peer/trust auth and use Unix domain socket
+        return "postgresql://postgres@/postgres"
 
 
-class Config:
-    SECRET_KEY = "".join(random.choice(string.ascii_letters + string.digits) for i in range(32))
+class BaseConfig:
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
     SQLALCHEMY_DATABASE_URI = get_db_url()
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_ACCESS_TOKEN_EXPIRES = 300
 
-    def __init__(self):
-        if os.getenv("FLASK_DEBUG"):
-            self.SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV"
-            self.JWT_ACCESS_TOKEN_EXPIRES = 3600
+
+class ProdConfig(BaseConfig):
+    SECRET_KEY = str(uuid.uuid4())
+    JWT_ACCESS_TOKEN_EXPIRES: int = 300
+
+
+class DevConfig(BaseConfig):
+    SECRET_KEY = "A_KEY_ONLY_USED_FOR_DEV"
+    JWT_ACCESS_TOKEN_EXPIRES = 3600
+
+
+def get_config() -> type:
+    if os.getenv("FLASK_DEBUG"):
+        return DevConfig
+    else:
+        return ProdConfig

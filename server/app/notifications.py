@@ -1,18 +1,17 @@
 import json
 import smtplib
 import ssl
-from abc import ABC, ABCMeta, abstractmethod
 from datetime import datetime
-from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from enum import IntEnum
-from typing import Any, Dict
+from typing import Any, cast
 
 import requests
 from app import db
-from app.models import XSS, Settings
+from app.schemas import XSS, Client, Settings, User
 from jinja2 import Environment, FileSystemLoader
+from werkzeug.exceptions import InternalServerError
 
 
 class WebhookType(IntEnum):
@@ -21,39 +20,33 @@ class WebhookType(IntEnum):
     AUTOMATION = 2
 
 
-class Notification(ABC):
-    @property
-    @abstractmethod
-    def message(self) -> Any:  # pragma: no cover
-        pass
-
-    @abstractmethod
-    def send(self) -> None:  # pragma: no cover
-        pass
-
-
-class EmailNotification(Notification, metaclass=ABCMeta):
+class EmailNotification:
     email_to: str
     email_from: str
     settings: Settings
 
     def __init__(self) -> None:
-        self.settings: Settings = db.session.query(Settings).one_or_none()
-        self.email_from = self.settings.mail_from
+        self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
+        if self.settings.mail_from is None:
+            raise InternalServerError("Cannot initialize EmailNotification without mail_from setting")
+        else:
+            self.email_from = self.settings.mail_from
 
     @property
-    @abstractmethod
-    def message(self) -> MIMEBase:  # pragma: no cover
-        pass
+    def message(self) -> Any:  # pragma: no cover
+        raise NotImplementedError()
 
-    def send(self):
+    def send(self) -> None:
+        if self.settings.smtp_host is None or self.settings.smtp_port is None:
+            raise InternalServerError("Cannot send EmailNotification without smtp_host and smtp_port settings")
+
         user = self.settings.smtp_user
         password = self.settings.smtp_pass
 
         if self.settings.ssl_tls:
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL(self.settings.smtp_host, self.settings.smtp_port, context=context) as server:
-                if user is not None:
+                if user is not None and password is not None:
                     server.login(user, password)
                 server.sendmail(self.email_from, self.email_to, self.message.as_string())
 
@@ -61,27 +54,32 @@ class EmailNotification(Notification, metaclass=ABCMeta):
             with smtplib.SMTP(self.settings.smtp_host, self.settings.smtp_port) as server:
                 if self.settings.starttls:
                     server.starttls()
-                if user is not None:
+                if user is not None and password is not None:
                     server.login(user, password)
                 server.sendmail(self.email_from, self.email_to, self.message.as_string())
 
 
 class EmailXssNotification(EmailNotification):
     xss: XSS
+    client: Client
 
     def __init__(self, xss: XSS) -> None:
         super().__init__()
         self.xss = xss
-        self.email_to = self.xss.client.mail_to or self.settings.mail_to
+        self.client = cast(Client, self.xss.client)  # type: ignore
+        if email_to := self.client.mail_to or self.settings.mail_to:
+            self.email_to = email_to
+        else:
+            raise InternalServerError("Cannot initialize EmailXssNotification without global or client mail_to setting")
 
     @property
     def message(self) -> MIMEMultipart:
         j2_environment = Environment(loader=FileSystemLoader("app/templates"))
         email_template = j2_environment.get_template("email_notification.html")
 
-        text_content = f"XSS Catcher just caught a new {self.xss.xss_type} XSS for client {self.xss.client.name}"
+        text_content = f"XSS Catcher just caught a new {self.xss.xss_type} XSS for client {self.client.name}"
         html_content = email_template.render(
-            client_name=self.xss.client.name,
+            client_name=self.client.name,
             xss_type=self.xss.xss_type,
             timestamp=datetime.fromtimestamp(self.xss.timestamp),
             ip_address=self.xss.ip_addr,
@@ -91,7 +89,7 @@ class EmailXssNotification(EmailNotification):
         message = MIMEMultipart("alternative")
         message["To"] = self.email_to
         message["From"] = f"XSS Catcher <{self.email_from}>"
-        message["Subject"] = f"Captured {self.xss.xss_type} XSS for client {self.xss.client.name}"
+        message["Subject"] = f"Captured {self.xss.xss_type} XSS for client {self.client.name}"
         message.attach(MIMEText(text_content, "plain"))
         message.attach(MIMEText(html_content, "html"))
 
@@ -112,72 +110,80 @@ class EmailTestNotification(EmailNotification):
         return message
 
 
-class WebhookNotification(Notification, metaclass=ABCMeta):
+class WebhookNotification:
     settings: Settings
     webhook_type: int
     webhook_url: str
 
     def __init__(self) -> None:
-        self.settings: Settings = db.session.query(Settings).one_or_none()
-        self.webhook_type = self.settings.webhook_type
-
-    @property
-    def message(self) -> Dict[str, Any]:
-        if self.webhook_type == WebhookType.AUTOMATION.value:
-            return self.automation_message
-        elif self.webhook_type == WebhookType.DISCORD.value:
-            return self.discord_message
+        self.settings: Settings = db.session.execute(db.select(Settings)).scalar_one()
+        if self.settings.webhook_type is None:
+            raise InternalServerError("Cannot initialize WebhookNotification without webhook_type setting")
         else:
-            return self.slack_message
+            self.webhook_type = self.settings.webhook_type
 
     @property
-    @abstractmethod
-    def slack_message(self) -> Dict[str, Any]:  # pragma: no cover
-        pass
+    def message(self) -> dict[str, Any]:
+        match self.webhook_type:
+            case WebhookType.SLACK:
+                return self.slack_message
+            case WebhookType.DISCORD:
+                return self.discord_message
+            case _:
+                return self.automation_message
 
     @property
-    @abstractmethod
-    def discord_message(self) -> Dict[str, Any]:  # pragma: no cover
-        pass
+    def slack_message(self) -> dict[str, Any]:  # pragma: no cover
+        raise NotImplementedError()
 
     @property
-    @abstractmethod
-    def automation_message(self) -> Dict[str, Any]:  # pragma: no cover
-        pass
+    def discord_message(self) -> dict[str, Any]:  # pragma: no cover
+        raise NotImplementedError()
 
-    def send(self):
+    @property
+    def automation_message(self) -> dict[str, Any]:  # pragma: no cover
+        raise NotImplementedError()
+
+    def send(self) -> None:
         requests.post(url=self.webhook_url, json=self.message)
 
 
 class WebhookXssNotification(WebhookNotification):
     xss: XSS
+    client: Client
+    owner: User
 
     def __init__(self, xss: XSS) -> None:
         super().__init__()
         self.xss = xss
-        self.webhook_url = xss.client.webhook_url or self.settings.webhook_url
+        self.client = cast(Client, self.xss.client)  # type:ignore
+        self.owner = cast(User, self.client.owner)  # type:ignore
+        if webhook_url := self.client.webhook_url or self.settings.webhook_url:
+            self.webhook_url = webhook_url
+        else:
+            raise InternalServerError("Cannot initialize WebhookXssNotification without global or client webhook_url setting")
 
     @property
-    def slack_message(self) -> Dict[str, Any]:
+    def slack_message(self) -> dict[str, Any]:
         return {
-            "text": f"XSS Catcher just caught a new {self.xss.xss_type} XSS for client {self.xss.client.name}",
+            "text": f"XSS Catcher just caught a new {self.xss.xss_type} XSS for client {self.client.name}",
             "blocks": [
                 {
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*XSS Catcher just caught a new XSS*",
+                        "text": "*XSS Catcher just caught a new XSS*",
                     },
                 },
                 {
                     "type": "section",
                     "fields": [
-                        {"type": "mrkdwn", "text": f":bust_in_silhouette: *Client:* {self.xss.client.name}"},
+                        {"type": "mrkdwn", "text": f":bust_in_silhouette: *Client:* {self.client.name}"},
                         {"type": "mrkdwn", "text": f":lock: *XSS type:* {self.xss.xss_type}"},
                         {"type": "mrkdwn", "text": f":calendar: *Timestamp:* {datetime.fromtimestamp(self.xss.timestamp)} (UTC)"},
                         {"type": "mrkdwn", "text": f":globe_with_meridians: *IP address:* {self.xss.ip_addr}"},
-                        {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(self.xss.tags)) or '_None_'}"},
-                        {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(self.xss.data))}"},
+                        {"type": "mrkdwn", "text": f":label: *Tags:* {', '.join(json.loads(self.xss.tags or '[]')) or '_None_'}"},
+                        {"type": "mrkdwn", "text": f":floppy_disk: *Data collected:* {len(json.loads(self.xss.data or '{}'))}"},
                     ],
                 },
                 {"type": "divider"},
@@ -185,13 +191,13 @@ class WebhookXssNotification(WebhookNotification):
         }
 
     @property
-    def discord_message(self) -> Dict[str, Any]:
+    def discord_message(self) -> dict[str, Any]:
         return {
-            "content": f"**XSS Catcher just caught a new XSS**",
+            "content": "**XSS Catcher just caught a new XSS**",
             "embeds": [
                 {
                     "fields": [
-                        {"inline": True, "name": ":bust_in_silhouette: **Client**", "value": self.xss.client.name},
+                        {"inline": True, "name": ":bust_in_silhouette: **Client**", "value": self.client.name},
                         {"inline": True, "name": ":lock: **XSS type**", "value": self.xss.xss_type},
                         {"inline": True, "name": ":calendar: **Timestamp**", "value": f"{datetime.fromtimestamp(self.xss.timestamp)} (UTC)"},
                         {"inline": True, "name": ":globe_with_meridians: **IP address**", "value": self.xss.ip_addr},
@@ -203,7 +209,7 @@ class WebhookXssNotification(WebhookNotification):
         }
 
     @property
-    def automation_message(self) -> Dict[str, Any]:
+    def automation_message(self) -> dict[str, Any]:
         return {
             "xss": {
                 "id": self.xss.id,
@@ -215,11 +221,11 @@ class WebhookXssNotification(WebhookNotification):
                 "captured_data": list(json.loads(self.xss.data).keys()),
                 "captured_headers": list(json.loads(self.xss.headers).keys()),
             },
-            "client": {"id": self.xss.client.id, "uid": self.xss.client.uid, "name": self.xss.client.name, "description": self.xss.client.description},
+            "client": {"id": self.client.id, "uid": self.client.uid, "name": self.client.name, "description": self.client.description},
             "user": {
-                "id": self.xss.client.owner.id,
-                "username": self.xss.client.owner.username,
-                "admin": self.xss.client.owner.is_admin,
+                "id": self.owner.id,
+                "username": self.owner.username,
+                "admin": self.owner.is_admin,
             },
         }
 
@@ -230,13 +236,13 @@ class WebhookTestNotification(WebhookNotification):
         self.webhook_url = webhook_url
 
     @property
-    def slack_message(self) -> Dict[str, str]:
+    def slack_message(self) -> dict[str, str]:
         return {"text": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}
 
     @property
-    def discord_message(self) -> Dict[str, str]:
+    def discord_message(self) -> dict[str, str]:
         return {"content": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}
 
     @property
-    def automation_message(self) -> Dict[str, str]:
+    def automation_message(self) -> dict[str, str]:
         return {"msg": "This is a test webhook from XSS catcher. If you are getting this, it's because your webhook configuration works."}

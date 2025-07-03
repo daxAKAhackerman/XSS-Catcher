@@ -1,14 +1,18 @@
+from typing import Optional
+
 import pyotp
 from app import db
-from app.api import bp
 from app.api.models import LoginModel
-from app.models import BlockedJti, User
 from app.permissions import authorization_required, get_current_user
+from app.schemas import BlockedJti, User
+from flask import Blueprint
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt
 from flask_pydantic import validate
 
+auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-@bp.route("/auth/login", methods=["POST"])
+
+@auth_bp.route("/login", methods=["POST"])
 @authorization_required(optional=True)
 @validate()
 def login(body: LoginModel):
@@ -17,7 +21,7 @@ def login(body: LoginModel):
     if current_user:
         return {"msg": "Already logged in"}, 400
 
-    user: User = db.session.query(User).filter_by(username=body.username).one_or_none()
+    user: Optional[User] = db.session.execute(db.select(User).filter_by(username=body.username)).scalar_one_or_none()
     if user is None or not user.check_password(body.password):
         return {"msg": "Bad username or password"}, 403
 
@@ -30,14 +34,14 @@ def login(body: LoginModel):
     return {"access_token": create_access_token(user.username), "refresh_token": create_refresh_token(user.username)}
 
 
-@bp.route("/auth/refresh", methods=["POST"])
+@auth_bp.route("/refresh", methods=["POST"])
 @authorization_required(refresh=True)
-def refresh():
+def refresh_token():
     current_user: User = get_current_user()
     return {"access_token": create_access_token(identity=current_user.username)}
 
 
-@bp.route("/auth/logout", methods=["POST"])
+@auth_bp.route("/logout", methods=["POST"])
 @authorization_required(refresh=True)
 def logout():
     jti = get_jwt()["jti"]
