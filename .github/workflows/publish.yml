@@ -8,6 +8,8 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     env:
       REPO_NAME: daxhackerman/xss-catcher
     steps:
@@ -33,11 +35,11 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: ${{env.REPO_NAME}}:${{ github.event.release.tag_name }},${{env.REPO_NAME}}:latest
+          tags: ${{ env.REPO_NAME }}:${{ env.CLEAN_TAG }},${{ env.REPO_NAME }}:latest
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/${{env.REPO_NAME}}
+          subject-name: index.docker.io/${{ env.REPO_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
