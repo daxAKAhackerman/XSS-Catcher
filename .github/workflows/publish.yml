@@ -33,11 +33,11 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: true
-          tags: $REPO_NAME:${{ github.event.release.tag_name }},$REPO_NAME:latest
+          tags: ${{env.REPO_NAME}}:${{ github.event.release.tag_name }},${{env.REPO_NAME}}:latest
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: index.docker.io/$REPO_NAME
+          subject-name: index.docker.io/${{env.REPO_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
