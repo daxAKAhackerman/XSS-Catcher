@@ -9,6 +9,9 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     permissions:
+      packages: write
+      contents: read
+      attestations: write
       id-token: write
     env:
       REPO_NAME: daxhackerman/xss-catcher
