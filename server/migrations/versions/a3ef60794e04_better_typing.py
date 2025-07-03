@@ -1,8 +1,8 @@
-"""Add better typing
+"""Better typing
 
-Revision ID: 8b8c263029bf
+Revision ID: a3ef60794e04
 Revises: 06ce8ca0fea4
-Create Date: 2025-06-22 21:11:43.727421
+Create Date: 2025-07-03 10:30:03.189788
 
 """
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "8b8c263029bf"
+revision = "a3ef60794e04"
 down_revision = "06ce8ca0fea4"
 branch_labels = None
 depends_on = None
