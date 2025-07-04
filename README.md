@@ -6,7 +6,8 @@
   <br>
 </h1>
 <h4 align="center">A blind XSS detection and XSS data capture framework that runs on <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a>, <a href="https://vuejs.org/" target="_blank">VueJS</a> and <a href="https://www.postgresql.org/" target="_blank">PostgreSQL</a>.</h4>
-XSS Catcher is an intuitive tool that automates blind Cross-Site Scripting (XSS) attacks and data gathering, including screenshots. It features a user-friendly payload generator for creating customizable XSS payloads and offers robust functionalities like webhook and email notifications, multi-factor authentication, and multi-user access. Designed to be straightforward, it integrates easily with platforms such as Slack and Discord, captures comprehensive data including cookies, local storage, and session storage, and provides detailed insights like HTTP headers and DOM snapshots. Additionally, it supports API keys for advanced automation, streamlining XSS testing and making complex attack scenarios more accessible and manageable.
+XSS Catcher is an intuitive tool that automates blind Cross-Site Scripting (XSS) attacks and data gathering, including screenshots. It features a user-friendly payload generator for creating customizable XSS payloads and offers functionalities like webhook and email notifications, multi-factor authentication, and multi-user access. Designed to be straightforward, it integrates easily with platforms such as Slack and Discord, captures comprehensive data including cookies, local storage, and session storage, and provides detailed insights like HTTP headers and DOM snapshots. Additionally, it supports API keys for advanced automation, streamlining XSS testing and making complex attack scenarios more accessible and manageable.
+
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#installation">Installation</a> •
@@ -104,11 +105,13 @@ In order to avoid JavaScript mixed content errors when the XSS payload is trigge
 
 ## Disclaimer
 
-Usage of this tool for attacking targets without prior mutual consent is illegal. It is the end user’s responsibility to obey all applicable local, state and federal laws. We assume no liability and are not responsible for any misuse or damage caused by this tool.
+Usage of this tool for attacking targets without prior mutual consent is illegal. It is the end user's responsibility to obey all applicable local, state and federal laws. We assume no liability and are not responsible for any misuse or damage caused by this tool.
 
 ## You may also like...
 
 - [Simple One Time Secret](https://github.com/daxAKAhackerman/simple-one-time-secret) - Generate single use, expiring links to share sensitive information
+- [Testing TOR network](https://github.com/daxAKAhackerman/testing-tor-network) - CLI tool to setup a testing TOR network with Docker
+- [Tor HashedControlPassword Brute](https://github.com/daxAKAhackerman/tor-hashed-control-password-brute) - C program to execute a dictionary attack against a Tor HashedControlPassword value
 
 ---
 
