@@ -9,10 +9,10 @@ Flask-Cors = "==6.0.1"
 Flask-JWT-Extended = "==4.7.1"
 Flask-Migrate = "==4.1.0"
 Flask-SQLAlchemy = "==3.1.1"
-requests = "==2.32.4"
+requests = "==2.32.5"
 Flask-Pydantic = "==0.13.1"
 waitress = "==3.0.2"
-pydantic = {extras = ["email"], version = "==2.11.7"}
+pydantic = {extras = ["email"], version = "==2.11.9"}
 psycopg2-binary = "==2.9.10"
 pyotp = "==2.9.0"
 pyqrcode = "==1.2.1"
