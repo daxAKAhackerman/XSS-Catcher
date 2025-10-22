@@ -19,10 +19,10 @@ build-image:
 	docker build -t xsscatcher -f docker/Dockerfile .
 
 build-collector-script:
-		cd $(COLLECTOR_SCRIPT_DIR) && npx webpack
+	cd $(COLLECTOR_SCRIPT_DIR) && npx webpack
 
 build-frontend:
-		npm run --prefix $(SRC_CLIENT_DIR) build
+	npm run --prefix $(SRC_CLIENT_DIR) build
 
 lock-requirements:
 	pipenv requirements > $(SRC_SERVER_DIR)/requirements.txt
